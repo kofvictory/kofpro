@@ -10,7 +10,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "electron:compile": "tsc -p electron/tsconfig.json",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:dev": "npm run electron:compile && concurrently \"npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
     "electron:build": "npm run build && npm run electron:compile && electron-builder build",
     "electron:build:win-arm64": "npm run build && npm run electron:compile && electron-builder build --win --arm64"
   },
