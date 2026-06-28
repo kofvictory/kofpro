@@ -2,6 +2,7 @@
 
 import NavTabs from '@/components/NavTabs'
 import QuickCapture from '@/components/QuickCapture'
+import DesktopAgent from '@/components/DesktopAgent'
 import { RefreshProvider } from '@/lib/refresh-context'
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
         <main>{children}</main>
       </div>
+      <DesktopAgent />
     </RefreshProvider>
   )
 }
