@@ -5,6 +5,10 @@ node_modules/
 .next/
 out/
 
+# electron build outputs
+dist-electron/
+dist/
+
 # env
 .env*.local
 
