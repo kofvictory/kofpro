@@ -19,3 +19,4 @@ tsconfig.tsbuildinfo
 # misc
 .DS_Store
 *.pem
+next-env.d.ts

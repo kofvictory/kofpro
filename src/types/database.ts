@@ -105,22 +105,25 @@ export type Database = {
           created_by?: string
         }
         Update: Partial<Entry>
+        Relationships: []
       }
       areas: {
         Row: Area
         Insert: Omit<Area, 'id' | 'created_at'> & { id?: string }
         Update: Partial<Area>
+        Relationships: []
       }
       projects: {
         Row: Project
         Insert: Omit<Project, 'id' | 'created_at' | 'updated_at'> & { id?: string }
         Update: Partial<Project>
+        Relationships: []
       }
     }
     Views: {
-      inbox_view: { Row: InboxView }
-      active_view: { Row: ActiveView }
-      today_view: { Row: TodayView }
+      inbox_view: { Row: InboxView; Relationships: [] }
+      active_view: { Row: ActiveView; Relationships: [] }
+      today_view: { Row: TodayView; Relationships: [] }
     }
     Functions: Record<string, never>
     Enums: {
