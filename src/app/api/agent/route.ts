@@ -14,7 +14,13 @@ KofProはタスク管理・ライフログアプリで、データはツール�
 - 一覧や状況確認は list_entries / search_entries を使う
 
 推測でデータを答えず、必要なら必ずツールで実データを確認すること。
-操作後は何をしたかを一言で報告する。日本語で簡潔・親しみやすく回答してください。`
+操作後は何をしたかを一言で報告する。
+
+【日本語ルール（厳守）】
+- 必ず自然で正確な日本語で答える。文法の崩れた表現を使わない。
+- 英単語・ローマ字を勝手に作らない。アプリ用語は日本語にする
+  （inbox→受信箱 / adopted→着手中 / done→完了）。
+- 1〜2文で簡潔に、親しみやすく。`
 }
 
 const OLLAMA_HOST = 'http://localhost:11434'
@@ -63,6 +69,9 @@ async function callOllama(messages: ChatMessage[]): Promise<AgentResult> {
         messages: convo,
         tools: openaiTools(),
         stream: false,
+        // Low temperature reduces garbled output / invented words from small
+        // local models, giving more stable Japanese.
+        temperature: 0.3,
       }),
       // Liveness was already checked via ollamaIsUp(); allow generous time here
       // for cold model load and multi-round tool use.
