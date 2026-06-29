@@ -17,9 +17,28 @@ KofProはタスク管理・ライフログアプリで、データはツール�
 操作後は何をしたかを一言で報告する。日本語で簡潔・親しみやすく回答してください。`
 }
 
-const OLLAMA_URL = 'http://localhost:11434/v1/chat/completions'
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'phi4-mini'
+const OLLAMA_HOST = 'http://localhost:11434'
+const OLLAMA_URL = `${OLLAMA_HOST}/v1/chat/completions`
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'qwen2.5'
 const MAX_TOOL_ROUNDS = 6
+// Cold-loading a 7B model into memory can take much longer than a few seconds,
+// so we detect "Ollama is up" with a fast ping, then allow generous time for
+// the actual generation (model load + tool-use rounds).
+const OLLAMA_PING_TIMEOUT = 2500
+const OLLAMA_GEN_TIMEOUT = 120000
+
+// Quick liveness check so we fail over to the cloud fast when Ollama is down,
+// without killing a legitimately slow first token (cold model load).
+async function ollamaIsUp(): Promise<boolean> {
+  try {
+    const res = await fetch(`${OLLAMA_HOST}/api/tags`, {
+      signal: AbortSignal.timeout(OLLAMA_PING_TIMEOUT),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
 
 // Tools that change data — the UI should refresh task lists after these run.
 const MUTATING_TOOLS = new Set(['create_entry', 'update_entry'])
@@ -45,8 +64,9 @@ async function callOllama(messages: ChatMessage[]): Promise<AgentResult> {
         tools: openaiTools(),
         stream: false,
       }),
-      // First round must fail fast if Ollama is down; later rounds can take longer.
-      signal: AbortSignal.timeout(round === 0 ? 8000 : 60000),
+      // Liveness was already checked via ollamaIsUp(); allow generous time here
+      // for cold model load and multi-round tool use.
+      signal: AbortSignal.timeout(OLLAMA_GEN_TIMEOUT),
     })
     if (!res.ok) throw new Error(`Ollama ${res.status}`)
 
@@ -129,12 +149,25 @@ async function callAnthropic(messages: ChatMessage[]): Promise<AgentResult> {
 export async function POST(req: NextRequest) {
   const { messages } = await req.json()
 
-  // 1. Try local Ollama (NPU/GPU accelerated on Snapdragon X via Vulkan)
-  try {
-    const { content, mutated } = await callOllama(messages)
-    return NextResponse.json({ content, mutated, backend: 'ollama' })
-  } catch {
-    // Ollama not running — fall through
+  // 1. Try local Ollama (NPU/GPU accelerated on Snapdragon X via Vulkan).
+  //    Ping first so a genuinely-down Ollama fails over fast, while a running
+  //    one is given plenty of time to cold-load the model.
+  if (await ollamaIsUp()) {
+    try {
+      const { content, mutated } = await callOllama(messages)
+      return NextResponse.json({ content, mutated, backend: 'ollama' })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      // Ollama is up but the request failed (e.g. model not pulled). Surface
+      // it instead of silently falling through to the cloud.
+      if (!process.env.ANTHROPIC_API_KEY) {
+        return NextResponse.json(
+          { error: `Ollama エラー: ${message}（モデル名や \`ollama pull\` を確認してください）` },
+          { status: 502 }
+        )
+      }
+      // else fall through to Anthropic
+    }
   }
 
   // 2. Fall back to Anthropic cloud API
