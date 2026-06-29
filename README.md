@@ -27,11 +27,14 @@
 
 | ツール | 用途 |
 |--------|------|
-| `list_entries` | 状態/種別で一覧 (inbox/adopted/done…) |
+| `list_entries` | 状態/種別/稼働量(effort)で一覧 (inbox/adopted/done…) |
+| `list_today` | 今日やること (adopted かつ期限が今日以前) |
 | `search_entries` | キーワード検索 |
-| `create_entry` | タスク/アイデア/予定の作成 |
-| `update_entry` | 状態変更・next_action・優先度・期限の設定 |
+| `create_entry` | タスク/アイデア/予定の作成 (effort 指定可) |
+| `update_entry` | 状態変更・next_action・優先度・稼働量・期限の設定 |
 | `list_areas` | 領域一覧 (分類用) |
+
+> effort: `quick`=15分 / `short`=1時間 / `deep`=じっくり
 
 作成・更新が走ると画面のタスク一覧は自動でリフレッシュされる。
 

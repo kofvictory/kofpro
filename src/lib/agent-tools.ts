@@ -19,6 +19,7 @@ export type ToolDef = {
 
 const STATUS_VALUES = ['inbox', 'adopted', 'declined', 'someday', 'done', 'archived']
 const KIND_VALUES = ['task', 'idea', 'log', 'note', 'decision', 'event']
+const EFFORT_VALUES = ['quick', 'short', 'deep'] // 15分 / 1時間 / じっくり
 
 export const TOOLS: ToolDef[] = [
   {
@@ -31,9 +32,21 @@ export const TOOLS: ToolDef[] = [
       properties: {
         status: { type: 'string', enum: STATUS_VALUES, description: '絞り込む状態' },
         kind: { type: 'string', enum: KIND_VALUES, description: '絞り込む種別' },
+        effort: {
+          type: 'string',
+          enum: EFFORT_VALUES,
+          description: '稼働量で絞込 (quick=15分/short=1時間/deep=じっくり)',
+        },
         limit: { type: 'number', description: '最大件数 (既定20)' },
       },
     },
+  },
+  {
+    name: 'list_today',
+    description:
+      '今日やるべきタスクを取得する。着手中(adopted)かつ期限が今日以前のものを' +
+      '期限順で返す。「今日やることは？」「今日のタスク」と聞かれたら使う。',
+    parameters: { type: 'object', properties: {} },
   },
   {
     name: 'search_entries',
@@ -63,6 +76,11 @@ export const TOOLS: ToolDef[] = [
           enum: ['low', 'medium', 'high', 'urgent'],
           description: '優先度',
         },
+        effort: {
+          type: 'string',
+          enum: EFFORT_VALUES,
+          description: '稼働量 (quick=15分/short=1時間/deep=じっくり)',
+        },
         due_at: { type: 'string', description: '期限 (ISO8601, 例 2026-07-01T14:00:00)' },
         area_slug: {
           type: 'string',
@@ -87,6 +105,11 @@ export const TOOLS: ToolDef[] = [
           type: 'string',
           enum: ['low', 'medium', 'high', 'urgent'],
           description: '優先度',
+        },
+        effort: {
+          type: 'string',
+          enum: EFFORT_VALUES,
+          description: '稼働量 (quick=15分/short=1時間/deep=じっくり)',
         },
         due_at: { type: 'string', description: '期限 (ISO8601)' },
       },
@@ -129,10 +152,20 @@ export async function executeTool(name: string, input: ToolInput): Promise<unkno
       let q = supabase.from('entries').select(ENTRY_FIELDS)
       if (typeof input.status === 'string') q = q.eq('status', input.status)
       if (typeof input.kind === 'string') q = q.eq('kind', input.kind)
+      if (typeof input.effort === 'string') q = q.eq('effort', input.effort)
       const limit = typeof input.limit === 'number' ? input.limit : 20
       const { data, error } = await q.order('created_at', { ascending: false }).limit(limit)
       if (error) return { error: error.message }
       return { count: data?.length ?? 0, entries: data ?? [] }
+    }
+
+    case 'list_today': {
+      // today_view: adopted かつ due_at が今日以前のものを期限順で返す
+      const { data, error } = await supabase
+        .from('today_view')
+        .select('id, title, next_action, area, due_at, priority')
+      if (error) return { error: error.message }
+      return { count: data?.length ?? 0, today: data ?? [] }
     }
 
     case 'search_entries': {
@@ -163,6 +196,7 @@ export async function executeTool(name: string, input: ToolInput): Promise<unkno
         kind: (input.kind as string) ?? 'idea',
         body: (input.body as string) ?? null,
         priority: (input.priority as string) ?? null,
+        effort: (input.effort as string) ?? null,
         due_at: (input.due_at as string) ?? null,
         area_id: areaId,
         source: 'agent',
@@ -185,13 +219,14 @@ export async function executeTool(name: string, input: ToolInput): Promise<unkno
       if (typeof input.status === 'string') patch.status = input.status
       if (typeof input.next_action === 'string') patch.next_action = input.next_action
       if (typeof input.priority === 'string') patch.priority = input.priority
+      if (typeof input.effort === 'string') patch.effort = input.effort
       if (typeof input.due_at === 'string') patch.due_at = input.due_at
       if (Object.keys(patch).length === 0) return { error: 'no fields to update' }
       const { data, error } = await supabase
         .from('entries')
         .update(patch as never)
         .eq('id', id)
-        .select('id, title, status, next_action, priority, due_at')
+        .select('id, title, status, next_action, priority, effort, due_at')
         .single()
       if (error) return { error: error.message }
       return { updated: data }
