@@ -26,7 +26,10 @@ KofProはタスク管理・ライフログアプリで、データはツール�
 - 1〜2文で簡潔に、親しみやすく。`
 }
 
-const OLLAMA_HOST = 'http://localhost:11434'
+// Defaults to Ollama (11434). Point this at any OpenAI/Ollama-compatible
+// server to switch runtimes — e.g. npurun on http://localhost:11435 for real
+// Snapdragon X NPU acceleration. Set OLLAMA_HOST in .env.local.
+const OLLAMA_HOST = process.env.OLLAMA_HOST ?? 'http://localhost:11434'
 const OLLAMA_URL = `${OLLAMA_HOST}/v1/chat/completions`
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'qwen2.5'
 const MAX_TOOL_ROUNDS = 6

@@ -24,6 +24,17 @@
 2. **Anthropic API** — Ollama 未起動時のフォールバック、または下記「賢いモード」
    (`ANTHROPIC_API_KEY` 必要)
 
+接続先は `OLLAMA_HOST` で差し替え可能 (OpenAI/Ollama互換サーバーなら何でも)。
+
+### NPU 推論 (実験的 / Snapdragon X)
+
+NPU(Hexagon) は ONNX 専用で GGUF は不可。NPU を実際に使うには別ランタイムが要る:
+
+- **[npurun](https://github.com/bpbonker/npurun)** … OpenAI/Ollama互換APIを
+  ポート `11435` で提供。`OLLAMA_HOST=http://localhost:11435` を指定すれば
+  本アプリは無改修で接続可。要 QAIRT SDK + Rust。対応は概ね4Bまで。
+- **AnythingLLM** / **Foundry Local** … GUI/MS公式の NPU 対応ランタイム。
+
 ### 賢いモード (Claude)
 
 チャットヘッダーの **🧠 賢い** トグルを ON にすると、その後の発言は
