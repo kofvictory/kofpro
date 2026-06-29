@@ -63,6 +63,8 @@
 | `create_entry` | 作成 (effort/優先度/期限/領域 指定可) |
 | `update_entry` | 状態・next_action・優先度・稼働量・期限の更新 |
 | `list_areas` | 領域一覧 |
+| `list_projects` / `set_entry_project` | プロジェクト一覧 / 紐付け |
+| `list_tags` / `tag_entry` / `find_entries_by_tag` | タグ一覧 / 付与 / 横断検索 |
 
 ## 4. 主要な設計判断・ハマりどころ
 
@@ -88,7 +90,7 @@ npm run electron:build:win-arm64
 ## 6. 拡張ロードマップ
 
 - **フェーズ1（実装済）**: 「今日やること」/ effort 稼働量フィルタ
-- **フェーズ2**: タグ・プロジェクト連携、トリアージ補助
+- **フェーズ2（実装済）**: タグ操作・プロジェクト連携（トリアージ補助は賢いモードのプロンプトで対応）
 - **フェーズ3**: 判断理由の振り返り(triage_decisions読取)、週次レビュー、agent_actions監査
 - **フェーズ4**: 音声入力、画像添付、能動的リマインド
 - **NPU化（実験）**: npurun へ `OLLAMA_HOST=http://localhost:11435` で接続
@@ -113,3 +115,4 @@ npm run electron:build:win-arm64
 - 2026-06-29｜feat｜🧠賢いモード(Claude)トグル追加 + NPU非対応の正確な記述に訂正
 - 2026-06-29｜feat｜OLLAMA_HOST を環境変数化（npurun 等のNPUランタイム接続用）
 - 2026-06-30｜feat｜賢いモード専用の強化プロンプト（高度推論・能動提案）+ Claude時 max_tokens 2048 + DEVLOG.md 新設
+- 2026-06-30｜feat｜フェーズ2: タグ操作(tag_entry/find_entries_by_tag/list_tags)とプロジェクト連携(list_projects/set_entry_project)を追加

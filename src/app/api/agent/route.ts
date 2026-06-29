@@ -17,6 +17,8 @@ KofProはタスク管理・ライフログアプリで、データはツール�
 - 「今日やることは？」と聞かれたら list_today を使う
 - 「15分でできること」等の稼働量での絞込は list_entries の effort を使う
 - 一覧や状況確認は list_entries / search_entries を使う
+- タグ操作: tag_entry(付与) / find_entries_by_tag(検索) / list_tags(一覧)
+- プロジェクト: list_projects(一覧) / set_entry_project(紐付け)
 
 推測でデータを答えず、必要なら必ずツールで実データを確認すること。
 操作後は何をしたかを一言で報告する。
@@ -74,7 +76,12 @@ async function ollamaIsUp(): Promise<boolean> {
 }
 
 // Tools that change data — the UI should refresh task lists after these run.
-const MUTATING_TOOLS = new Set(['create_entry', 'update_entry'])
+const MUTATING_TOOLS = new Set([
+  'create_entry',
+  'update_entry',
+  'set_entry_project',
+  'tag_entry',
+])
 
 type ChatMessage = { role: string; content: string }
 type AgentResult = { content: string; mutated: boolean }

@@ -121,6 +121,58 @@ export const TOOLS: ToolDef[] = [
     description: '領域(area)の一覧を取得する。create_entry の area_slug を決めるのに使う。',
     parameters: { type: 'object', properties: {} },
   },
+  {
+    name: 'list_projects',
+    description:
+      'プロジェクトの一覧を取得する。「〇〇プロジェクト関連を見せて」等で、' +
+      'まず対象プロジェクトを特定するのに使う。',
+    parameters: { type: 'object', properties: {} },
+  },
+  {
+    name: 'set_entry_project',
+    description:
+      'エントリーをプロジェクトに紐付ける。project_title はlist_projectsの' +
+      'タイトル(部分一致可)。「これを〇〇プロジェクトに入れて」で使う。',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: '対象エントリーのUUID(必須)' },
+        project_title: { type: 'string', description: 'プロジェクト名(部分一致可、必須)' },
+      },
+      required: ['id', 'project_title'],
+    },
+  },
+  {
+    name: 'list_tags',
+    description: 'タグの一覧を取得する。タグ付けや検索の前に存在するタグを確認するのに使う。',
+    parameters: { type: 'object', properties: {} },
+  },
+  {
+    name: 'tag_entry',
+    description:
+      'エントリーにタグを付ける。tag_slug が未登録なら自動作成する。' +
+      '「これに#〇〇を付けて」で使う。',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: '対象エントリーのUUID(必須)' },
+        tag_slug: { type: 'string', description: 'タグのslug(英数字, 必須)' },
+        tag_name: { type: 'string', description: 'タグ表示名(省略時はslugを使用)' },
+      },
+      required: ['id', 'tag_slug'],
+    },
+  },
+  {
+    name: 'find_entries_by_tag',
+    description: '指定したタグが付いたエントリーを検索する。「#〇〇のメモを全部出して」で使う。',
+    parameters: {
+      type: 'object',
+      properties: {
+        tag_slug: { type: 'string', description: 'タグのslug(必須)' },
+      },
+      required: ['tag_slug'],
+    },
+  },
 ]
 
 // --- Format adapters -------------------------------------------------------
@@ -239,6 +291,86 @@ export async function executeTool(name: string, input: ToolInput): Promise<unkno
         .order('sort_order')
       if (error) return { error: error.message }
       return { areas: data ?? [] }
+    }
+
+    case 'list_projects': {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, title, description, status, area_id')
+        .order('created_at', { ascending: false })
+      if (error) return { error: error.message }
+      return { count: data?.length ?? 0, projects: data ?? [] }
+    }
+
+    case 'set_entry_project': {
+      const id = String(input.id ?? '')
+      const title = String(input.project_title ?? '')
+      if (!id || !title) return { error: 'id と project_title は必須です' }
+      const { data: proj } = await supabase
+        .from('projects')
+        .select('id, title')
+        .ilike('title', `%${title}%`)
+        .limit(1)
+        .maybeSingle()
+      if (!proj) return { error: `プロジェクトが見つかりません: ${title}` }
+      const { data, error } = await supabase
+        .from('entries')
+        .update({ project_id: proj.id } as never)
+        .eq('id', id)
+        .select('id, title, project_id')
+        .single()
+      if (error) return { error: error.message }
+      return { updated: data, project: proj.title }
+    }
+
+    case 'list_tags': {
+      const { data, error } = await supabase.from('tags').select('slug, name').order('name')
+      if (error) return { error: error.message }
+      return { tags: data ?? [] }
+    }
+
+    case 'tag_entry': {
+      const id = String(input.id ?? '')
+      const slug = String(input.tag_slug ?? '')
+      if (!id || !slug) return { error: 'id と tag_slug は必須です' }
+      // Ensure the tag exists (create on demand).
+      let { data: tag } = await supabase.from('tags').select('id').eq('slug', slug).maybeSingle()
+      if (!tag) {
+        const name = (input.tag_name as string) ?? slug
+        const { data: created, error: tagErr } = await supabase
+          .from('tags')
+          .insert({ slug, name } as never)
+          .select('id')
+          .single()
+        if (tagErr) return { error: tagErr.message }
+        tag = created
+      }
+      // Link entry <-> tag (idempotent via upsert on the composite PK).
+      const { error } = await supabase
+        .from('entry_tags')
+        .upsert({ entry_id: id, tag_id: tag!.id } as never, { onConflict: 'entry_id,tag_id' })
+      if (error) return { error: error.message }
+      return { tagged: { entry_id: id, tag_slug: slug } }
+    }
+
+    case 'find_entries_by_tag': {
+      const slug = String(input.tag_slug ?? '')
+      if (!slug) return { error: 'tag_slug は必須です' }
+      const { data: tag } = await supabase
+        .from('tags')
+        .select('id')
+        .eq('slug', slug)
+        .maybeSingle()
+      if (!tag) return { count: 0, entries: [], note: `タグが存在しません: ${slug}` }
+      const { data: links } = await supabase
+        .from('entry_tags')
+        .select('entry_id')
+        .eq('tag_id', tag.id)
+      const ids = (links ?? []).map((l: { entry_id: string }) => l.entry_id)
+      if (ids.length === 0) return { count: 0, entries: [] }
+      const { data, error } = await supabase.from('entries').select(ENTRY_FIELDS).in('id', ids)
+      if (error) return { error: error.message }
+      return { count: data?.length ?? 0, entries: data ?? [] }
     }
 
     default:

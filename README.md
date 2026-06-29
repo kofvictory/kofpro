@@ -56,6 +56,11 @@ NPU(Hexagon) は ONNX 専用で GGUF は不可。NPU を実際に使うには別
 | `create_entry` | タスク/アイデア/予定の作成 (effort 指定可) |
 | `update_entry` | 状態変更・next_action・優先度・稼働量・期限の設定 |
 | `list_areas` | 領域一覧 (分類用) |
+| `list_projects` | プロジェクト一覧 |
+| `set_entry_project` | エントリーをプロジェクトに紐付け |
+| `list_tags` | タグ一覧 |
+| `tag_entry` | タグ付け (未登録slugは自動作成) |
+| `find_entries_by_tag` | タグでエントリー横断検索 |
 
 > effort: `quick`=15分 / `short`=1時間 / `deep`=じっくり
 
