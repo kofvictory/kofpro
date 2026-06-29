@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useRefresh } from '@/lib/refresh-context'
 
 type AgentState = 'idle' | 'thinking' | 'talking'
 type Message = { role: 'user' | 'assistant'; content: string }
@@ -90,6 +91,7 @@ export default function DesktopAgent() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const talkingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { trigger } = useRefresh()
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -118,6 +120,8 @@ export default function DesktopAgent() {
         const data = await res.json()
         const reply = data.error ?? data.content ?? 'エラーが発生しました。'
         setMessages((prev) => [...prev, { role: 'assistant', content: reply }])
+        // If the agent created/updated tasks, refresh the visible task lists.
+        if (data.mutated) trigger()
         setAgentState('talking')
         if (talkingTimerRef.current) clearTimeout(talkingTimerRef.current)
         talkingTimerRef.current = setTimeout(() => setAgentState('idle'), 2500)
@@ -129,7 +133,7 @@ export default function DesktopAgent() {
         setAgentState('idle')
       }
     },
-    [messages, agentState]
+    [messages, agentState, trigger]
   )
 
   const handleSubmit = (e: React.FormEvent) => {

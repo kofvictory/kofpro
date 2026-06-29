@@ -12,6 +12,39 @@
 
 クイックキャプチャは全画面の上部に常時表示（タイトルだけで inbox 登録）。
 
+## AIアシスタント「コフ」
+
+右下に常駐するアバター。クリックでチャットが開き、タスクの読み書きを代行する。
+
+### バックエンド (自動切替)
+
+1. **Ollama** (`localhost:11434`) — ローカル推論。起動していれば優先使用
+2. **Anthropic API** — Ollama 未起動時のフォールバック (`ANTHROPIC_API_KEY` 必要)
+
+### タスク連動 (Function Calling)
+
+コフは以下のツールで `entries` を直接操作できる:
+
+| ツール | 用途 |
+|--------|------|
+| `list_entries` | 状態/種別で一覧 (inbox/adopted/done…) |
+| `search_entries` | キーワード検索 |
+| `create_entry` | タスク/アイデア/予定の作成 |
+| `update_entry` | 状態変更・next_action・優先度・期限の設定 |
+| `list_areas` | 領域一覧 (分類用) |
+
+作成・更新が走ると画面のタスク一覧は自動でリフレッシュされる。
+
+> **モデル選定**: ツール使用には対応モデルが必要。`qwen2.5` や `llama3.1` を推奨
+> (`phi4-mini` はツール呼び出しが不安定)。`.env.local` の `OLLAMA_MODEL` で指定。
+
+## デスクトップアプリ (Electron)
+
+```bash
+npm run electron:dev          # 開発起動 (Next.js + Electron)
+npm run electron:build:win-arm64   # Windows ARM64 インストーラー生成
+```
+
 ## セットアップ
 
 ### 1. Supabase プロジェクト作成
