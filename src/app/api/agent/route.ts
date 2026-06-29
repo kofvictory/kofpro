@@ -159,11 +159,30 @@ async function callAnthropic(messages: ChatMessage[]): Promise<AgentResult> {
 }
 
 export async function POST(req: NextRequest) {
-  const { messages } = await req.json()
+  const { messages, prefer } = await req.json()
 
-  // 1. Try local Ollama (NPU/GPU accelerated on Snapdragon X via Vulkan).
-  //    Ping first so a genuinely-down Ollama fails over fast, while a running
-  //    one is given plenty of time to cold-load the model.
+  // Smart (hybrid) mode: user explicitly asked for the cloud model. Go straight
+  // to Anthropic for the best quality, skipping local Ollama entirely.
+  if (prefer === 'anthropic') {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { error: '賢いモードには .env.local に ANTHROPIC_API_KEY の設定が必要です。' },
+        { status: 503 }
+      )
+    }
+    try {
+      const { content, mutated } = await callAnthropic(messages)
+      return NextResponse.json({ content, mutated, backend: 'anthropic' })
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      return NextResponse.json({ error: `APIエラー: ${message}` }, { status: 500 })
+    }
+  }
+
+  // 1. Try local Ollama. Note: on Snapdragon X this runs on CPU — Ollama
+  //    (llama.cpp) does not use the Hexagon NPU; that needs a separate
+  //    QNN/ONNX Runtime stack. Ping first so a genuinely-down Ollama fails
+  //    over fast, while a running one is given time to cold-load the model.
   if (await ollamaIsUp()) {
     try {
       const { content, mutated } = await callOllama(messages)

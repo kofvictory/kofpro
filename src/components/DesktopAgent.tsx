@@ -88,6 +88,8 @@ export default function DesktopAgent() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [agentState, setAgentState] = useState<AgentState>('idle')
+  // Smart mode = route to the cloud model (Claude) for the best quality.
+  const [smartMode, setSmartMode] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const talkingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -115,7 +117,10 @@ export default function DesktopAgent() {
         const res = await fetch('/api/agent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: next }),
+          body: JSON.stringify({
+            messages: next,
+            prefer: smartMode ? 'anthropic' : undefined,
+          }),
         })
         const data = await res.json()
         const reply = data.error ?? data.content ?? 'エラーが発生しました。'
@@ -133,7 +138,7 @@ export default function DesktopAgent() {
         setAgentState('idle')
       }
     },
-    [messages, agentState, trigger]
+    [messages, agentState, trigger, smartMode]
   )
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -155,12 +160,27 @@ export default function DesktopAgent() {
             <div className="min-w-0">
               <div className="text-white font-semibold text-sm">コフ</div>
               <div className="text-purple-200 text-xs truncate">
-                {agentState === 'thinking' ? '考え中...' : 'KofPro アシスタント'}
+                {agentState === 'thinking'
+                  ? '考え中...'
+                  : smartMode
+                    ? '賢いモード (Claude)'
+                    : 'ローカル (Ollama)'}
               </div>
             </div>
             <button
+              onClick={() => setSmartMode((s) => !s)}
+              title={smartMode ? '賢いモード: ON (Claudeを使用)' : '賢いモード: OFF (ローカル)'}
+              className={`ml-auto flex-shrink-0 text-xs font-medium px-2 py-1 rounded-full transition-colors ${
+                smartMode
+                  ? 'bg-amber-300 text-amber-900'
+                  : 'bg-white/15 text-purple-100 hover:bg-white/25'
+              }`}
+            >
+              {smartMode ? '🧠 賢い' : '🧠 賢い'}
+            </button>
+            <button
               onClick={() => setIsOpen(false)}
-              className="ml-auto text-purple-200 hover:text-white transition-colors text-xl leading-none flex-shrink-0"
+              className="text-purple-200 hover:text-white transition-colors text-xl leading-none flex-shrink-0"
               aria-label="閉じる"
             >
               ×

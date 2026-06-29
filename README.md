@@ -16,10 +16,19 @@
 
 右下に常駐するアバター。クリックでチャットが開き、タスクの読み書きを代行する。
 
-### バックエンド (自動切替)
+### バックエンド (ハイブリッド)
 
-1. **Ollama** (`localhost:11434`) — ローカル推論。起動していれば優先使用
-2. **Anthropic API** — Ollama 未起動時のフォールバック (`ANTHROPIC_API_KEY` 必要)
+1. **Ollama** (`localhost:11434`) — ローカル推論。通常はこちらを使用
+   - 注: Snapdragon X では **CPU 推論**。Ollama(llama.cpp) は Hexagon NPU を
+     使わない (NPU 利用には QNN/ONNX Runtime 等の別スタックが必要)
+2. **Anthropic API** — Ollama 未起動時のフォールバック、または下記「賢いモード」
+   (`ANTHROPIC_API_KEY` 必要)
+
+### 賢いモード (Claude)
+
+チャットヘッダーの **🧠 賢い** トグルを ON にすると、その後の発言は
+ローカルをスキップして Claude (クラウド) に直接送られる。難しい相談や
+自然な日本語が欲しいときに使う。`ANTHROPIC_API_KEY` が必要。
 
 ### タスク連動 (Function Calling)
 
