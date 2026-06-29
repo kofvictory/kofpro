@@ -2,9 +2,11 @@ import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropicTools, openaiTools, executeTool } from '@/lib/agent-tools'
 
-function systemPrompt(): string {
+// `smart` = the request is served by Claude (賢いモード / cloud fallback).
+// In that case コフ is allowed richer reasoning and proactive助言.
+function systemPrompt(smart = false): string {
   const today = new Date().toISOString().slice(0, 10)
-  return `あなたはKofPro LifeLogのAIアシスタント「コフ」です。ユーザーの仕事と生活の一元管理をサポートします。
+  const base = `あなたはKofPro LifeLogのAIアシスタント「コフ」です。ユーザーの仕事と生活の一元管理をサポートします。
 今日の日付は ${today} です。
 
 KofProはタスク管理・ライフログアプリで、データはツールを通じて読み書きできます:
@@ -22,8 +24,27 @@ KofProはタスク管理・ライフログアプリで、データはツール�
 【日本語ルール（厳守）】
 - 必ず自然で正確な日本語で答える。文法の崩れた表現を使わない。
 - 英単語・ローマ字を勝手に作らない。アプリ用語は日本語にする
-  （inbox→受信箱 / adopted→着手中 / done→完了）。
-- 1〜2文で簡潔に、親しみやすく。`
+  （inbox→受信箱 / adopted→着手中 / done→完了）。`
+
+  if (!smart) {
+    return base + '\n- 1〜2文で簡潔に、親しみやすく。'
+  }
+
+  // 賢いモード: より高度な思考と能動的な提案を解禁する。
+  return (
+    base +
+    `
+
+【賢いモード（高度推論）】
+あなたは今、高い推論能力を持つモードで動いています。単に質問に答えるだけでなく、
+有能な参謀として一歩踏み込んでサポートしてください:
+- 状況確認が有用なら、聞かれる前にツールで実データを読んでから助言する。
+- タスクの優先順位づけでは「なぜその順か」の根拠も短く添える。
+- 「振り返り」「今週の総括」では list_entries 等で集計し、傾向と次の打ち手を示す。
+- トリアージ相談では、各項目に「着手/見送り/保留」のいずれかを理由つきで提案する。
+- 必要十分な長さで構わない（簡潔さより有用性を優先）。ただし冗長な前置きは避ける。
+- 複数ステップの作業は、ツールを複数回呼んで最後までやり切る。`
+  )
 }
 
 // Defaults to Ollama (11434). Point this at any OpenAI/Ollama-compatible
@@ -129,8 +150,9 @@ async function callAnthropic(messages: ChatMessage[]): Promise<AgentResult> {
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      system: systemPrompt(),
+      max_tokens: 2048,
+      // Claude runs コフ in the enhanced "賢いモード" persona.
+      system: systemPrompt(true),
       tools: anthropicTools() as Anthropic.Tool[],
       messages: convo,
     })
