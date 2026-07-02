@@ -4,7 +4,18 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRefresh } from '@/lib/refresh-context'
 
 type AgentState = 'idle' | 'thinking' | 'talking'
-type Message = { role: 'user' | 'assistant'; content: string }
+type Backend = 'ollama' | 'anthropic'
+type Message = { role: 'user' | 'assistant'; content: string; backend?: Backend }
+
+// Floating window sizes (kept in sync with electron/main.ts initial size).
+const FLOAT_CLOSED = { width: 96, height: 96 }
+const FLOAT_OPEN = { width: 360, height: 600 }
+
+declare global {
+  interface Window {
+    kofproFloating?: { setSize: (width: number, height: number) => void }
+  }
+}
 
 function AvatarFace({ state, size = 60 }: { state: AgentState; size?: number }) {
   const squintY = state === 'thinking' ? 2 : 5
@@ -83,7 +94,10 @@ function ThinkingDots() {
   )
 }
 
-export default function DesktopAgent() {
+// `floating` = rendered inside the dedicated always-on-top Electron window.
+// The component then drives the window size on open/close and exposes a
+// drag region around the avatar / panel (border strip + header).
+export default function DesktopAgent({ floating = false }: { floating?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -103,6 +117,18 @@ export default function DesktopAgent() {
     if (isOpen) inputRef.current?.focus()
   }, [isOpen])
 
+  const toggleOpen = useCallback(() => {
+    setIsOpen((open) => {
+      const next = !open
+      if (floating) {
+        // Grow the window before showing the panel; shrink after hiding it.
+        const size = next ? FLOAT_OPEN : FLOAT_CLOSED
+        window.kofproFloating?.setSize(size.width, size.height)
+      }
+      return next
+    })
+  }, [floating])
+
   const sendMessage = useCallback(
     async (text: string) => {
       if (!text.trim() || agentState === 'thinking') return
@@ -118,13 +144,17 @@ export default function DesktopAgent() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: next,
+            // Send only what the model needs (strip UI fields like `backend`).
+            messages: next.map((m) => ({ role: m.role, content: m.content })),
             prefer: smartMode ? 'anthropic' : undefined,
           }),
         })
         const data = await res.json()
         const reply = data.error ?? data.content ?? 'エラーが発生しました。'
-        setMessages((prev) => [...prev, { role: 'assistant', content: reply }])
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: reply, backend: data.backend },
+        ])
         // If the agent created/updated tasks, refresh the visible task lists.
         if (data.mutated) trigger()
         setAgentState('talking')
@@ -148,39 +178,58 @@ export default function DesktopAgent() {
 
   return (
     <>
+      {/* Drag layer: in the floating window, everything except the avatar and
+          the chat panel acts as a native drag handle (grab the rim to move). */}
+      {floating && <div className="fixed inset-0 z-40 app-drag" aria-hidden="true" />}
+
       {/* Chat panel */}
       {isOpen && (
         <div
-          className="fixed bottom-24 right-4 z-50 w-80 bg-white rounded-2xl shadow-2xl border border-purple-100 flex flex-col overflow-hidden"
+          className={`fixed bottom-24 right-4 z-50 w-80 bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden app-no-drag ${
+            smartMode ? 'border-amber-200' : 'border-purple-100'
+          }`}
           style={{ maxHeight: 'calc(100vh - 130px)' }}
         >
-          {/* Header */}
-          <div className="bg-gradient-to-r from-violet-600 to-purple-600 px-4 py-3 flex items-center gap-3 flex-shrink-0">
+          {/* Header — colour flips with the mode so the switch reads on camera.
+              In the floating window the header doubles as a drag handle. */}
+          <div
+            className={`px-4 py-3 flex items-center gap-3 flex-shrink-0 transition-colors duration-300 ${
+              floating ? 'app-drag' : ''
+            } ${
+              smartMode
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                : 'bg-gradient-to-r from-violet-600 to-purple-600'
+            }`}
+          >
             <AvatarFace state={agentState} size={34} />
             <div className="min-w-0">
               <div className="text-white font-semibold text-sm">コフ</div>
-              <div className="text-purple-200 text-xs truncate">
+              <div
+                className={`text-xs truncate ${smartMode ? 'text-amber-100' : 'text-purple-200'}`}
+              >
                 {agentState === 'thinking'
                   ? '考え中...'
                   : smartMode
-                    ? '賢いモード (Claude)'
+                    ? '賢い (Claude)'
                     : 'ローカル (Ollama)'}
               </div>
             </div>
             <button
               onClick={() => setSmartMode((s) => !s)}
               title={smartMode ? '賢いモード: ON (Claudeを使用)' : '賢いモード: OFF (ローカル)'}
-              className={`ml-auto flex-shrink-0 text-xs font-medium px-2 py-1 rounded-full transition-colors ${
+              className={`ml-auto flex-shrink-0 text-xs font-medium px-2 py-1 rounded-full transition-colors app-no-drag ${
                 smartMode
-                  ? 'bg-amber-300 text-amber-900'
+                  ? 'bg-white text-amber-600 shadow-sm'
                   : 'bg-white/15 text-purple-100 hover:bg-white/25'
               }`}
             >
-              {smartMode ? '🧠 賢い' : '🧠 賢い'}
+              🧠 賢い
             </button>
             <button
-              onClick={() => setIsOpen(false)}
-              className="text-purple-200 hover:text-white transition-colors text-xl leading-none flex-shrink-0"
+              onClick={toggleOpen}
+              className={`transition-colors text-xl leading-none flex-shrink-0 app-no-drag ${
+                smartMode ? 'text-amber-100 hover:text-white' : 'text-purple-200 hover:text-white'
+              }`}
               aria-label="閉じる"
             >
               ×
@@ -202,10 +251,10 @@ export default function DesktopAgent() {
             {messages.map((m, i) => (
               <div
                 key={i}
-                className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
                     m.role === 'user'
                       ? 'bg-violet-600 text-white rounded-br-sm'
                       : 'bg-gray-100 text-gray-800 rounded-bl-sm'
@@ -213,6 +262,18 @@ export default function DesktopAgent() {
                 >
                   {m.content}
                 </div>
+                {/* Which brain answered — makes fallback/smart mode visible */}
+                {m.role === 'assistant' && m.backend && (
+                  <span
+                    className={`mt-0.5 px-1.5 text-[10px] leading-4 rounded-full ${
+                      m.backend === 'anthropic'
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-gray-200 text-gray-500'
+                    }`}
+                  >
+                    {m.backend === 'anthropic' ? 'Claude' : 'ローカル'}
+                  </span>
+                )}
               </div>
             ))}
             {agentState === 'thinking' && (
@@ -253,8 +314,8 @@ export default function DesktopAgent() {
 
       {/* Floating avatar button */}
       <button
-        onClick={() => setIsOpen((o) => !o)}
-        className={`fixed bottom-6 right-4 z-50 w-16 h-16 rounded-full shadow-xl transition-transform duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 ${
+        onClick={toggleOpen}
+        className={`fixed bottom-6 right-4 z-50 w-16 h-16 rounded-full shadow-xl transition-transform duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 app-no-drag ${
           isOpen ? 'scale-95' : ''
         }`}
         style={

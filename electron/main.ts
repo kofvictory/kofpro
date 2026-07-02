@@ -1,13 +1,19 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, screen } from 'electron'
 import { spawn, ChildProcess } from 'child_process'
 import * as path from 'path'
 import * as http from 'http'
 
 let mainWindow: BrowserWindow | null = null
+let floatingWindow: BrowserWindow | null = null
 let serverProcess: ChildProcess | null = null
 
 const DEV_PORT = 3000
 const PROD_PORT = 3721
+
+// Initial (closed / avatar-only) size of the floating コフ window.
+// Must match FLOAT_CLOSED in src/components/DesktopAgent.tsx.
+const FLOAT_INITIAL = { width: 96, height: 96 }
+const FLOAT_MARGIN = 16
 
 function isDev(): boolean {
   return !app.isPackaged
@@ -93,11 +99,64 @@ async function createWindow(): Promise<void> {
   mainWindow.on('closed', () => { mainWindow = null })
 }
 
+// Always-on-top frameless mini window where コフ lives permanently.
+// Survives minimizing (or even closing) the main window. Minimal scope:
+// always-on-top + click to open the chat + drag to move (via CSS app-region).
+// No transparency — a small rounded card reads fine on camera and avoids
+// the transparent-window rabbit hole.
+function createFloatingWindow(): void {
+  const { workArea } = screen.getPrimaryDisplay()
+
+  floatingWindow = new BrowserWindow({
+    width: FLOAT_INITIAL.width,
+    height: FLOAT_INITIAL.height,
+    x: workArea.x + workArea.width - FLOAT_INITIAL.width - FLOAT_MARGIN,
+    y: workArea.y + workArea.height - FLOAT_INITIAL.height - FLOAT_MARGIN,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    skipTaskbar: true,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    backgroundColor: '#f9fafb',
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+    },
+  })
+
+  floatingWindow.loadURL(`http://localhost:${getPort()}/floating`)
+  floatingWindow.once('ready-to-show', () => floatingWindow?.show())
+  floatingWindow.on('closed', () => { floatingWindow = null })
+}
+
+// The floating window asks to be resized when the chat panel opens/closes.
+// Keep the bottom-right corner anchored so コフ stays where the user put it.
+ipcMain.on('floating:set-size', (_event, { width, height }: { width: number; height: number }) => {
+  if (!floatingWindow) return
+  const b = floatingWindow.getBounds()
+  const bounds = {
+    x: b.x + b.width - width,
+    y: b.y + b.height - height,
+    width,
+    height,
+  }
+  // resizable:false blocks programmatic resize on some platforms — toggle it.
+  floatingWindow.setResizable(true)
+  floatingWindow.setBounds(bounds)
+  floatingWindow.setResizable(false)
+})
+
 app.whenReady().then(async () => {
   if (!isDev()) {
     await startProductionServer()
   }
   await createWindow()
+  createFloatingWindow()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

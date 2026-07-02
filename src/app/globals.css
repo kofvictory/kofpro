@@ -16,3 +16,11 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
 }
+
+/* Electron frameless-window drag regions (floating コフ) */
+.app-drag {
+  -webkit-app-region: drag;
+}
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
