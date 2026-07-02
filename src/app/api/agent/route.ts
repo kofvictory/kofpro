@@ -74,7 +74,10 @@ const MAX_TOOL_ROUNDS = 6
 // so we detect "Ollama is up" with a fast ping, then allow generous time for
 // the actual generation (model load + tool-use rounds).
 const OLLAMA_PING_TIMEOUT = 2500
-const OLLAMA_GEN_TIMEOUT = 120000
+// Env-overridable so the EP01 "誤フォールバック" before-shot can be reproduced
+// without editing code: set OLLAMA_GEN_TIMEOUT=8000 in .env.local to recreate
+// the old buggy behavior (cold load exceeds timeout → falls back to Claude).
+const OLLAMA_GEN_TIMEOUT = Number(process.env.OLLAMA_GEN_TIMEOUT ?? 120000)
 
 // Quick liveness check so we fail over to the cloud fast when Ollama is down,
 // without killing a legitimately slow first token (cold model load).
