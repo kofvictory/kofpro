@@ -274,15 +274,19 @@ export async function executeTool(name: string, input: ToolInput): Promise<unkno
       const UUID_RE =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       if (!UUID_RE.test(rawId)) {
-        const { data: cands } = await supabase
+        // Models copy the title straight from user text, brackets and all
+        // (「動画素材のリストアップ」等) — strip surrounding quotes/brackets.
+        const cleaned = rawId.replace(/^[\s「『【（("'“]+|[\s」』】）)"'”]+$/g, '')
+        const { data: cands, error: candErr } = await supabase
           .from('entries')
           .select('id, title, status')
-          .ilike('title', `%${rawId}%`)
+          .ilike('title', `%${cleaned}%`)
           .not('status', 'in', '(done,archived)')
           .limit(5)
+        if (candErr) return { error: `候補検索に失敗しました: ${candErr.message}` }
         if (!cands || cands.length === 0) {
           return {
-            error: `idがUUIDではなく、タイトル「${rawId}」に一致する未完了エントリーも見つかりません。search_entries で確認してください`,
+            error: `idがUUIDではなく、タイトル「${cleaned}」に一致する未完了エントリーも見つかりません。list_entries で実在するタイトルとidを確認してください`,
           }
         }
         if (cands.length > 1) {
