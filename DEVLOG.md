@@ -42,6 +42,13 @@
 - 接続先は `OLLAMA_HOST` 環境変数で差し替え可能（npurun 等のNPUランタイムへ切替用）。
 - ツール使用後に操作系(create/update)が走ると `mutated:true` を返し、UI がタスク一覧を再取得。
 
+### フローティング常駐コフ (Electron)
+- コフは常時最前面の枠なし別 BrowserWindow（`/floating` ルート）に常駐。
+  メインを最小化/閉じても残る。Electron時はメイン内アバターは非表示（コフは1体）。
+- 開閉時は preload 経由の IPC でウィンドウを 96x96⇔360x600 に伸縮（右下アンカー）。
+  ドラッグは CSS `-webkit-app-region: drag`（縁・ヘッダー）、顔クリックで開閉。透過は不採用。
+- ウィンドウ間のタスク一覧同期は RefreshProvider 内の BroadcastChannel(`kofpro-refresh`)。
+
 ### コフの人格 = システムプロンプト + ツール
 - 人格はファインチューニングではなく `systemPrompt()` による指示。
 - ローカルでも Claude でも**同じ役・同じ道具**。頭脳(モデル)だけ入れ替わる。
@@ -116,3 +123,7 @@ npm run electron:build:win-arm64
 - 2026-06-29｜feat｜OLLAMA_HOST を環境変数化（npurun 等のNPUランタイム接続用）
 - 2026-06-30｜feat｜賢いモード専用の強化プロンプト（高度推論・能動提案）+ Claude時 max_tokens 2048 + DEVLOG.md 新設
 - 2026-06-30｜feat｜フェーズ2: タグ操作(tag_entry/find_entries_by_tag/list_tags)とプロジェクト連携(list_projects/set_entry_project)を追加
+- 2026-07-02｜feat｜EP01撮影ゲート#1: systemPromptに話し方ルールを追加し、チャット返答からMarkdown生記法(太字/表/見出し/箇条書き)を排除
+- 2026-07-02｜feat｜EP01撮影ゲート#2: 賢いモードの別人感を可視化 — ヘッダーが紫(ローカル)⇔琥珀(賢い/Claude)で切替、各返答に応答元チップ(ローカル/Claude)を表示。フォールバック(⑤)も画で分かる
+- 2026-07-02｜feat｜EP01撮影ゲート#3: フローティング常駐コフ(最小構成) — 常時最前面の枠なし別ウィンドウ(/floatingルート)にコフが常駐。顔クリックで開閉(IPCでウィンドウを96x96⇔360x600に伸縮・右下アンカー)、縁とヘッダーはapp-regionドラッグ。Electron時はメイン内アバターを非表示(コフは1体)。RefreshProviderにBroadcastChannelを追加しウィンドウ間でタスク一覧を同期。透過ウィンドウは採用せず(スコープ外)
+- 2026-07-02｜docs｜EP01撮影ゲート#4: docs/FILMING_CHECKLIST_EP01.md 新設 — 受け入れ基準の検証手順、オフライン実演の罠(SupabaseはクラウドのためオフラインはLLM会話のみ)、フォールバック/コールドロードの再現手順、inboxキュレーション案
