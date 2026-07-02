@@ -49,8 +49,14 @@ npm run electron:dev
   タスク一覧・追加・完了はオンラインで撮る。
 
 ### フォールバック（⑤の主役カット）
-- [ ] Ollama を完全終了: タスクトレイの Ollama アイコン右クリック → Quit
-      （または `taskkill /IM "ollama app.exe" /F & taskkill /IM ollama.exe /F`）
+- [ ] Ollama を完全終了。**必ず親(監視役)から先に殺す**こと:
+      ```powershell
+      taskkill /F /IM "ollama app.exe"   # 先: トレイの監視アプリ
+      taskkill /F /IM ollama.exe         # 後: サーバー本体
+      ```
+      （タスクトレイの Ollama 右クリック → Quit でも両方止まる）
+      ⚠️ `ollama.exe` だけ殺すと監視役が**即座に自動再起動**してフォールバックしない（実機で確認済みの罠）
+- [ ] 死活確認: `ollama list` が**接続エラーになる**こと（これが出れば失敗テイクなし）
 - [ ] コフに話しかける → 約2.5秒のping失敗後、自動でClaudeが応答。
       返答バブル下のチップが「ローカル」(灰)→「**Claude**」(琥珀)に変わるのが画で分かる
 - [ ] Ollama を再起動（スタートメニューからOllama起動）→ 話しかける → チップが「ローカル」に戻る
