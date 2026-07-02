@@ -12,8 +12,12 @@ const PROD_PORT = 3721
 
 // Initial (closed / avatar-only) size of the floating コフ window.
 // Must match FLOAT_CLOSED in src/components/DesktopAgent.tsx.
-const FLOAT_INITIAL = { width: 96, height: 96 }
+const FLOAT_INITIAL = { width: 112, height: 112 }
 const FLOAT_MARGIN = 16
+
+// Set to false to fall back to the opaque card look if the transparent
+// window misbehaves on some machine (known Electron escape hatch).
+const FLOAT_TRANSPARENT = true
 
 function isDev(): boolean {
   return !app.isPackaged
@@ -99,27 +103,45 @@ async function createWindow(): Promise<void> {
   mainWindow.on('closed', () => { mainWindow = null })
 }
 
-// Always-on-top frameless mini window where コフ lives permanently.
-// Survives minimizing (or even closing) the main window. Minimal scope:
-// always-on-top + click to open the chat + drag to move (via CSS app-region).
-// No transparency — a small rounded card reads fine on camera and avoids
-// the transparent-window rabbit hole.
+// Push a window rect fully inside the work area of the nearest display.
+// Fixes the first-launch clipping seen on scaled / multi-monitor setups
+// and keeps the window reachable after drags and panel-open growth.
+function clampToWorkArea(bounds: Electron.Rectangle): Electron.Rectangle {
+  const wa = screen.getDisplayMatching(bounds).workArea
+  return {
+    width: bounds.width,
+    height: bounds.height,
+    x: Math.min(Math.max(bounds.x, wa.x), wa.x + wa.width - bounds.width),
+    y: Math.min(Math.max(bounds.y, wa.y), wa.y + wa.height - bounds.height),
+  }
+}
+
+// Always-on-top frameless transparent window where コフ lives permanently.
+// Survives minimizing (or even closing) the main window. Only コフ and the
+// bubble are visible — the rest of the window is transparent. To keep the
+// invisible click-blocking area tiny, the window stays avatar-sized while
+// closed and grows only while the chat panel is open. Click-through is
+// intentionally NOT used (out of scope).
 function createFloatingWindow(): void {
   const { workArea } = screen.getPrimaryDisplay()
 
   floatingWindow = new BrowserWindow({
-    width: FLOAT_INITIAL.width,
-    height: FLOAT_INITIAL.height,
-    x: workArea.x + workArea.width - FLOAT_INITIAL.width - FLOAT_MARGIN,
-    y: workArea.y + workArea.height - FLOAT_INITIAL.height - FLOAT_MARGIN,
+    ...clampToWorkArea({
+      width: FLOAT_INITIAL.width,
+      height: FLOAT_INITIAL.height,
+      x: workArea.x + workArea.width - FLOAT_INITIAL.width - FLOAT_MARGIN,
+      y: workArea.y + workArea.height - FLOAT_INITIAL.height - FLOAT_MARGIN,
+    }),
     frame: false,
+    transparent: FLOAT_TRANSPARENT,
     alwaysOnTop: true,
     resizable: false,
     skipTaskbar: true,
     minimizable: false,
     maximizable: false,
     fullscreenable: false,
-    backgroundColor: '#f9fafb',
+    hasShadow: false,
+    backgroundColor: FLOAT_TRANSPARENT ? '#00000000' : '#f9fafb',
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -131,7 +153,18 @@ function createFloatingWindow(): void {
 
   floatingWindow.loadURL(`http://localhost:${getPort()}/floating`)
   floatingWindow.once('ready-to-show', () => floatingWindow?.show())
-  floatingWindow.on('closed', () => { floatingWindow = null })
+  floatingWindow.on('closed', () => {
+    stopFloatingDrag()
+    floatingWindow = null
+  })
+}
+
+function setFloatingBounds(bounds: Electron.Rectangle): void {
+  if (!floatingWindow) return
+  // resizable:false blocks programmatic resize on some platforms — toggle it.
+  floatingWindow.setResizable(true)
+  floatingWindow.setBounds(clampToWorkArea(bounds))
+  floatingWindow.setResizable(false)
 }
 
 // The floating window asks to be resized when the chat panel opens/closes.
@@ -139,16 +172,46 @@ function createFloatingWindow(): void {
 ipcMain.on('floating:set-size', (_event, { width, height }: { width: number; height: number }) => {
   if (!floatingWindow) return
   const b = floatingWindow.getBounds()
-  const bounds = {
+  setFloatingBounds({
     x: b.x + b.width - width,
     y: b.y + b.height - height,
     width,
     height,
+  })
+})
+
+// --- コフ本体のドラッグ移動 ---------------------------------------------
+// The renderer only signals drag start/end; the actual movement is done here
+// by polling the OS cursor. This avoids renderer/DIP coordinate mismatches
+// and keeps working even if the cursor briefly outruns mousemove events
+// (the window chases the cursor, so it never escapes).
+let dragTimer: ReturnType<typeof setInterval> | null = null
+
+function stopFloatingDrag(): void {
+  if (dragTimer) {
+    clearInterval(dragTimer)
+    dragTimer = null
   }
-  // resizable:false blocks programmatic resize on some platforms — toggle it.
-  floatingWindow.setResizable(true)
-  floatingWindow.setBounds(bounds)
-  floatingWindow.setResizable(false)
+}
+
+ipcMain.on('floating:drag-start', () => {
+  if (!floatingWindow || dragTimer) return
+  const cursorStart = screen.getCursorScreenPoint()
+  const [winX, winY] = floatingWindow.getPosition()
+
+  dragTimer = setInterval(() => {
+    if (!floatingWindow) return stopFloatingDrag()
+    const c = screen.getCursorScreenPoint()
+    floatingWindow.setPosition(winX + c.x - cursorStart.x, winY + c.y - cursorStart.y)
+  }, 16)
+})
+
+ipcMain.on('floating:drag-end', () => {
+  stopFloatingDrag()
+  if (floatingWindow) {
+    // Snap back inside the work area if dropped half off-screen.
+    floatingWindow.setBounds(clampToWorkArea(floatingWindow.getBounds()))
+  }
 })
 
 app.whenReady().then(async () => {

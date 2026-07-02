@@ -8,12 +8,16 @@ type Backend = 'ollama' | 'anthropic'
 type Message = { role: 'user' | 'assistant'; content: string; backend?: Backend }
 
 // Floating window sizes (kept in sync with electron/main.ts initial size).
-const FLOAT_CLOSED = { width: 96, height: 96 }
+const FLOAT_CLOSED = { width: 112, height: 112 }
 const FLOAT_OPEN = { width: 360, height: 600 }
 
 declare global {
   interface Window {
-    kofproFloating?: { setSize: (width: number, height: number) => void }
+    kofproFloating?: {
+      setSize: (width: number, height: number) => void
+      dragStart: () => void
+      dragEnd: () => void
+    }
   }
 }
 
@@ -129,6 +133,41 @@ export default function DesktopAgent({ floating = false }: { floating?: boolean 
     })
   }, [floating])
 
+  // コフ本体を掴んで動かす / そのままクリックで開閉。
+  // mousedown後に4px以上動いたらドラッグ(移動は main process がカーソル追従)、
+  // 動かず離したらクリック扱いにする。
+  const dragRef = useRef<{ startX: number; startY: number; dragging: boolean } | null>(null)
+
+  const handleAvatarMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!floating || e.button !== 0) return
+      dragRef.current = { startX: e.screenX, startY: e.screenY, dragging: false }
+
+      const onMove = (ev: MouseEvent) => {
+        const d = dragRef.current
+        if (!d || d.dragging) return
+        if (Math.abs(ev.screenX - d.startX) + Math.abs(ev.screenY - d.startY) > 4) {
+          d.dragging = true
+          window.kofproFloating?.dragStart()
+        }
+      }
+      const onUp = () => {
+        window.removeEventListener('mousemove', onMove)
+        window.removeEventListener('mouseup', onUp)
+        const wasDragging = dragRef.current?.dragging
+        dragRef.current = null
+        if (wasDragging) {
+          window.kofproFloating?.dragEnd()
+        } else {
+          toggleOpen()
+        }
+      }
+      window.addEventListener('mousemove', onMove)
+      window.addEventListener('mouseup', onUp)
+    },
+    [floating, toggleOpen]
+  )
+
   const sendMessage = useCallback(
     async (text: string) => {
       if (!text.trim() || agentState === 'thinking') return
@@ -178,10 +217,6 @@ export default function DesktopAgent({ floating = false }: { floating?: boolean 
 
   return (
     <>
-      {/* Drag layer: in the floating window, everything except the avatar and
-          the chat panel acts as a native drag handle (grab the rim to move). */}
-      {floating && <div className="fixed inset-0 z-40 app-drag" aria-hidden="true" />}
-
       {/* Chat panel */}
       {isOpen && (
         <div
@@ -312,12 +347,14 @@ export default function DesktopAgent({ floating = false }: { floating?: boolean 
         </div>
       )}
 
-      {/* Floating avatar button */}
+      {/* Floating avatar button — in the floating window コフ itself is both
+          the click target (open/close) and the drag handle (move window). */}
       <button
-        onClick={toggleOpen}
+        onClick={floating ? undefined : toggleOpen}
+        onMouseDown={handleAvatarMouseDown}
         className={`fixed bottom-6 right-4 z-50 w-16 h-16 rounded-full shadow-xl transition-transform duration-200 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 app-no-drag ${
           isOpen ? 'scale-95' : ''
-        }`}
+        } ${floating ? 'cursor-grab active:cursor-grabbing' : ''}`}
         style={
           agentState === 'idle' && !isOpen
             ? { animation: 'avatarFloat 3s ease-in-out infinite' }

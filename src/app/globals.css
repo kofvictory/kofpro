@@ -24,3 +24,11 @@
 .app-no-drag {
   -webkit-app-region: no-drag;
 }
+
+/* Floating コフ window: the Electron window is transparent, so the page
+   itself must not paint a background. Only コフ and the bubble are visible. */
+html.floating,
+html.floating body {
+  background: transparent !important;
+  overflow: hidden;
+}

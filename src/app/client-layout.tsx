@@ -18,8 +18,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     setShowInAppAgent(!navigator.userAgent.includes('Electron'))
   }, [])
 
-  // The floating window renders コフ alone — no app chrome.
-  if (pathname === '/floating') {
+  // The floating window renders コフ alone — no app chrome. The window is
+  // transparent, so the page background must be transparent too.
+  const isFloating = pathname === '/floating'
+  useEffect(() => {
+    if (isFloating) document.documentElement.classList.add('floating')
+    return () => document.documentElement.classList.remove('floating')
+  }, [isFloating])
+
+  if (isFloating) {
     return <RefreshProvider>{children}</RefreshProvider>
   }
 
