@@ -136,3 +136,4 @@ npm run electron:build:win-arm64
 - 2026-07-02｜feat｜EP01撮影ゲート#3: フローティング常駐コフ(最小構成) — 常時最前面の枠なし別ウィンドウ(/floatingルート)にコフが常駐。顔クリックで開閉(IPCでウィンドウを96x96⇔360x600に伸縮・右下アンカー)、縁とヘッダーはapp-regionドラッグ。Electron時はメイン内アバターを非表示(コフは1体)。RefreshProviderにBroadcastChannelを追加しウィンドウ間でタスク一覧を同期。透過ウィンドウは採用せず(スコープ外)
 - 2026-07-02｜docs｜EP01撮影ゲート#4: docs/FILMING_CHECKLIST_EP01.md 新設 — 受け入れ基準の検証手順、オフライン実演の罠(SupabaseはクラウドのためオフラインはLLM会話のみ)、フォールバック/コールドロードの再現手順、inboxキュレーション案
 - 2026-07-02｜fix/feat｜フローティングを透過ウィンドウ化(ユーザー指示によりスコープ拡張) — 小窓の白枠なしでコフ本体と吹き出しだけが浮かぶ見た目に。コフ本体でクリック(開閉)/ドラッグ(移動、main processがカーソル追従)。初回起動時の画面外見切れを clampToWorkArea で修正。FLOAT_TRANSPARENT フラグで非透過に即時退避可能
+- 2026-07-02｜docs｜docs/EP01_MATERIAL_TASKS.md 新設 — shot_list の撮影素材をコフ(create_entry)に渡せる17タスク×4バッチに再構成。賢いモードでコピペ登録し、着手中にすれば today_view に撮影予定が載る(①B実演の画作りを兼ねる)
