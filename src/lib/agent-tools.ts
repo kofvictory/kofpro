@@ -265,8 +265,34 @@ export async function executeTool(name: string, input: ToolInput): Promise<unkno
     }
 
     case 'update_entry': {
-      const id = String(input.id ?? '')
-      if (!id) return { error: 'id is required' }
+      const rawId = String(input.id ?? '').trim()
+      if (!rawId) return { error: 'id is required' }
+      let id = rawId
+      // Small local models often pass a title instead of the UUID.
+      // Resolve it against open entries; fail loudly when ambiguous so the
+      // model reports failure instead of claiming success.
+      const UUID_RE =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (!UUID_RE.test(rawId)) {
+        const { data: cands } = await supabase
+          .from('entries')
+          .select('id, title, status')
+          .ilike('title', `%${rawId}%`)
+          .not('status', 'in', '(done,archived)')
+          .limit(5)
+        if (!cands || cands.length === 0) {
+          return {
+            error: `idがUUIDではなく、タイトル「${rawId}」に一致する未完了エントリーも見つかりません。search_entries で確認してください`,
+          }
+        }
+        if (cands.length > 1) {
+          return {
+            error: 'タイトルに複数の候補が一致しました。idを特定して指定してください',
+            candidates: cands,
+          }
+        }
+        id = cands[0].id
+      }
       const patch: Record<string, unknown> = {}
       if (typeof input.status === 'string') patch.status = input.status
       if (typeof input.next_action === 'string') patch.next_action = input.next_action

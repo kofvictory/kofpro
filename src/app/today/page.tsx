@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useRefresh } from '@/lib/refresh-context'
 import type { TodayView } from '@/types/database'
 
 const PRIORITY_CLS: Record<string, string> = {
@@ -12,6 +13,7 @@ const PRIORITY_CLS: Record<string, string> = {
 export default function TodayPage() {
   const [entries, setEntries] = useState<TodayView[]>([])
   const [loading, setLoading] = useState(true)
+  const { count } = useRefresh()
 
   useEffect(() => {
     supabase
@@ -21,7 +23,7 @@ export default function TodayPage() {
         setEntries(data ?? [])
         setLoading(false)
       })
-  }, [])
+  }, [count]) // re-fetch when QuickCapture or コフ mutates entries
 
   if (loading) {
     return <p className="text-sm text-gray-400 py-8 text-center">読み込み中…</p>
