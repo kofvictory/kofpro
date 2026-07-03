@@ -133,6 +133,16 @@ export default function DesktopAgent({ floating = false }: { floating?: boolean 
     })
   }, [floating])
 
+  // Wipe the conversation. Long histories (especially ones containing a small
+  // model's earlier hallucinations) drag later answers into skipping tools —
+  // a fresh chat restores reliable tool-calling.
+  const clearChat = useCallback(() => {
+    setMessages([])
+    setInput('')
+    setAgentState('idle')
+    inputRef.current?.focus()
+  }, [])
+
   // コフ本体を掴んで動かす / そのままクリックで開閉。
   // mousedown後に4px以上動いたらドラッグ(移動は main process がカーソル追従)、
   // 動かず離したらクリック扱いにする。
@@ -260,6 +270,18 @@ export default function DesktopAgent({ floating = false }: { floating?: boolean 
             >
               🧠 賢い
             </button>
+            {messages.length > 0 && (
+              <button
+                onClick={clearChat}
+                title="会話をクリア（履歴をリセット）"
+                className={`flex-shrink-0 text-base leading-none transition-colors app-no-drag ${
+                  smartMode ? 'text-amber-100 hover:text-white' : 'text-purple-200 hover:text-white'
+                }`}
+                aria-label="会話をクリア"
+              >
+                🗑
+              </button>
+            )}
             <button
               onClick={toggleOpen}
               className={`transition-colors text-xl leading-none flex-shrink-0 app-no-drag ${
