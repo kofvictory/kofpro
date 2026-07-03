@@ -115,6 +115,40 @@ const MUTATING_TOOLS = new Set([
 type ChatMessage = { role: string; content: string }
 type AgentResult = { content: string; mutated: boolean }
 
+// Safety net: small local models sometimes ignore the "no Markdown" rule and
+// leak ```code fences```, tables, **bold**, headings, and `- [ ]` bullets into
+// the chat bubble. Strip the markup mechanically so it never reaches the UI.
+// (Filming gate #1: the bubble must read as plain speech.)
+function stripMarkdown(text: string): string {
+  return text
+    // fenced code blocks — drop the fence lines, keep inner text
+    .replace(/```[a-zA-Z]*\n?/g, '')
+    .replace(/```/g, '')
+    // headings (### ...) → plain line
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    // blockquote markers
+    .replace(/^\s{0,3}>\s?/gm, '')
+    // checkbox / bullet list markers → nothing (keep the item text)
+    .replace(/^\s*[-*+]\s+\[[ xX]\]\s+/gm, '')
+    .replace(/^\s*[-*+]\s+/gm, '')
+    // numbered list "1. " markers
+    .replace(/^\s*\d+\.\s+/gm, '')
+    // bold / italic emphasis (**x**, __x__, *x*, _x_)
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    // inline code `x`
+    .replace(/`([^`]+)`/g, '$1')
+    // table pipes → spaces (leave cell text)
+    .replace(/^\s*\|(.+)\|\s*$/gm, (_m, cells) =>
+      String(cells).split('|').map((c) => c.trim()).filter(Boolean).join('、')
+    )
+    // markdown table separator rows (|---|---|)
+    .replace(/^\s*\|?[\s:-]*\|[\s:|-]*$/gm, '')
+    // collapse 3+ blank lines
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 // --- Ollama (OpenAI-compatible) tool-use loop ------------------------------
 async function callOllama(messages: ChatMessage[]): Promise<AgentResult> {
   const convo: unknown[] = [
@@ -151,7 +185,7 @@ async function callOllama(messages: ChatMessage[]): Promise<AgentResult> {
       | undefined
 
     if (!toolCalls || toolCalls.length === 0) {
-      return { content: msg.content ?? '', mutated }
+      return { content: stripMarkdown(msg.content ?? ''), mutated }
     }
 
     convo.push(msg)
@@ -198,7 +232,7 @@ async function callAnthropic(messages: ChatMessage[]): Promise<AgentResult> {
         .filter((b): b is Anthropic.TextBlock => b.type === 'text')
         .map((b) => b.text)
         .join('')
-      return { content, mutated }
+      return { content: stripMarkdown(content), mutated }
     }
 
     convo.push({ role: 'assistant', content: response.content })
