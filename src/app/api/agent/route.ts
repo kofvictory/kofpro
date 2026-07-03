@@ -79,6 +79,18 @@ const OLLAMA_PING_TIMEOUT = 2500
 // the old buggy behavior (cold load exceeds timeout → falls back to Claude).
 const OLLAMA_GEN_TIMEOUT = Number(process.env.OLLAMA_GEN_TIMEOUT ?? 120000)
 
+// Run a tool and log the full round-trip to the dev terminal so agent
+// behavior is observable (which tool, what args, what came back). This is
+// the ground truth when the model's claims and the UI disagree.
+async function runTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+  const result = await executeTool(name, args)
+  const summary = JSON.stringify(result)
+  console.log(
+    `[agent-tool] ${name} ${JSON.stringify(args)} → ${summary.length > 400 ? summary.slice(0, 400) + '…' : summary}`
+  )
+  return result
+}
+
 // Quick liveness check so we fail over to the cloud fast when Ollama is down,
 // without killing a legitimately slow first token (cold model load).
 async function ollamaIsUp(): Promise<boolean> {
@@ -151,7 +163,7 @@ async function callOllama(messages: ChatMessage[]): Promise<AgentResult> {
         /* leave empty */
       }
       if (MUTATING_TOOLS.has(tc.function.name)) mutated = true
-      const result = await executeTool(tc.function.name, args)
+      const result = await runTool(tc.function.name, args)
       convo.push({
         role: 'tool',
         tool_call_id: tc.id,
@@ -194,7 +206,7 @@ async function callAnthropic(messages: ChatMessage[]): Promise<AgentResult> {
     for (const block of response.content) {
       if (block.type === 'tool_use') {
         if (MUTATING_TOOLS.has(block.name)) mutated = true
-        const result = await executeTool(block.name, block.input as Record<string, unknown>)
+        const result = await runTool(block.name, block.input as Record<string, unknown>)
         toolResults.push({
           type: 'tool_result',
           tool_use_id: block.id,
@@ -209,6 +221,9 @@ async function callAnthropic(messages: ChatMessage[]): Promise<AgentResult> {
 
 export async function POST(req: NextRequest) {
   const { messages, prefer } = await req.json()
+  console.log(
+    `[agent] request prefer=${prefer ?? 'auto'} genTimeout=${OLLAMA_GEN_TIMEOUT}ms messages=${messages?.length ?? 0}`
+  )
 
   // Smart (hybrid) mode: user explicitly asked for the cloud model. Go straight
   // to Anthropic for the best quality, skipping local Ollama entirely.
@@ -221,9 +236,11 @@ export async function POST(req: NextRequest) {
     }
     try {
       const { content, mutated } = await callAnthropic(messages)
+      console.log(`[agent] served by anthropic (smart mode) mutated=${mutated}`)
       return NextResponse.json({ content, mutated, backend: 'anthropic' })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
+      console.error(`[agent] anthropic (smart mode) failed: ${message}`)
       return NextResponse.json({ error: `APIエラー: ${message}` }, { status: 500 })
     }
   }
@@ -235,9 +252,11 @@ export async function POST(req: NextRequest) {
   if (await ollamaIsUp()) {
     try {
       const { content, mutated } = await callOllama(messages)
+      console.log(`[agent] served by ollama mutated=${mutated}`)
       return NextResponse.json({ content, mutated, backend: 'ollama' })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
+      console.error(`[agent] ollama failed (${message}) — falling back to anthropic`)
       // Ollama is up but the request failed (e.g. model not pulled). Surface
       // it instead of silently falling through to the cloud.
       if (!process.env.ANTHROPIC_API_KEY) {
@@ -264,9 +283,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const { content, mutated } = await callAnthropic(messages)
+    console.log(`[agent] served by anthropic (fallback) mutated=${mutated}`)
     return NextResponse.json({ content, mutated, backend: 'anthropic' })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
+    console.error(`[agent] anthropic (fallback) failed: ${message}`)
     return NextResponse.json({ error: `APIエラー: ${message}` }, { status: 500 })
   }
 }
