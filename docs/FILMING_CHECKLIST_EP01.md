@@ -16,6 +16,18 @@ npm run electron:dev
 - **テイク前のウォームアップ**: コフに捨てメッセージを1つ送って応答させておく
   （モデルがメモリに載り、以後の応答が速くなる。約5分アイドルで再びコールドに戻る）
 
+## 🔒 画面に映してはいけない秘密情報（VS Code / ターミナルを撮る時）
+
+自分のKofProコードを背景/コード差分に映すのはOK(むしろ推奨・④⑦兼用)。ただし以下は絶対に映さない:
+- [ ] **`.env.local`** … Supabase URL/キー・`ANTHROPIC_API_KEY` が入る。**タブで開かない・プレビューも出さない**
+- [ ] **`ANTHROPIC_API_KEY`（sk-ant-…）** … 課金キー。漏洩=不正利用・請求
+- [ ] **Supabase URL + publishable キー** … 本アプリはRLSがanon全許可のため、映ると誰でもDBを読み書き可能
+- [ ] **ターミナルのスクロールバック** … `.env.local`作成時にキーが出た履歴。`cls`でクリアしてから映すか映さない
+- [ ] 撮影後・書き出し前に**キーが1フレームも映っていないか早送りチェック**
+
+積極的に映すと良い(④⑦兼用): `src/lib/agent-tools.ts` の anthropicTools/openaiTools /
+`src/app/api/agent/route.ts` の OLLAMA_PING_TIMEOUT・OLLAMA_GEN_TIMEOUT・ollamaIsUp。
+
 ---
 
 ## 1. Markdown生表示が出ない
