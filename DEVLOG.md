@@ -158,3 +158,4 @@ npm run electron:build:win-arm64
 - 2026-07-03｜feat｜応答からMarkdown記法を機械的に除去 (撮影ゲート#1の安全網) — プロンプト禁止に加え、サーバー側 stripMarkdown で ```code fence```/表/太字/見出し/- [ ]箇条書き/インラインコードを除去。小型モデルが崩しても吹き出しに生記法が出ない二重防御(両バックエンド適用)
 - 2026-07-03｜note｜ハルシネーションの根治は7Bでは不可と確認 — お題を「事実確認(今日やること/inbox)」にするとツール呼び出し率が上がり捏造が減る。相談形式は捏造しやすい。撮影は ローカル=事実確認/Claude=相談 の役割分担で回避。将来のサーバー側ガード(ツール未使用なら実データ注入して再生成)はEP02以降の候補(IDEA_BACKLOG級)
 - 2026-07-03｜docs｜撮影・収録・後工程の資料を整備 — docs/EP01_NARRATION_CHECKLIST.md(全章VO台本+別テイク)、docs/EP01_POST_UPLOAD_MONETIZATION.md(DaVinci編集/YouTube公開/収益化)。既存の FILMING_CHECKLIST_EP01.md / EP01_MATERIAL_TASKS.md と合わせEP01の実務資料が一式揃った
+- 2026-07-03｜docs｜EP01台本レビュー実施(docs/EP01_SCRIPT_REVIEW.md) — 手直し用v2をSCRIPT_REVIEW_GUIDEの評価軸+DEVLOG照合でレビュー。🔴発見: ⑤フォールバックの「ヘッダー色が紫→オレンジに変わる」は実装と不一致(色はトグル連動、フォールバックで変わるのはチップのみ)→台本をチップ基準に修正。🟡: ⑥図解の(Vulkan/GPU)但し書きを純CPUに、②の弱点カットは造語/捏造の実録クリップに。技術記述はDEVLOGとほぼ完全一致で捏造なし。残: ⑦コールドロード実測値の確定
