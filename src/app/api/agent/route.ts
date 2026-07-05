@@ -74,10 +74,15 @@ const MAX_TOOL_ROUNDS = 6
 // so we detect "Ollama is up" with a fast ping, then allow generous time for
 // the actual generation (model load + tool-use rounds).
 const OLLAMA_PING_TIMEOUT = 2500
-// Env-overridable so the EP01 "誤フォールバック" before-shot can be reproduced
-// without editing code: set OLLAMA_GEN_TIMEOUT=8000 in .env.local to recreate
-// the old buggy behavior (cold load exceeds timeout → falls back to Claude).
-const OLLAMA_GEN_TIMEOUT = Number(process.env.OLLAMA_GEN_TIMEOUT ?? 120000)
+// Generation timeout. The FIRST request after a cold model is far heavier than
+// a bare `ollama run` (system prompt + ~11 tool defs + multi-round tool use on
+// CPU), so the true cold first-response can exceed 120s and wrongly fall back
+// to Claude. 240s gives headroom so the cold first request completes locally
+// (the ping already catches a genuinely-down Ollama fast, so a long gen cap
+// only affects the rare "up but slow" case). Env-overridable: set
+// OLLAMA_GEN_TIMEOUT=8000 in .env.local to reproduce the EP01 "誤フォールバック"
+// before-shot.
+const OLLAMA_GEN_TIMEOUT = Number(process.env.OLLAMA_GEN_TIMEOUT ?? 240000)
 
 // Run a tool and log the full round-trip to the dev terminal so agent
 // behavior is observable (which tool, what args, what came back). This is
