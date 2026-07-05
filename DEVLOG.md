@@ -166,3 +166,4 @@ npm run electron:build:win-arm64
 - 2026-07-03｜docs｜撮影ショット進捗トラッカー新設(docs/EP01_SHOTLIST_PROGRESS.md) — shot_listを基に✅/🟡/⬜で撮影しながら更新できる進捗表。最優先の証拠系・フォールバック・コールドロードは確保済、残コアはA系(常駐/キャプチャ/done/オフライン/⑤対比/⑥偽りの安心/⑧ダイジェスト)・Bスペック画面・Cコード差分×2、要撮り直しは⑦ビフォー/①⑤別人感
 - 2026-07-05｜docs｜IP注意を明記(EP01_SCRIPT_REVIEW / SHOTLIST_PROGRESS) — ①コフ常駐構図の背景に公式ロックマンエグゼのサイト/キービジュアルを小ネタで映す案は不採用。IP_GUIDELINESのNG(キャラデザ/ロゴ/スクショ/ゲーム映像)に該当し、セリフ非言及でも画面表示時点でNG・収益化でContent IDリスク。背景は自分の実物(エディタ/KofPro/ターミナル)、エグゼ愛はコフ+ナレで語る
 - 2026-07-05｜docs｜撮影の秘密情報保護メモを追記(FILMING_CHECKLIST) — 自分のKofProコードをVS Codeで映すのはOK(④⑦のコード差分兼用で推奨)。ただし .env.local / ANTHROPIC_API_KEY / Supabase URL+publishableキー(RLSがanon全許可のためDB読み書き可能になる) / ターミナルのキー履歴 は画面に映さない。書き出し前に早送りでキー混入チェック
+- 2026-07-05｜note｜①コフ常駐構図を撮影(0705_1.mp4/1920x1080/12.6s) — VS CodeにKofProの agent-tools.ts(anthropicTools/openaiTools)を映しつつコフが浮遊・実働。秘密情報の混入なし・エグゼ画像なしを全フレーム確認。①常駐構図＋④コード差分＋①「今日やること」実演の3つを同時取得。編集はCapCut(PC/ARMネイティブ)方針。トラッカーで①常駐・④を✅に更新
