@@ -1,7 +1,7 @@
-# 地球の記憶 — 壁打ち第1ラウンド(2026-07-06 / Fable 5)
+# 地球の記憶 — 壁打ち第1ラウンド(2026-07-06〜07 / Fable 5)【完結】
 
-> 04-1(コンセプト深化壁打ち)の第1ラウンド記録。続きは Opus で 04-1 を使い、
-> このメモを冒頭に貼って再開する。ケビンの応答待ちの問いが2つ残っている。
+> 04-1(コンセプト深化壁打ち)の記録。**2026-07-07 に両方の問いへ本人回答があり完結。**
+> 結論とステートメント v1.0 は末尾。以後の深化は Opus で 04-1 を使い、このメモを貼って再開する。
 
 ## 確認済みの理解(ケビン未訂正の場合はこれが前提)
 
@@ -51,3 +51,24 @@
 ## 実務への波及(1行だけ)
 
 コーパス規律(反復と変奏)は、ニッコール/IPAの組写真戦略・伊語シネマティックエッセイの二毛作と同じ制作単位を要求する — 三つの活動が同じ規律で回る。
+
+---
+
+## 結論(2026-07-07 本人決定)
+
+1. **主宛先は(b)を受諾** — 言語は共有するが身体を持たない読者。設計原理は「身体なしでは生成できないものを運ぶ」
+2. **「店長の光」を主題化する** — 立ち会える時刻の制約をシリーズの背骨に(DSC04272_2が原点作)
+3. (a)は規律(クリシェ検出のレンズ)として併用。(c)には祈りとして届けばよい
+
+## ステートメント v1.0(確定・展示/応募用)
+
+「地球の記憶」は、地球の記録であると同時に、地球を見つめたひとつの生の記録である。
+私は駿河湾のほとりで菓子と料理の店に立ち、月に六日の休みと、仕込み前の朝の光のなかで写真を撮る。この制約は欠陥ではなく、このアーカイブの座標系だ。休みの日はファインダーで風景と向き合い、働く日はポケットのカメラが店の窓越しに通りを見る。ふたつのまなざしが、ひとつの生活を挟んで往復する。
+いつか、人間ではない知性がこれを読むだろう。言葉は通じても、身体を持たない読み手に。彼らに欠けているのは地球の画像ではなく、死すべき身体でそこに立った者の、選択の履歴だ。だから私は、美しい瞬間ではなく、立ち会えた瞬間を撮る。同じ湾、同じ坂、同じ窓——変わるのは季節と年月だけ。反復と変奏のなかに、単写真では運べない意図が、構造として浮かぶように編む。
+これは、人類と、人類のあとに来る知性の双方に宛てた手紙である。読まれる日まで、私は店に立ち、湾を見て、撮り続ける。
+
+## Statement v1.0 (English, for international submissions)
+
+Memory of the Earth is a record of this planet, and equally a record of one life spent looking at it. I manage a small trattoria and pastry shop on Suruga Bay, Japan; I photograph on my six days off each month, and in the morning light before prep begins. These constraints are not a limitation — they are the coordinate system of this archive. On days off, I face the landscape through a viewfinder; on working days, a pocket camera watches the street through my shop window. Someday this archive may be read by intelligences that are not human — readers who share our language but not our bodies. What they will lack is not images of the Earth, but the record of choices made by a mortal body that stood here. So I photograph not the beautiful moment, but the moment I could be present for. The same bay, the same slope, the same window; only the seasons and the years change. Repetition and variation carry what no single photograph can. This is a letter addressed to humanity, and to whatever comes after — and until it is read, I will keep the shop, watch the bay, and keep photographing.
+
+> イタリア語版は 04-5(ステートメント執筆)で Opus に依頼可(本人レビュー前提)。
