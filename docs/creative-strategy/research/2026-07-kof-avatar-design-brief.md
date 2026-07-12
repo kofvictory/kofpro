@@ -77,8 +77,78 @@
 3. 具体的SVG実装仕様(まる手のパス、目の潤みの表現、呼吸モーションのキーフレーム)
 4. 初期形AvatarFaceからの差分(何を保ち、何を足すか)の部品リスト
 
-## Fableへの渡し方
+## 🔨 Fable発注書:第1発注(EP06完成形の静止SVG + 2モード外皮)
 
-このブリーフ + 現行 `AvatarFace`(DesktopAgent.tsx)を見せ、
-「この設計言語で、EP06完成形のSVGコンポーネント + モード外皮(ローカル/賢い)+ モーション仕様3種
-(まばたき/呼吸/手の出現)を、実装ごと一発で」と依頼する。作業はavatarブランチで。
+> 使い方: **下の「発注書本文」以下をまるごとFableに渡し**、「avatarブランチの
+> `src/components/DesktopAgent.tsx` の `AvatarFace` を、この第1発注どおりに置き換えて」と依頼する。
+> この発注書だけで自己完結(ブリーフ全体を読ませなくても実装できる)。Fableが使えるうちに。
+
+---
+### 発注書本文
+
+あなたに、デスクトップ常駐AI相棒「コフ」の**EP06完成形アバター**のSVG実装を依頼します。一発の質が要る仕事です。
+
+**コフとは**: 頭脳は2つ(ローカルOllama / 賢いClaude)だが人格は1つ。設計原理は「不変コア+可変外皮」——
+シルエット・目・アンテナ・フォルムは不変(コフの証)、配色・光・表情はモードで変わる外皮。
+二元論: **ローカル=常駐する機械の器(体)/ 賢い=時々灯る生命の火(魂)**。色は 紫=器・寒、オレンジ=生命・暖(体温)。
+
+**現行の初期形(これを土台に、足す)**:
+```tsx
+function AvatarFace({ state, size = 60 }: { state: AgentState; size?: number }) {
+  const squintY = state === 'thinking' ? 2 : 5
+  return (
+    <svg viewBox="0 0 60 64" fill="none" xmlns="http://www.w3.org/2000/svg" width={size} height={size}>
+      {/* Antenna stem */}
+      <line x1="30" y1="11" x2="30" y2="4" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round" />
+      {/* Antenna tip — pulses yellow while thinking */}
+      <circle cx="30" cy="3" r="3" fill={state === 'thinking' ? '#fbbf24' : '#a78bfa'}
+        style={state === 'thinking' ? { animation: 'pulse 1s ease-in-out infinite' } : undefined} />
+      {/* Head */}
+      <circle cx="30" cy="36" r="22" fill="url(#headGrad)" />
+      {/* Eyes (left/right): ellipse白目 + 紺の瞳#312e81 + 白ハイライト */}
+      <ellipse cx="22" cy="34" rx="5" ry={squintY} fill="white" /> {/* +右目 cx=38 */}
+      {/* Mouth: talking=楕円 / それ以外=微笑カーブ、#1e1b4b opacity .65 */}
+      {/* Cheeks: circle #f9a8d4 opacity .35, 左cx=13 右cx=47 */}
+      <defs><radialGradient id="headGrad" cx="35%" cy="30%" r="70%">
+        <stop offset="0%" stopColor="#ddd6fe"/><stop offset="55%" stopColor="#8b5cf6"/><stop offset="100%" stopColor="#5b21b6"/>
+      </radialGradient></defs>
+    </svg>
+  )
+}
+```
+※完全な現行コードは avatarブランチ `src/components/DesktopAgent.tsx` L23–96。座標系 viewBox 0 0 60 64(頭部のみ)。
+
+**第1発注のスコープ(これだけを一発で)**:
+- **保つ(不変コア)**: アンテナ / 丸頭のフォルムとグラデ構造 / まる目 / 全体の配置
+- **足す**:
+  - 浮遊する**まる手2つ**(体幹なし・指なし・頭の左右下に浮く。`handsVisible` propで出し入れ。待機時はしまう)
+  - **目の潤み**(賢いモードで生きるためのハイライト層)
+- **外皮の分岐(`backend` propで)**:
+
+| 要素 | ローカル(ollama=器) | 賢い(anthropic=魂) |
+|---|---|---|
+| 頭グラデ | 現行の紫(#ddd6fe→#8b5cf6→#5b21b6) | 暖色(例 #fed7aa→#fb923c→#c2410c) |
+| 目 | ややフラット | 潤む(ハイライト増) |
+| ほっぺ | 淡い(現行 opacity .35) | 灯る(暖色寄り・opacity上げ) |
+| 光 | 冷たい・均一 | 温かい・脈打つ(アンテナ先端など) |
+
+  - **緊張点(厳守)**: ローカルを無機物にしすぎない。狙いは「**愛せる機械**」(R2-D2 / 魂が宿る前のピノキオ)。健気だが、まだ火は灯っていない器。だから賢いモードで火が灯る瞬間が効く。
+
+**技術要件**:
+- React + インラインSVG + TypeScript(現行と同じ流儀)
+- props: `state:'idle'|'thinking'|'talking'`, `backend:'ollama'|'anthropic'`, `size?:number`, `handsVisible?:boolean`
+- `backend` で紫/オレンジを分岐。両モードのグラデを `defs` に用意
+- 現行 `AvatarFace` をそのまま差し替えられる形(呼び出し側は `backend` と `handsVisible` を渡す1行変更で済むように)
+- 手を足すため viewBox は下方拡張可(例 0 0 60 80)
+
+**出力**:
+1. 完成した `AvatarFace` コンポーネント全文(コピペで差し替え可能)
+2. 各デザイン判断の1行コメント(なぜこの形か)
+3. 呼び出し側(`DesktopAgent` 内)の変更点
+
+---
+### 次段(今日余力があれば続けて / なければ後日)
+- **第2発注**: モーション3種 — まばたき / 呼吸(有機的な上下ゆれ)/ 手の出現 — をCSSアニメで
+- **第3発注(EP05時)**: 4モード配色(集中/発想/記録/調査)。**今日は不要**
+
+作業はavatarブランチで。EP01は初期形のまま(この完成形はEP06公開まで寝かせる)。
