@@ -17,6 +17,25 @@
   50% { transform: translateY(-5px); }
 }
 
+/* コフのモーション(第2発注): まばたき / 呼吸 / 手の浮遊。
+   器(ローカル)= kofTick の規則的な上下、魂(賢い)= kofBreathe のふくらむ呼吸で対比を作る */
+@keyframes kofBlink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%, 97% { transform: scaleY(0.08); }
+}
+@keyframes kofBreathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-1.2px) scale(1.02); }
+}
+@keyframes kofTick {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.8px); }
+}
+@keyframes kofHandFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
 /* Electron frameless-window drag regions (floating コフ) */
 .app-drag {
   -webkit-app-region: drag;

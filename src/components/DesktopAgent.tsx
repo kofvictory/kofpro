@@ -42,6 +42,8 @@ function AvatarFace({
   const antennaColor = warm ? '#fdba74' : '#a78bfa'
   // 口も外皮: 頭色に馴染む暗色(寒=濃紺 / 暖=焦げ茶)で同じ形のまま体温だけ変える
   const inkColor = warm ? '#431407' : '#1e1b4b'
+  // SVG内グループをCSS transformで動かすための共通指定(要素自身の中心を基準に)
+  const animBase = { transformBox: 'fill-box', transformOrigin: 'center' } as const
   return (
     <svg
       viewBox="0 0 60 80"
@@ -49,87 +51,113 @@ function AvatarFace({
       xmlns="http://www.w3.org/2000/svg"
       width={size}
       height={(size * 80) / 60}
+      style={{ overflow: 'visible' }} // アンテナ光暈(cy=3, r=5.5)がviewBox上端で切れて平らに見えるのを防ぐ
     >
-      {/* Antenna stem */}
-      <line x1="30" y1="11" x2="30" y2="4" stroke={antennaColor} strokeWidth="2.5" strokeLinecap="round" />
-      {/* 魂モードだけの光暈: 冷たい均一光との対比で「温かい光が脈打つ」を作る(thinking中は黄パルスに譲る) */}
-      {warm && state !== 'thinking' && (
+      {/* 呼吸 — 魂はふくらむ有機的な呼吸、器は一定の規則的な上下(機械)。振り分けはブリーフの動きの表どおり */}
+      <g
+        style={{
+          ...animBase,
+          animation: warm
+            ? 'kofBreathe 3.4s ease-in-out infinite'
+            : 'kofTick 2.8s linear infinite',
+        }}
+      >
+        {/* Antenna stem */}
+        <line x1="30" y1="11" x2="30" y2="4" stroke={antennaColor} strokeWidth="2.5" strokeLinecap="round" />
+        {/* 魂モードだけの光暈: 冷たい均一光との対比で「温かい光が脈打つ」を作る(thinking中は黄パルスに譲る) */}
+        {warm && state !== 'thinking' && (
+          <circle
+            cx="30"
+            cy="3"
+            r="5.5"
+            fill="#fb923c"
+            opacity="0.3"
+            style={{ animation: 'pulse 2.6s ease-in-out infinite' }}
+          />
+        )}
+        {/* Antenna tip — pulses yellow while thinking (思考の記号は両モード共通=不変コア) */}
         <circle
           cx="30"
           cy="3"
-          r="5.5"
-          fill="#fb923c"
-          opacity="0.3"
-          style={{ animation: 'pulse 2.6s ease-in-out infinite' }}
+          r="3"
+          fill={state === 'thinking' ? '#fbbf24' : antennaColor}
+          style={state === 'thinking' ? { animation: 'pulse 1s ease-in-out infinite' } : undefined}
         />
-      )}
-      {/* Antenna tip — pulses yellow while thinking (思考の記号は両モード共通=不変コア) */}
-      <circle
-        cx="30"
-        cy="3"
-        r="3"
-        fill={state === 'thinking' ? '#fbbf24' : antennaColor}
-        style={state === 'thinking' ? { animation: 'pulse 1s ease-in-out infinite' } : undefined}
-      />
 
-      {/* Head — 同じ形・同じグラデ構造(35%/30%光源)で色だけ器⇄魂に振る */}
-      <circle cx="30" cy="36" r="22" fill={headFill} />
+        {/* Head — 同じ形・同じグラデ構造(35%/30%光源)で色だけ器⇄魂に振る */}
+        <circle cx="30" cy="36" r="22" fill={headFill} />
 
-      {/* Left eye */}
-      <ellipse cx="22" cy="34" rx="5" ry={squintY} fill="white" />
-      <circle cx="23" cy="34" r="2.5" fill="#312e81" />
-      <circle cx="23.8" cy="33" r={warm ? 1.2 : 1} fill="white" />
-      {/* 潤み層(魂モードのみ): 下瞼の水膜+瞳の底の二次光で「目が潤む=生きている」を出す */}
-      {warm && (
-        <>
-          <circle cx="22.2" cy="35.2" r="0.6" fill="white" opacity="0.85" />
-          <ellipse cx="22" cy={34 + squintY - 0.8} rx="3.4" ry="0.8" fill="white" opacity="0.35" />
-        </>
-      )}
+        {/* まばたき — 両目を1グループでscaleY。魂は頻繁(生き生き)、器は控えめ(機械は瞬きが少ない)。
+            thinking中は細目が主役なので止める */}
+        <g
+          style={{
+            ...animBase,
+            animation:
+              state === 'thinking' ? undefined : `kofBlink ${warm ? '3.6s' : '5.2s'} linear infinite`,
+          }}
+        >
+          {/* Left eye */}
+          <ellipse cx="22" cy="34" rx="5" ry={squintY} fill="white" />
+          <circle cx="23" cy="34" r="2.5" fill="#312e81" />
+          <circle cx="23.8" cy="33" r={warm ? 1.2 : 1} fill="white" />
+          {/* 潤み層(魂モードのみ): 下瞼の水膜+瞳の底の二次光で「目が潤む=生きている」を出す */}
+          {warm && (
+            <>
+              <circle cx="22.2" cy="35.2" r="0.6" fill="white" opacity="0.85" />
+              <ellipse cx="22" cy={34 + squintY - 0.8} rx="3.4" ry="0.8" fill="white" opacity="0.35" />
+            </>
+          )}
 
-      {/* Right eye */}
-      <ellipse cx="38" cy="34" rx="5" ry={squintY} fill="white" />
-      <circle cx="39" cy="34" r="2.5" fill="#312e81" />
-      <circle cx="39.8" cy="33" r={warm ? 1.2 : 1} fill="white" />
-      {warm && (
-        <>
-          <circle cx="38.2" cy="35.2" r="0.6" fill="white" opacity="0.85" />
-          <ellipse cx="38" cy={34 + squintY - 0.8} rx="3.4" ry="0.8" fill="white" opacity="0.35" />
-        </>
-      )}
+          {/* Right eye */}
+          <ellipse cx="38" cy="34" rx="5" ry={squintY} fill="white" />
+          <circle cx="39" cy="34" r="2.5" fill="#312e81" />
+          <circle cx="39.8" cy="33" r={warm ? 1.2 : 1} fill="white" />
+          {warm && (
+            <>
+              <circle cx="38.2" cy="35.2" r="0.6" fill="white" opacity="0.85" />
+              <ellipse cx="38" cy={34 + squintY - 0.8} rx="3.4" ry="0.8" fill="white" opacity="0.35" />
+            </>
+          )}
+        </g>
 
-      {/* Mouth */}
-      {state === 'talking' ? (
-        <ellipse cx="30" cy="43" rx="5.5" ry="3.5" fill={inkColor} opacity="0.65" />
-      ) : (
-        <path
-          d="M 24 42 Q 30 47 36 42"
-          stroke={inkColor}
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.65"
-        />
-      )}
+        {/* Mouth */}
+        {state === 'talking' ? (
+          <ellipse cx="30" cy="43" rx="5.5" ry="3.5" fill={inkColor} opacity="0.65" />
+        ) : (
+          <path
+            d="M 24 42 Q 30 47 36 42"
+            stroke={inkColor}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.65"
+          />
+        )}
 
-      {/* Cheeks — 器では淡く残し(愛せる機械=無機物にしない)、魂では血色が灯る */}
-      <circle cx="13" cy="40" r="5" fill={warm ? '#fb7185' : '#f9a8d4'} opacity={warm ? 0.5 : 0.35} />
-      <circle cx="47" cy="40" r="5" fill={warm ? '#fb7185' : '#f9a8d4'} opacity={warm ? 0.5 : 0.35} />
+        {/* Cheeks — 器では淡く残し(愛せる機械=無機物にしない)、魂では血色が灯る */}
+        <circle cx="13" cy="40" r="5" fill={warm ? '#fb7185' : '#f9a8d4'} opacity={warm ? 0.5 : 0.35} />
+        <circle cx="47" cy="40" r="5" fill={warm ? '#fb7185' : '#f9a8d4'} opacity={warm ? 0.5 : 0.35} />
+      </g>
 
       {/* まる手2つ — 体幹に繋がらない浮遊球(=データの記号)。頭と同じグラデ=同じ存在の一部。
-          待機時はしまう: 非表示時も DOM に残し、opacity+沈み込みで出し入れの気配を作る */}
+          待機時はしまう: 非表示時も DOM に残し、opacity+ばね系イージングの浮上で「ぽん」と出す */}
       <g
         style={{
           opacity: handsVisible ? 1 : 0,
           transform: handsVisible ? 'translateY(0)' : 'translateY(6px)',
-          transition: 'opacity 0.3s ease, transform 0.3s ease',
+          transition: 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
       >
-        <circle cx="9" cy="66" r="6" fill={headFill} />
-        <circle cx="51" cy="66" r="6" fill={headFill} />
-        {/* 手のハイライト: 頭と同じ左上光源に揃えて球体として同居させる */}
-        <circle cx="7.5" cy="64" r="1.4" fill="white" opacity="0.45" />
-        <circle cx="49.5" cy="64" r="1.4" fill="white" opacity="0.45" />
+        {/* 手の浮遊は左右で位相をずらすと有機的、揃えると機械的 — ここでも器⇄魂を振り分ける */}
+        <g style={{ ...animBase, animation: `kofHandFloat 3s ease-in-out ${warm ? '-1.1s' : '0s'} infinite` }}>
+          <circle cx="9" cy="66" r="6" fill={headFill} />
+          {/* 手のハイライト: 頭と同じ左上光源に揃えて球体として同居させる */}
+          <circle cx="7.5" cy="64" r="1.4" fill="white" opacity="0.45" />
+        </g>
+        <g style={{ ...animBase, animation: 'kofHandFloat 3s ease-in-out infinite' }}>
+          <circle cx="51" cy="66" r="6" fill={headFill} />
+          <circle cx="49.5" cy="64" r="1.4" fill="white" opacity="0.45" />
+        </g>
       </g>
 
       <defs>
