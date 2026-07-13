@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第0章 トーンカーブ実験台 — 傾き・分離・質感の生存</title>
+<meta name="description" content="トーンカーブの制御点をドラッグして、傾きが1を下回った帯からテクスチャが消える瞬間を観察する実験装置。">
+<!-- TODO(人間): ドメイン確定後に og:url / og:image を差し替え -->
+<meta property="og:title" content="トーンカーブ実験台 — 傾き・分離・質感の生存">
+<meta property="og:description" content="カーブそのものより、傾きが何をしているかを見るための装置。">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="assets/site.css">
+<!-- TODO(人間): アナリティクスのスニペットをここに挿入 -->
+<style>
+  body{padding-bottom:72px}
+  .wrap{max-width:720px}
+
+  header.page{border-bottom:1px solid var(--rule);padding:28px 0 18px;margin-bottom:28px}
+  header.page h1{font-size:22px;font-weight:600;letter-spacing:.01em;line-height:1.35}
+  header.page p{color:var(--muted);font-size:13px;margin-top:8px}
+
+  section{margin-bottom:34px;padding:0}
+  h2{
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--muted);font-family:ui-monospace,monospace;
+    font-weight:500;margin-bottom:12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h2::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  /* presets */
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .presets button{
+    background:var(--surface);border:1px solid var(--rule);color:var(--muted);
+    padding:7px 11px;font-size:12px;border-radius:2px;cursor:pointer;
+    font-family:inherit;transition:.12s;
+  }
+  .presets button:hover{border-color:#484850;color:var(--text)}
+  .presets button[aria-pressed="true"]{
+    border-color:var(--safelight);color:var(--text);background:#1F1315;
+  }
+  .presets button:focus-visible{outline:2px solid var(--safelight);outline-offset:2px}
+
+  .note{margin-bottom:20px}
+
+  /* curve */
+  .plot{background:var(--surface);border:1px solid var(--rule);padding:14px;border-radius:2px}
+  svg{display:block;width:100%;height:auto;touch-action:none}
+  .axlab{font-size:9px;fill:var(--muted);font-family:ui-monospace,monospace;letter-spacing:.1em}
+
+  /* strips */
+  .stripwrap{margin-top:6px}
+  .striplabel{font-size:10px;color:var(--muted);font-family:ui-monospace,monospace;letter-spacing:.14em;margin-bottom:5px}
+  .strip{display:flex;height:34px;width:100%;border:1px solid var(--rule)}
+  .strip div{height:100%;position:relative}
+  .zlabels{display:flex;width:100%;margin-top:3px}
+  .zlabels span{
+    font-size:8px;color:var(--muted);font-family:ui-monospace,monospace;
+    text-align:center;overflow:hidden;white-space:nowrap;
+  }
+
+  /* texture canvas */
+  canvas{width:100%;height:auto;display:block;image-rendering:auto;border:1px solid var(--rule)}
+  .cap{font-size:11px;color:var(--muted);margin-top:6px}
+
+  /* slope table */
+  table{font-size:12px}
+  td{padding:5px 0}
+  td:first-child{width:44px}
+  td:last-child{width:64px;text-align:right}
+  .bar{height:7px;background:var(--cold);border-radius:1px}
+  .bar.up{background:var(--safelight)}
+  .barcell{padding-right:14px}
+  .barbg{position:relative;background:#232329;height:7px;border-radius:1px}
+  .unity{position:absolute;left:33.33%;top:-3px;bottom:-3px;width:1px;background:#4A4A52}
+
+  .sum{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);
+    font-size:12px;color:var(--muted);
+  }
+  .sum b{color:var(--text);font-size:15px}
+
+  .legend{display:flex;gap:16px;font-size:11px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+  .swatch{display:inline-block;width:10px;height:10px;vertical-align:-1px;margin-right:5px;border-radius:1px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html">触れる現像講座<span>(仮)</span></a>
+    <a class="item" href="index.html">講座</a>
+    <a class="item" href="tone-curve.html" aria-current="page">実験台</a>
+    <a class="item" href="portfolio.html">制作依頼</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="page">
+  <div class="eyebrow">Tone / Slope / Survival</div>
+  <h1>トーンカーブ実験台</h1>
+  <p>カーブそのものより、<b>傾きが何をしているか</b>を見るための装置。制御点はドラッグできます。</p>
+</header>
+
+<section>
+  <h2>Curve</h2>
+  <div class="presets" id="presets"></div>
+  <div class="note" id="note"></div>
+  <div class="plot">
+    <svg id="svg" viewBox="0 0 320 320" role="img" aria-label="トーンカーブ">
+      <g id="grid"></g>
+      <line x1="30" y1="290" x2="290" y2="30" stroke="#33333A" stroke-width="1" stroke-dasharray="2 3"/>
+      <path id="curve" fill="none" stroke="#C43D2E" stroke-width="2"/>
+      <g id="pts"></g>
+      <text class="axlab" x="30" y="308">0 — INPUT —</text>
+      <text class="axlab" x="252" y="308">255</text>
+      <text class="axlab" x="4" y="290">0</text>
+      <text class="axlab" x="4" y="36">255</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <h2>① 傾きの保存則</h2>
+  <p style="font-size:13px;color:#B9B7B2;margin-bottom:14px">
+    入力の各ゾーンが、出力レンジのどれだけの幅を与えられたか。<b>幅の合計は常に 100%</b> ——
+    どこかを広げれば、必ずどこかが狭くなる。
+  </p>
+
+  <div class="stripwrap">
+    <div class="striplabel">INPUT — 入力レンジ上のゾーン</div>
+    <div class="strip" id="stripIn"></div>
+    <div class="zlabels" id="zlabIn"></div>
+  </div>
+
+  <div class="stripwrap" style="margin-top:18px">
+    <div class="striplabel">OUTPUT — 出力レンジ上の同じゾーン</div>
+    <div class="strip" id="stripOut"></div>
+    <div class="zlabels" id="zlabOut"></div>
+  </div>
+
+  <div class="sum">
+    <span>出力幅の合計</span>
+    <b class="mono" id="sum">100.0%</b>
+  </div>
+</section>
+
+<section>
+  <h2>② 質感の生存テスト</h2>
+  <p style="font-size:13px;color:#B9B7B2;margin-bottom:14px">
+    各ゾーンに <span class="mono">±3.5%</span> の微細テクスチャ(金網・スポーク・アスファルトの骨材に相当)を
+    埋め込んである。カーブを通すと、<b>傾きが 1 を下回った帯からテクスチャが消える</b>。
+  </p>
+  <div class="striplabel">BEFORE — 入力(リニア)</div>
+  <canvas id="cvBefore" width="528" height="52" aria-label="カーブ適用前のテクスチャ"></canvas>
+  <div class="striplabel" style="margin-top:14px">AFTER — カーブ適用後</div>
+  <canvas id="cvAfter" width="528" height="52" aria-label="カーブ適用後のテクスチャ"></canvas>
+  <div class="zlabels" id="zlabTex" style="margin-top:4px"></div>
+  <p class="cap">画面の輝度を上げ、顔を近づけて見ること。消えたテクスチャは、あとから戻せない。</p>
+</section>
+
+<section>
+  <h2>③ ゾーン別の傾き</h2>
+  <table>
+    <thead><tr><th>Zone</th><th>Slope f′(x)</th><th>値</th></tr></thead>
+    <tbody id="slopeBody"></tbody>
+  </table>
+  <div class="legend">
+    <span><i class="swatch" style="background:var(--safelight)"></i>傾き &gt; 1 — 伸長(分離が生まれる)</span>
+    <span><i class="swatch" style="background:var(--cold)"></i>傾き &lt; 1 — 圧縮(質感が死ぬ)</span>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    © 2026 触れる現像講座(仮) — <a href="portfolio.html">Web制作・教材制作のご依頼</a>
+  </div>
+</footer>
+
+<script>
+const ZB = [0,.03,.08,.15,.23,.36,.53,.67,.81,.91,.98,1];
+const ZN = ["0","I","II","III","IV","V","VI","VII","VIII","IX","X"];
+const ZM = ZB.slice(0,11).map((b,i)=>(b+ZB[i+1])/2);
+
+const PRESETS = [
+  { name:"リニア", pts:[[0,0],[1,1]],
+    note:"基準。すべてのゾーンの傾きが 1。何も伸ばさず、何も潰さない。<b>この状態からの差分だけが、あなたの設計である。</b>" },
+  { name:"S字", pts:[[0,0],[.25,.17],[.5,.5],[.75,.83],[1,1]],
+    note:"中間調に傾きを集める。代償として <b>Zone I–III と VII–IX の質感が死ぬ</b>。硬い夏光の街角には向くが、影の質感を要求するなら下端を寝かせすぎないこと。" },
+  { name:"逆S字(両端伸長)", pts:[[0,0],[.2,.28],[.5,.5],[.8,.72],[1,1]],
+    note:"両端に傾きを移送し、中間を寝かせる。情報が中間調に密集した画面で、最奥のシルエットと最上層の空を同時に引き離せる。" },
+  { name:"マット(黒上げ)", pts:[[0,.10],[.5,.52],[1,.97]],
+    note:"Zone 0 を捨て、黒を Zone I–II へ持ち上げる。全体の傾きは 1 未満になる = <b>コントラストの総量を放棄する代わりに、両端の情報を全部残す</b>。シリーズ統一のための黒レベル定義に使える。" },
+  { name:"シャドウ締め・ハイライト保護", pts:[[0,0],[.15,.05],[.7,.82],[1,.95]],
+    note:"上端の傾き ≈ 0.4。<b>白壁を Zone VII に留めて割らない</b>。失ったハイライトの質感は、トーンではなく<b>テクスチャ(空間周波数)で取り戻す</b>——トーンと質感の分業。" },
+  { name:"ハイライト分離", pts:[[0,0],[.5,.42],[.75,.60],[.9,.80],[1,1]],
+    note:"上端の傾き ≈ 2。金属反射を、周囲の路面から引き剥がす。中間調は代償として寝る。" },
+  { name:"《Pixels》— 金網を沈める", pts:[[0,0],[.30,.14],[.55,.58],[1,1]],
+    note:"金網(Zone II–III)を沈め、その上に急峻な傾きを置いて<b>自転車(Zone IV–V)と背景(VI–VII)を引き離す</b>。格子・被写体・地の三層が 2 Zone ずつ離れる。<b>Zone 0 の面積はほぼゼロでよい</b> ——この作品の強度は黒の深さではなく格子の規則性にある。" },
+];
+
+let pts = PRESETS[0].pts.map(p=>({x:p[0],y:p[1]}));
+let active = 0;
+
+/* ---- monotone cubic (Fritsch–Carlson) ---- */
+function spline(P){
+  const n=P.length, xs=P.map(p=>p.x), ys=P.map(p=>p.y);
+  if(n<2) return x=>x;
+  const d=[],m=new Array(n);
+  for(let i=0;i<n-1;i++) d[i]=(ys[i+1]-ys[i])/(xs[i+1]-xs[i]);
+  m[0]=d[0]; m[n-1]=d[n-2];
+  for(let i=1;i<n-1;i++){
+    if(d[i-1]*d[i]<=0){ m[i]=0; }
+    else{
+      const h1=xs[i+1]-xs[i], h0=xs[i]-xs[i-1];
+      const w1=2*h1+h0, w2=h1+2*h0;
+      m[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);
+    }
+  }
+  return function(x){
+    x=Math.min(1,Math.max(0,x));
+    let i=0; while(i<n-2 && x>xs[i+1]) i++;
+    const h=xs[i+1]-xs[i], t=(x-xs[i])/h, t2=t*t, t3=t2*t;
+    const v=(2*t3-3*t2+1)*ys[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*ys[i+1]+(t3-t2)*h*m[i+1];
+    return Math.min(1,Math.max(0,v));
+  };
+}
+let f = spline(pts);
+const slopeAt = x => { const h=.008, a=Math.max(0,x-h), b=Math.min(1,x+h); return (f(b)-f(a))/(b-a); };
+const gray = v => { const c=Math.round(v*255); return `rgb(${c},${c},${c})`; };
+
+/* ---- geometry ---- */
+const X = x => 30 + x*260, Y = y => 290 - y*260;
+const invX = px => (px-30)/260, invY = py => (290-py)/260;
+
+/* ---- build ---- */
+const presetsEl = document.getElementById("presets");
+PRESETS.forEach((p,i)=>{
+  const b=document.createElement("button");
+  b.textContent=p.name; b.setAttribute("aria-pressed", i===0);
+  b.onclick=()=>{ active=i; pts=p.pts.map(q=>({x:q[0],y:q[1]})); syncButtons(); render(); };
+  presetsEl.appendChild(b);
+});
+function syncButtons(){
+  [...presetsEl.children].forEach((b,i)=>b.setAttribute("aria-pressed", i===active));
+  document.getElementById("note").innerHTML = PRESETS[active].note;
+}
+
+const gridEl=document.getElementById("grid");
+ZB.forEach(b=>{
+  const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",X(b)); l.setAttribute("x2",X(b));
+  l.setAttribute("y1",30); l.setAttribute("y2",290);
+  l.setAttribute("stroke","#232329"); l.setAttribute("stroke-width","1");
+  gridEl.appendChild(l);
+  const h=document.createElementNS("http://www.w3.org/2000/svg","line");
+  h.setAttribute("y1",Y(b)); h.setAttribute("y2",Y(b));
+  h.setAttribute("x1",30); h.setAttribute("x2",290);
+  h.setAttribute("stroke","#232329"); h.setAttribute("stroke-width","1");
+  gridEl.appendChild(h);
+});
+
+function render(){
+  f = spline(pts);
+
+  // curve
+  let d="";
+  for(let i=0;i<=130;i++){ const x=i/130; d += (i?"L":"M") + X(x).toFixed(1) + " " + Y(f(x)).toFixed(1) + " "; }
+  document.getElementById("curve").setAttribute("d", d);
+
+  // control points
+  const g=document.getElementById("pts"); g.innerHTML="";
+  pts.forEach((p,i)=>{
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",X(p.x)); c.setAttribute("cy",Y(p.y)); c.setAttribute("r",6);
+    c.setAttribute("fill","#0E0E10"); c.setAttribute("stroke","#C43D2E"); c.setAttribute("stroke-width","2");
+    c.style.cursor="grab";
+    c.onpointerdown=e=>{ e.preventDefault(); drag(i,c); };
+    g.appendChild(c);
+  });
+
+  // strips
+  const sIn=document.getElementById("stripIn"), sOut=document.getElementById("stripOut");
+  const lIn=document.getElementById("zlabIn"), lOut=document.getElementById("zlabOut"), lTex=document.getElementById("zlabTex");
+  sIn.innerHTML=sOut.innerHTML=lIn.innerHTML=lOut.innerHTML=lTex.innerHTML="";
+  let total=0;
+  for(let i=0;i<11;i++){
+    const wIn=ZB[i+1]-ZB[i];
+    const wOut=Math.max(0, f(ZB[i+1])-f(ZB[i]));
+    total+=wOut;
+
+    const a=document.createElement("div");
+    a.style.flex=wIn; a.style.background=gray(ZM[i]); sIn.appendChild(a);
+
+    const b=document.createElement("div");
+    b.style.flex=Math.max(wOut,0.0005); b.style.background=gray(f(ZM[i])); sOut.appendChild(b);
+
+    const la=document.createElement("span"); la.style.flex=wIn; la.textContent=ZN[i]; lIn.appendChild(la);
+    const lb=document.createElement("span"); lb.style.flex=Math.max(wOut,0.0005); lb.textContent=ZN[i]; lOut.appendChild(lb);
+    const lc=document.createElement("span"); lc.style.flex=1; lc.textContent=ZN[i]; lTex.appendChild(lc);
+  }
+  document.getElementById("sum").textContent = (total*100).toFixed(1)+"%";
+
+  // texture
+  paint(document.getElementById("cvBefore"), v=>v);
+  paint(document.getElementById("cvAfter"), f);
+
+  // slope table
+  const tb=document.getElementById("slopeBody"); tb.innerHTML="";
+  for(let i=0;i<11;i++){
+    const s=slopeAt(ZM[i]);
+    const tr=document.createElement("tr");
+    const pct=Math.min(100, s/3*100);
+    tr.innerHTML =
+      `<td class="mono" style="color:${s>=1?'#D9D7D1':'#75757C'}">${ZN[i]}</td>`+
+      `<td class="barcell"><div class="barbg"><div class="unity"></div>`+
+      `<div class="bar ${s>=1?'up':''}" style="width:${pct}%"></div></div></td>`+
+      `<td class="mono" style="color:${s>=1?'#C43D2E':'#75757C'}">${s.toFixed(2)}</td>`;
+    tb.appendChild(tr);
+  }
+}
+
+function paint(cv, fn){
+  const ctx=cv.getContext("2d");
+  const img=ctx.createImageData(cv.width, cv.height);
+  const colW = cv.width/11;
+  for(let x=0;x<cv.width;x++){
+    const zi=Math.min(10, Math.floor(x/colW));
+    const tex = ((x % 6) < 3) ? 0.035 : -0.035;
+    const v = Math.max(0, Math.min(1, ZM[zi] + tex));
+    const c = Math.round(fn(v)*255);
+    for(let y=0;y<cv.height;y++){
+      const o=(y*cv.width+x)*4;
+      img.data[o]=img.data[o+1]=img.data[o+2]=c; img.data[o+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+}
+
+function drag(i, el){
+  const svg=document.getElementById("svg");
+  const pt=svg.createSVGPoint();
+  const move=e=>{
+    pt.x=e.clientX; pt.y=e.clientY;
+    const p=pt.matrixTransform(svg.getScreenCTM().inverse());
+    let nx=invX(p.x), ny=invY(p.y);
+    ny=Math.min(1,Math.max(0,ny));
+    if(i===0) nx=0; else if(i===pts.length-1) nx=1;
+    else nx=Math.min(pts[i+1].x-.03, Math.max(pts[i-1].x+.03, nx));
+    pts[i]={x:nx,y:ny};
+    render();
+  };
+  const up=()=>{ window.removeEventListener("pointermove",move); window.removeEventListener("pointerup",up); };
+  window.addEventListener("pointermove",move);
+  window.addEventListener("pointerup",up);
+}
+
+syncButtons();
+render();
+</script>
+</body>
+</html>
