@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>業務効率化ツール導入のご提案 — Baker's Dozen</title>
+<style>
+  :root {
+    --paper:#F6F3ED; --surface:#FCFAF6; --surface-2:#F0EBE1;
+    --ink:#232A29; --muted:#6C6E68; --line:#E4DED3; --line-strong:#D6CDBE;
+    --pine:#1E4A44; --pine-soft:#2C665E; --brass:#A9742B;
+    --good:#2F7D5B; --warn:#A9742B; --crit:#A6402F;
+    --font-display:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP","Times New Roman",serif;
+    --font-body:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",Meiryo,system-ui,sans-serif;
+    --font-num:ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:#0F1413; --surface:#172120; --surface-2:#1E2A27;
+      --ink:#ECE7DD; --muted:#9AA09A; --line:#293330; --line-strong:#35423E;
+      --pine:#79BEAE; --pine-soft:#8FCFC0; --brass:#D6A75F;
+      --good:#63B18B; --warn:#D6A75F; --crit:#DD8B73;
+    }
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; }
+  body {
+    background:var(--paper); color:var(--ink);
+    font-family:var(--font-body); line-height:1.75;
+    -webkit-font-smoothing:antialiased; font-feature-settings:"palt";
+    padding:clamp(20px,5vw,64px) clamp(16px,5vw,40px);
+  }
+  .wrap { max-width:840px; margin:0 auto; }
+  :is(h1,h2,h3){ font-family:var(--font-display); text-wrap:balance; line-height:1.35; font-weight:600; margin:0; }
+  p { margin:0; }
+  .num { font-family:var(--font-num); font-variant-numeric:tabular-nums; }
+
+  .cover { border-top:3px solid var(--pine); padding-top:22px; margin-bottom:52px; }
+  .eyebrow { font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; color:var(--pine-soft); font-weight:700; margin-bottom:20px; }
+  .cover h1 { font-size:clamp(1.9rem,5.2vw,3rem); margin:0 0 18px; letter-spacing:.01em; }
+  .cover .lead { font-size:1.06rem; color:var(--muted); max-width:60ch; }
+  .cover .meta { display:flex; flex-wrap:wrap; gap:6px 22px; margin-top:26px; font-size:.8rem; color:var(--muted); border-top:1px solid var(--line); padding-top:16px; }
+  .cover .meta b { color:var(--ink); font-weight:600; }
+
+  section { margin:48px 0; }
+  .sec-head { display:flex; align-items:baseline; gap:14px; margin-bottom:22px; }
+  .sec-head .tag { font-family:var(--font-num); font-size:.78rem; color:var(--brass); border:1px solid var(--line-strong); border-radius:4px; padding:2px 8px; white-space:nowrap; background:var(--surface); }
+  .sec-head h2 { font-size:clamp(1.35rem,3.4vw,1.7rem); }
+  .kicker { color:var(--muted); font-size:.95rem; margin:-8px 0 24px; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--pine); border-radius:6px; padding:22px clamp(18px,3vw,28px); margin:16px 0; }
+  .card + .card { margin-top:14px; }
+
+  ul.clean { list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:9px; }
+  ul.clean li { position:relative; padding-left:20px; }
+  ul.clean li::before { content:""; position:absolute; left:2px; top:.66em; width:6px; height:6px; border-radius:50%; background:var(--pine-soft); }
+  .label { font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; font-weight:700; color:var(--muted); margin-bottom:6px; }
+
+  .stack { display:flex; flex-direction:column; gap:0; margin:8px 0 6px; }
+  .tier { border:1px solid var(--line-strong); border-radius:6px; padding:16px 20px; background:var(--surface); }
+  .tier.upper { border-color:var(--brass); border-style:dashed; }
+  .tier .t-label { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; margin-bottom:6px; }
+  .tier.upper .t-label { color:var(--brass); }
+  .tier.lower .t-label { color:var(--pine-soft); }
+  .tier .t-body { font-size:.95rem; }
+  .stack .joiner { align-self:center; font-size:.74rem; color:var(--muted); font-family:var(--font-num); padding:7px 0; letter-spacing:.02em; }
+
+  .flow { display:grid; grid-template-columns:1fr; gap:14px; margin-top:10px; }
+  .flow .source { text-align:center; background:var(--pine); color:#F6F3ED; border-radius:6px; padding:14px 18px; font-weight:600; font-family:var(--font-display); }
+  @media (prefers-color-scheme:dark){ .flow .source{ color:#0F1413; } }
+  .flow .source small { display:block; font-family:var(--font-body); font-weight:400; opacity:.85; font-size:.78rem; margin-top:3px; }
+  .flow .branches { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .flow .branch { background:var(--surface-2); border:1px solid var(--line); border-radius:6px; padding:14px 16px; font-size:.92rem; }
+  .flow .branch b { color:var(--brass); font-family:var(--font-num); font-size:.82rem; }
+  @media (max-width:520px){ .flow .branches{ grid-template-columns:1fr; } }
+
+  .tbl-wrap { overflow-x:auto; margin-top:12px; border:1px solid var(--line); border-radius:6px; }
+  table { border-collapse:collapse; width:100%; font-size:.9rem; min-width:440px; }
+  th,td { text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top; }
+  thead th { background:var(--surface-2); font-family:var(--font-body); font-weight:700; font-size:.8rem; letter-spacing:.03em; color:var(--muted); }
+  tbody tr:last-child td { border-bottom:none; }
+  .pill { display:inline-block; font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:999px; font-family:var(--font-body); }
+  .pill.free { color:var(--good); background:color-mix(in srgb,var(--good) 15%,transparent); }
+  .pill.paid { color:var(--warn); background:color-mix(in srgb,var(--warn) 15%,transparent); }
+  .pill.build{ color:var(--pine-soft); background:color-mix(in srgb,var(--pine-soft) 15%,transparent); }
+
+  .steps { display:flex; flex-direction:column; gap:14px; counter-reset:step; margin-top:12px; }
+  .step { display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:start; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 20px; }
+  .step .n { counter-increment:step; font-family:var(--font-num); font-weight:700; color:var(--pine); width:38px; height:38px; border-radius:50%; display:grid; place-items:center; border:1.5px solid var(--pine); flex:none; }
+  .step .n::before { content:counter(step); font-size:1.05rem; }
+  .step h3 { font-size:1.05rem; margin:0 0 4px; }
+  .step .when { font-size:.76rem; font-family:var(--font-num); color:var(--brass); margin-bottom:7px; letter-spacing:.02em; }
+  .step p { font-size:.92rem; color:var(--muted); }
+
+  .note { border:1px solid var(--line-strong); border-radius:6px; padding:20px 24px; background:var(--surface); }
+  .note.honest { border-left:3px solid var(--crit); }
+  .note.decision { border-left:3px solid var(--brass); background:var(--surface-2); }
+  .note h3 { font-size:1.1rem; margin-bottom:12px; }
+
+  .foot { margin-top:56px; border-top:1px solid var(--line); padding-top:18px; font-size:.78rem; color:var(--muted); }
+  em.hl { font-style:normal; color:var(--brass); font-weight:600; }
+  strong { font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="cover">
+    <div class="eyebrow">Baker's Dozen ・ 業務効率化のご提案</div>
+    <h1>手作業を減らし、<br>数字で店を回す。</h1>
+    <p class="lead">レジ締めの転記、ランチ／ディナーの手集計、勘に頼るシフト作り ——
+      日々の見えない手間を、既製の無料ツールと最小限の自作の仕組みで減らすご提案です。</p>
+    <div class="meta">
+      <span><b>対象店舗</b>　Baker's Dozen（沼津）</span>
+      <span><b>テーマ</b>　売上・レジ締め／シフト作成の自動化</span>
+      <span><b>作成</b>　2026年7月</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head"><span class="tag">背景</span><h2>なぜ、いま取り組むのか</h2></div>
+    <ul class="clean">
+      <li>梅雨で売上が振れるいまこそ、<strong>日々の数字を早く・正確に</strong>掴んで手を打ちたい。</li>
+      <li>レジ締め後の転記、ランチ／ディナー別の集計、シフト作成が、<strong>毎日の見えない時間</strong>を奪っている。</li>
+      <li>リクルートの「Airシリーズ」など、<strong>大部分が無料で使える既製ツール</strong>が充実してきた。土台はもう揃っている。</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="tag">全体像</span><h2>ぜんぶ作らない。足りない所だけ足す。</h2></div>
+    <p class="kicker">既製ツールで済む部分は既製に任せ、既製が苦手な部分だけを自作で補う「2階建て」の考え方です。</p>
+    <div class="stack">
+      <div class="tier upper">
+        <div class="t-label">2階｜自作でおぎなう（KofProアプリを拡張）</div>
+        <div class="t-body">補正・売掛台帳（つけ払い・関係者売掛・後日訂正の管理）　／　売上に連動したシフト必要人数の提案</div>
+      </div>
+      <div class="joiner">▲ 足りない部分だけを足す</div>
+      <div class="tier lower">
+        <div class="t-label">1階｜既製ツールの土台（大部分が無料）</div>
+        <div class="t-body">Airレジ（会計・売上）　・　Airメイト（売上分析）　・　Airシフト（シフト・勤怠）</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="tag">提案 ①</span><h2>売上・レジ締めの自動化</h2></div>
+    <div class="card">
+      <div class="label">いまの困りごと</div>
+      <ul class="clean">
+        <li>レジ締めのあと、数字を管理表へ<strong>手で書き写している</strong>。</li>
+        <li>ランチとディナーの売上を<strong>手作業で分けて集計</strong>している。</li>
+        <li>つけ払い・オーナー関係者の売掛・後日の訂正で、<strong>日々の数字が実態と合わない</strong>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="label">導入で変わること</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>やること</th><th>担当</th><th>費用</th></tr></thead>
+          <tbody>
+            <tr><td>ランチ／ディナー別の売上集計</td><td>Airレジの「時間帯設定」で自動（設定するだけ）</td><td><span class="pill free">無料</span></td></tr>
+            <tr><td>日々の売上・客数・客単価の集計</td><td>Airメイトが自動で吸い上げ</td><td><span class="pill free">無料</span></td></tr>
+            <tr><td>レジ締め</td><td>会計時に自動集計済み。現金を数えて確認するだけ</td><td><span class="pill free">無料</span></td></tr>
+            <tr><td>つけ・関係者売掛・後日訂正の管理</td><td>自作の「補正・売掛台帳」で管理</td><td><span class="pill build">自作</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">自作の台帳が生むもの</div>
+      <ul class="clean">
+        <li><strong>本当の売上が見える</strong>：食べた日に売上を立て、入金は別に記録。二重計上せず、発生と入金を分けて把握。</li>
+        <li><strong>身内のつけを除いた「市場の売上」</strong>：関係者の飲食を除いた数字で、施策や広告の効果を正しく判断できる。</li>
+        <li><strong>正しい日付での訂正</strong>：後日の直しを元の日付に紐づけ、日別・時間帯別の数字が歪まない。</li>
+        <li><strong>未収の見える化</strong>：誰にいくら残っているか（Airレジには無い機能）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="tag">提案 ②</span><h2>シフト作成の自動化</h2></div>
+    <div class="card">
+      <div class="label">いまの困りごと</div>
+      <ul class="clean">
+        <li>「その日に何人要るか」が<strong>勘</strong>になっている。</li>
+        <li>スタッフの希望シフトの<strong>集約に手間</strong>がかかる。</li>
+        <li>人件費が売上に見合っているか<strong>その場で見えにくい</strong>。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="label">導入で変わること</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>やること</th><th>担当</th><th>費用</th></tr></thead>
+          <tbody>
+            <tr><td>希望シフトの収集・自動反映</td><td>Airシフト標準（スタッフアプリで回収）</td><td><span class="pill paid">無料試用可 / 月額</span></td></tr>
+            <tr><td>シフトの自動作成・人件費の概算</td><td>Airシフト標準（必要人数を入れれば自動）</td><td><span class="pill paid">無料試用可 / 月額</span></td></tr>
+            <tr><td><strong>必要人数を売上実績から提案</strong></td><td>自作（提案①の売上データを活用）</td><td><span class="pill build">自作</span></td></tr>
+            <tr><td>労基法・社会保険の壁のチェック</td><td>自作（提案の際に自動で確認）</td><td><span class="pill build">自作</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">効果</div>
+      <ul class="clean">
+        <li><strong>過剰・不足のない人員配置</strong>：「雨の火曜ランチは2名、晴れの金ディナーは4名」を実績から提案。</li>
+        <li><strong>人件費のムダ削減</strong>：売上に連動した適正人数で、勘による過剰シフトを抑える。</li>
+        <li><strong>法令・社保リスクの予防</strong>：休憩・連続勤務・扶養の壁（106／130万円）を提案時に自動チェック。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="tag">相乗効果</span><h2>①と②は、一本の線でつながる</h2></div>
+    <p class="kicker">同じ売上データが、レジ締めの自動化とシフトの必要人数の両方を動かします。二重の投資になりません。</p>
+    <div class="flow">
+      <div class="source">Airレジの売上データ<small>時間帯別・曜日別・天候別の実績</small></div>
+      <div class="branches">
+        <div class="branch"><b>→ 提案①</b><br>レジ締め・売上集計の自動化と「本当の売上」の把握</div>
+        <div class="branch"><b>→ 提案②</b><br>「その日に何人要るか」を実績から提案</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="tag">進め方</span><h2>段階的に、小さく始める</h2></div>
+    <div class="steps">
+      <div class="step">
+        <div class="n"></div>
+        <div>
+          <div class="when">いますぐ ・ 追加費用ゼロ</div>
+          <h3>既製ツールを設定する</h3>
+          <p>Airレジで時間帯（ランチ／ディナー）を設定し、Airメイトを連携。Airシフトは無料期間で試す。設定作業だけで、集計・締め・希望収集の大部分が自動になります。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n"></div>
+        <div>
+          <div class="when">効果を確認してから</div>
+          <h3>補正・売掛台帳をつくる（提案①）</h3>
+          <p>既存のKofProアプリを拡張して、つけ払い・関係者売掛・後日訂正を管理。外部サービスの追加料金は不要、制作の手間のみ。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n"></div>
+        <div>
+          <div class="when">売上データが溜まってから</div>
+          <h3>売上連動のシフト提案をつくる（提案②）</h3>
+          <p>提案①で整った売上データを使って、必要人数と配置の案を自動生成。Airシフトへ渡して確定します。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="note honest">
+      <h3>正直にお伝えする注意点</h3>
+      <ul class="clean">
+        <li><strong>完全な「ボタンひとつ」にはなりません。</strong>Airレジ・Airシフトは外部アプリ向けの公開窓口がなく、データの受け渡しはCSVを介した半自動になります。</li>
+        <li><strong>事実の記録は人が行います。</strong>つけ払いや訂正の「誰が・いくら・いつ」の入力（1件10秒ほど）は人手。そのあとの計算・集計・反映は自動です。</li>
+        <li><strong>労務・社保は最終確認を。</strong>自動チェックは下支えで、確定は人の判断で行います。</li>
+        <li><strong>Airシフトの有料プランは料金の確認が必要です。</strong>Airレジ・Airメイトは無料で使えます。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="note decision">
+      <h3>ご判断いただきたいこと</h3>
+      <p style="margin-bottom:12px">まずは <em class="hl">STEP 1（既製ツールの設定・追加費用ゼロ）</em> の実施をご承認いただくことをおすすめします。
+        リスクがほぼ無く、レジ締めと集計の手間がすぐ軽くなります。</p>
+      <p>STEP 2・3（自作の台帳とシフト提案）は、STEP 1の効果を見てから、投資に見合うと判断できた時点で進めます。
+        まずは小さく始め、効果を確かめながら広げる進め方です。</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    Baker's Dozen 業務効率化のご提案 ／ 2026年7月　—　既製ツール（Airレジ・Airメイト・Airシフト）と KofProアプリの拡張による、売上・レジ締め・シフト作成の省力化。
+    ツール仕様は各サービスの公式情報に基づく（2026年7月時点）。
+  </div>
+
+</div>
+</body>
+</html>
