@@ -1,0 +1,125 @@
+<title>コフと僕 EP01 ｜ サムネA案「NPU、0%でした」</title>
+<style>
+  /* =========================================================================
+     EP01 サムネイル A案(実測パンチ) 「NPU、0%でした」 — 1280×720 フルブリード
+     タイトル(広リーチ)との分業: サムネが"0%"の数字フックを背負う
+     図解シリーズと同一パレット。168×94(モバイル)での可読性を最優先:
+     要素は3つだけ — 巨大0% / コピー1行 / CPU対比チップ(+コフ小)
+     ========================================================================= */
+  :root {
+    --ground:  #0a0912;
+    --ink:     #f4f2fb;
+    --ink-dim: #a49bc0;
+    --violet:  #a689ff;
+    --violet-deep: #7a5cf0;
+    --orange:  #ff9d54;
+    --red:     #f2554e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #000; }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+    overflow: hidden;
+    background:
+      radial-gradient(95% 130% at 82% 50%, rgba(122,92,240,0.34) 0%, rgba(122,92,240,0) 58%),
+      radial-gradient(70% 90% at 12% 108%, rgba(242,85,78,0.2) 0%, rgba(242,85,78,0) 55%),
+      linear-gradient(160deg, #14102a 0%, var(--ground) 55%, #070610 100%);
+  }
+  /* 微細グリッド(遠目では消える質感) */
+  .stage::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 8cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 8cqw);
+    mask-image: radial-gradient(120% 100% at 60% 50%, #000 30%, transparent 90%);
+  }
+
+  /* ── 巨大 0% (主役・右寄せ) ─────────────────────────────────────── */
+  .zero {
+    position: absolute; right: 3cqw; top: 46%; transform: translateY(-50%);
+    font-family: "Arial Black", "Hiragino Kaku Gothic ProN", sans-serif;
+    font-size: 42cqw; line-height: 1; font-weight: 900; letter-spacing: -0.04em;
+    color: var(--violet);
+    text-shadow:
+      0 0 6cqw rgba(122,92,240,0.55),
+      0 1.2cqw 0 rgba(0,0,0,0.35);
+    -webkit-text-stroke: 0.5cqw rgba(255,255,255,0.1);
+  }
+  .zero .pct { font-size: 0.52em; vertical-align: 0.1em; }
+
+  /* ── コピー(左上・2行) ──────────────────────────────────────────── */
+  .copy {
+    position: absolute; left: 4.5cqw; top: 9cqw;
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    font-weight: 900; line-height: 1.18; letter-spacing: 0.01em;
+    color: var(--ink);
+    font-size: 9.6cqw;
+    text-shadow: 0 0.7cqw 2.4cqw rgba(0,0,0,0.75);
+  }
+  .copy .l2 { display: block; }
+  .copy .z { color: var(--violet); }
+
+  /* ── CPU対比チップ(左下) ────────────────────────────────────────── */
+  .cpu {
+    position: absolute; left: 4.5cqw; bottom: 15cqw;
+    display: flex; align-items: center; gap: 1.6cqw;
+    font-family: "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    font-size: 4.6cqw; font-weight: 900; color: #ffd9d6;
+    background: linear-gradient(180deg, rgba(242,85,78,0.32), rgba(242,85,78,0.16));
+    border: 0.35cqw solid rgba(242,85,78,0.85);
+    border-radius: 1.2cqw;
+    padding: 1.4cqw 2.6cqw;
+    text-shadow: 0 0.4cqw 1.4cqw rgba(0,0,0,0.6);
+  }
+  .cpu b { color: #fff; }
+  .cpu .arrow { color: var(--red); }
+
+  /* ── 実は…の小ラベル ────────────────────────────────────────────── */
+  .sub {
+    position: absolute; left: 4.5cqw; bottom: 8.6cqw;
+    font-family: "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    font-size: 3.4cqw; font-weight: 800; color: var(--ink-dim);
+    letter-spacing: 0.03em;
+  }
+
+  /* ── コフ(右下・小さく=成果物として添える) ──────────────────────── */
+  .kof {
+    position: absolute; right: 4cqw; bottom: 6cqw;
+    width: 11cqw; height: 11cqw; border-radius: 26%;
+    background:
+      radial-gradient(circle at 36% 30%, #d9c9ff 0%, var(--violet) 38%, var(--violet-deep) 78%, #5a3fd0 100%);
+    box-shadow:
+      0 0 4cqw rgba(122,92,240,0.65),
+      inset 0 -1cqw 2.4cqw rgba(0,0,0,0.3);
+  }
+  .kof .eye {
+    position: absolute; top: 38%;
+    width: 16%; height: 24%; border-radius: 45%;
+    background: #17122b;
+    box-shadow: inset 0 -0.25cqw 0.5cqw rgba(255,255,255,0.28);
+  }
+  .kof .eye.l { left: 24%; } .kof .eye.r { right: 24%; }
+  .kof .shine { position: absolute; top: 41%; width: 4.5%; height: 7%; border-radius: 50%; background: #fff; opacity: 0.9; }
+  .kof .shine.l { left: 29%; } .kof .shine.r { right: 33%; }
+</style>
+
+<main class="stage">
+  <div class="zero">0<span class="pct">%</span></div>
+
+  <div class="copy">
+    NPU、<br>
+    <span class="l2"><span class="z">0%</span>でした</span>
+  </div>
+
+  <div class="cpu"><span>動いてたのは</span><b>CPU 69%</b></div>
+  <div class="sub">自作AI相棒・実測の告白</div>
+
+  <div class="kof" aria-hidden="true">
+    <span class="eye l"></span><span class="eye r"></span>
+    <span class="shine l"></span><span class="shine r"></span>
+  </div>
+</main>
