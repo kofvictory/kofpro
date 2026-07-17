@@ -94,7 +94,9 @@
   /* ── コピー(左・縦積み大) ───────────────────────────────────────── */
   .copy {
     position: absolute; left: 4.5cqw; top: 12cqw;
-    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP","Meiryo",sans-serif;
+    /* タイトル書体=明朝(本人決定2026-07-17): ゴシック一色のYTサムネで差別化+物語の温度。
+       最終はPNG書き出し(CSPでlive埋込不可→liveは各OSの明朝にフォールバック) */
+    font-family: "Noto Serif CJK JP","Noto Serif JP","Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
     font-weight: 900; line-height: 1.22; letter-spacing: 0.01em;
     font-size: 10.4cqw; color: var(--ink);
     text-shadow: 0 0.8cqw 2.8cqw rgba(0,0,0,0.8);
