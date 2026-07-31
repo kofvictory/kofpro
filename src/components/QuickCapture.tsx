@@ -14,14 +14,19 @@ export default function QuickCapture() {
     const trimmed = title.trim()
     if (!trimmed) return
     setLoading(true)
-    await supabase.from('entries').insert({
+    const { error } = await supabase.from('entries').insert({
       title: trimmed,
       source: 'manual',
       status: 'inbox',
       kind: 'idea',
     })
-    setTitle('')
     setLoading(false)
+    if (error) {
+      // Surface failures (e.g. RLS denial) instead of silently clearing.
+      alert(`追加に失敗しました: ${error.message}`)
+      return
+    }
+    setTitle('')
     trigger()
   }
 
