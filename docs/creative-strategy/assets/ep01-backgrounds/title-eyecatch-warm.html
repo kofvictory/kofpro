@@ -1,0 +1,64 @@
+<title>コフと僕 EP01 ｜ タイトルアイキャッチ warm（夢・①への橋）</title>
+<style>
+  /* =========================================================================
+     EP01 タイトルアイキャッチ warm : ⓪→①の橋(暖・到達点)
+     構成: ⓪コールドオープン(冷/0%) →暗転→ [cold] →(冷→暖)→ [warm] →①夢パート
+     ★warm=dream-bookend背景の温度。タイトルは物語側=明朝(Noto Serif CJK JP)。
+     ★標(EP/ch)は情報側=ゴシック。telop2層思想(物語=明朝/情報=ゴシック)に整合。
+     ★分業: タイトル=広いエモ(ここ) / 0%数字フック=サムネ・⓪の役目(ここには出さない)。
+     ★可読性: 明朝は細いので weight + warmグロー + 影で背景から浮かせる(品質ゲート)。
+     ★1920x1080・IPセーフ(抽象のみ)。CapCutで文字立ち上げ+軽ズーム、尺1.5〜2.5秒。
+     ========================================================================= */
+  :root{
+    --ground-a:#0e0b1c; --ground-b:#0b0916; --ground-c:#090713;
+    --grid:rgba(198,186,236,1); --grid-op:0.035;
+    --g1c:rgba(255,207,138,0.18); --g1pos:50% 42%; --g1size:70% 64%;
+    --g2c:rgba(95,214,192,0.08); --g2pos:26% 80%;
+    --vig:rgba(12,7,18,0.8); --vig-edge:rgba(9,5,14,0.66);
+    --ink:#f4ecdb; --ink-dim:#d9c9a9; --teal:#7fe3d0;
+    --title-glow:rgba(255,207,138,0.38);
+  }
+  html,body{margin:0;padding:0;background:var(--ground-c);}
+  body{width:1920px;height:1080px;overflow:hidden;position:relative;
+    font-family:"Noto Serif CJK JP","Noto Serif JP",serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  .layer{position:absolute;inset:0;pointer-events:none;}
+  .ground{background:radial-gradient(120% 108% at 50% 44%, var(--ground-a) 0%, var(--ground-b) 52%, var(--ground-c) 100%);}
+  .glow{background:
+    radial-gradient(var(--g1size) at var(--g1pos), var(--g1c), transparent 66%),
+    radial-gradient(52% 54% at var(--g2pos), var(--g2c), transparent 64%);}
+  .grid{opacity:var(--grid-op);filter:blur(0.6px);
+    background-image:
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 68px),
+      repeating-linear-gradient(0deg,  var(--grid) 0 1px, transparent 1px 68px);
+    -webkit-mask-image:radial-gradient(120% 96% at 50% 44%, #000 22%, transparent 84%);
+            mask-image:radial-gradient(120% 96% at 50% 44%, #000 22%, transparent 84%);}
+  .vignette{box-shadow:inset 0 0 300px 60px var(--vig);
+    background:radial-gradient(128% 122% at 50% 46%, transparent 60%, var(--vig-edge) 100%);}
+
+  /* ===== タイトルブロック ===== */
+  .card{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;gap:40px;}
+  .series{display:flex;align-items:center;gap:26px;
+    font-family:"Noto Sans CJK JP",sans-serif;
+    font-size:30px;font-weight:700;letter-spacing:.44em;text-indent:.44em;}
+  .series .ep{color:var(--teal);}
+  .series .ch{color:var(--ink-dim);}
+  .series .sep{width:9px;height:9px;border:1.5px solid rgba(127,227,208,.7);
+    transform:rotate(45deg);}
+  .title{font-weight:700;color:var(--ink);
+    font-size:120px;line-height:1.34;letter-spacing:.05em;
+    text-shadow:0 3px 46px var(--title-glow), 0 2px 4px rgba(0,0,0,.55);}
+  .under{width:150px;height:2px;margin-top:6px;
+    background:linear-gradient(90deg, transparent, var(--teal), transparent);
+    box-shadow:0 0 18px 1px rgba(127,227,208,.55);}
+</style>
+<div class="layer ground"></div>
+<div class="layer glow"></div>
+<div class="layer grid"></div>
+<div class="layer vignette"></div>
+<div class="card">
+  <div class="series"><span class="ep">EP.01</span><span class="sep"></span><span class="ch">コフと僕</span></div>
+  <div class="title">憧れの相棒AIを<br>本気で自作してみる！</div>
+  <div class="under"></div>
+</div>

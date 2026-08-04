@@ -99,5 +99,20 @@
     "⑦ 解決": "warm-bright",
     "⑧ 宿題/CTA/夢への回帰": "warm-bright(夢への回帰の一瞬だけ dream-bookend)",
     "⑨ まとめ/ブックエンド": "dream-bookend"
+  },
+  "eyecatch": {
+    "purpose": "⓪コールドオープン→①夢パートの暗転に差すタイトルカード(提案採用)。掴んでから名乗る+冷→暖の橋",
+    "text": {
+      "title": "憧れの相棒AIを本気で自作してみる！(18字)",
+      "series": "EP.01 ◇ コフと僕",
+      "font_title": "Noto Serif CJK JP(明朝・物語側)",
+      "font_series": "Noto Sans CJK JP(ゴシック・情報側)"
+    },
+    "no_number_here": "0%数字はここに出さない=⓪とサムネの役目。カードは広いエモ側",
+    "frames": [
+      {"id": "cold", "file": "title-eyecatch-cold.html", "png": "title-eyecatch-cold.png", "role": "入口=0%残像(冷)", "bg": "deep-tense"},
+      {"id": "warm", "file": "title-eyecatch-warm.html", "png": "title-eyecatch-warm.png", "role": "到達点=夢(暖)・①へ渡す", "bg": "dream-bookend"}
+    ],
+    "capcut": "⓪(0%)→暗転0.3-0.5s→cold→クロスフェード0.5-1s→warm→①。尺1.5-2.5秒/文字立ち上げ+軽ズーム/BGM継続+SE一発/静止させない。warm1枚でも成立"
   }
 }
