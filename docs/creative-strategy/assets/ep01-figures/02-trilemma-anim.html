@@ -1,0 +1,183 @@
+<title>コフと僕 EP01 ｜ 図解02 三すくみ(アニメーション版)</title>
+<style>
+  /* =========================================================================
+     コフと僕 EP01 · 図解02「三すくみ」アニメーション版(試作)
+     図解02の静止B〜E(段階点灯)を、単一タイムライン(--T)のCSSアニメで自動展開。
+       ライブ: そのまま再生・ループ / フレーム固定: ?t=秒 で -delay+paused=その瞬間を静止描画
+     展開順(≈9s): 三角形を描く→①→②→③点灯→中央3✕1→解決ストリップ→持ち帰り→保持→ループ
+     デザインは静止版と同一トークン(全画面・映像書き出し用)。
+     ========================================================================= */
+  :root {
+    --ground:   #0a0912; --ground-2: #100e1b; --ground-3: #171426;
+    --line: rgba(181,170,224,0.14); --line-2: rgba(181,170,224,0.30);
+    --ink: #ece9f6; --ink-dim: #a49bc0; --ink-faint:#6a627f;
+    --local: #a689ff; --local-deep: #7a5cf0; --local-glow: rgba(166,137,255,0.55);
+    --claude: #ff9d54; --claude-deep: #f4772a; --claude-glow: rgba(255,157,84,0.5);
+    --ok: #9defc0; --no: #e5484d;
+    --stage-w: 1200px;
+    --T: 9s;          /* タイムライン長(ループ) */
+    --seek: 0s;       /* ?t= が入ると -秒 が入り その瞬間で静止 */
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 0;
+    background:
+      radial-gradient(120% 90% at 18% -10%, #16122a 0%, rgba(22,18,42,0) 55%),
+      radial-gradient(130% 100% at 92% 112%, #1a1020 0%, rgba(26,16,32,0) 50%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","YuGothic","Noto Sans JP","Meiryo",system-ui,sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  .stage {
+    position: relative; width: 100vw; aspect-ratio: 16 / 9;
+    container-type: inline-size; overflow: hidden; border-radius: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 40%), var(--ground-2);
+    transform-origin: 50% 46%;
+  }
+  .net { position: absolute; inset: 0; pointer-events: none; opacity: 0.5; }
+  .net::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 50% 45%, #000 30%, transparent 88%);
+  }
+  .net::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(28% 34% at 50% 24%, var(--claude-glow), transparent 70%),
+      radial-gradient(46% 30% at 50% 82%, var(--local-glow), transparent 72%);
+    opacity: 0.4;
+  }
+  .frame { position: absolute; inset: 0; padding: 5.2cqw 6cqw 4.4cqw; display: flex; flex-direction: column; }
+  .eyebrow { display: flex; align-items: center; gap: 1.1cqw; font-size: 1.28cqw; font-weight: 700; letter-spacing: 0.18em; color: var(--ink-dim); }
+  .eyebrow .tag { color: var(--local); padding: 0.35em 0.85em; border: 1px solid var(--local-glow); border-radius: 2px; background: rgba(166,137,255,0.08); letter-spacing: 0.12em; }
+  .eyebrow .en { color: var(--ink-faint); letter-spacing: 0.34em; font-weight: 600; }
+  h1 { margin: 1.7cqw 0 0; font-size: 3.7cqw; line-height: 1.12; font-weight: 800; letter-spacing: 0.005em; text-wrap: balance; }
+  h1 .hl { color: transparent; background: linear-gradient(100deg, var(--local) 0%, #c9b6ff 45%, var(--claude) 120%); -webkit-background-clip: text; background-clip: text; }
+  .dek { margin: 1.3cqw 0 0; font-size: 1.68cqw; color: var(--ink-dim); letter-spacing: 0.02em; }
+  .dek b { color: var(--ink); font-weight: 700; }
+  .figno { position: absolute; top: 5.2cqw; right: 6cqw; font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.24cqw; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-faint); }
+  .figno b { color: var(--local); }
+  .tri { position: relative; flex: 1 1 auto; margin: 2cqw 2cqw 0; }
+  .edges { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .edge-side { stroke: var(--line-2); stroke-width: 1.4; vector-effect: non-scaling-stroke; fill: none; --len: 72; stroke-dasharray: 72; }
+  .edge-base { stroke: var(--local); stroke-width: 2.4; vector-effect: non-scaling-stroke; fill: none; filter: drop-shadow(0 0 6px var(--local-glow)); --len: 66; stroke-dasharray: 66; }
+  .vx {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 27cqw; padding: 1.35cqw 1.5cqw;
+    background: var(--ground-3); border: 1.5px solid var(--line-2);
+    border-radius: 6px; text-align: center;
+    box-shadow: 0 16px 46px -26px rgba(0,0,0,0.9);
+  }
+  .vx .no-num { display: inline-grid; place-items: center; width: 2.5cqw; height: 2.5cqw; margin-bottom: 0.5cqw; font-family: "SF Mono",ui-monospace,monospace; font-size: 1.5cqw; font-weight: 700; border-radius: 50%; }
+  .vx .prop { font-size: 1.92cqw; font-weight: 800; letter-spacing: 0.01em; }
+  .vx .en { display: block; margin-top: 0.3cqw; font-size: 1.06cqw; font-weight: 700; letter-spacing: 0.22em; color: var(--ink-faint); }
+  .v-apex  { left: 50%; top: 17%; border-color: rgba(255,157,84,0.6); background: linear-gradient(180deg, rgba(244,119,42,0.15), rgba(244,119,42,0.05)), var(--ground-3); }
+  .v-left  { left: 17%; top: 80%; border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.15), rgba(122,92,240,0.05)), var(--ground-3); }
+  .v-right { left: 83%; top: 80%; border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.15), rgba(122,92,240,0.05)), var(--ground-3); }
+  .v-apex  .no-num { color: var(--claude); border: 1.5px solid var(--claude); }
+  .v-left  .no-num, .v-right .no-num { color: var(--local); border: 1.5px solid var(--local); }
+  .who { position: absolute; transform: translate(-50%, -50%); font-size: 1.16cqw; font-weight: 800; letter-spacing: 0.06em; padding: 0.4em 0.9em; border-radius: 2px; white-space: nowrap; }
+  .who-claude { left: 50%; top: -1.5%; color: var(--claude); border: 1px solid rgba(255,157,84,0.5); background: rgba(244,119,42,0.1); }
+  .who-local  { left: 50%; top: 99%;  color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.1); }
+  .core { position: absolute; left: 50%; top: 51%; transform: translate(-50%, -50%); text-align: center; width: 30cqw; }
+  .core .x { font-family: "SF Mono",ui-monospace,monospace; font-size: 3.6cqw; font-weight: 700; color: var(--no); line-height: 1; filter: drop-shadow(0 0 12px rgba(229,72,77,0.5)); }
+  .core .msg { margin-top: 0.6cqw; font-size: 1.66cqw; font-weight: 800; letter-spacing: 0.01em; color: var(--ink); }
+  .resolution { flex: 0 0 auto; margin-top: 1.6cqw; display: flex; align-items: center; justify-content: center; gap: 1.4cqw; padding: 1.35cqw 1.8cqw; border-radius: 5px; background: linear-gradient(90deg, rgba(166,137,255,0.12), rgba(255,157,84,0.10)); border: 1px solid var(--line); font-size: 1.66cqw; font-weight: 700; letter-spacing: 0.01em; }
+  .resolution .kill { color: var(--ink-dim); } .resolution .arrow { color: var(--ink-faint); font-family: ui-monospace,monospace; font-size: 1.5cqw; }
+  .resolution .opt { padding: 0.35em 0.9em; border-radius: 3px; font-weight: 800; }
+  .resolution .opt.local  { color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.10); }
+  .resolution .opt.claude { color: var(--claude); border: 1px solid rgba(255,157,84,0.5);  background: rgba(244,119,42,0.10); }
+  .resolution .sep { color: var(--ink-faint); }
+  .takeaway { flex: 0 0 auto; margin-top: 1.5cqw; display: flex; align-items: center; gap: 1.5cqw; padding: 1.35cqw 1.8cqw; border-radius: 5px; background: var(--ground-3); border: 1px solid var(--line); font-size: 1.66cqw; font-weight: 700; color: var(--ink); }
+  .takeaway .lb { flex: 0 0 auto; font-size: 1.18cqw; font-weight: 800; letter-spacing: 0.14em; color: var(--ground); background: linear-gradient(120deg, var(--local), var(--claude)); padding: 0.5em 1em; border-radius: 2px; }
+  .takeaway .em-l { color: var(--local); } .takeaway .em-c { color: var(--claude); }
+
+  /* ── アニメーション層 ───────────────────────────────────────────────
+     共有: 全アニメ要素は同じ --T / linear / infinite / -delay=var(--seek)。
+     各要素は animation-name のみ差し替え、点灯タイミングは keyframes の % に内包。 */
+  .stage, header, .figno, .edge-base, .edge-side,
+  .v-left, .v-right, .v-apex, .core, .who-local, .who-claude, .resolution, .takeaway {
+    animation-duration: var(--T); animation-timing-function: linear;
+    animation-iteration-count: infinite; animation-fill-mode: both;
+    animation-delay: var(--seek);
+  }
+  html.paused *, html.paused *::before, html.paused *::after { animation-play-state: paused !important; }
+
+  .stage    { animation-name: kb; }
+  header    { animation-name: fadeUp; }
+  .figno    { animation-name: fadeIn; }
+  .edge-base, .edge-side { animation-name: draw; }
+  .v-left   { animation-name: vpopL; }
+  .v-right  { animation-name: vpopR; }
+  .v-apex   { animation-name: vpopA; }
+  .core     { animation-name: coreIn; }
+  .who-local, .who-claude { animation-name: fadeSoft; }
+  .resolution { animation-name: slideUp; }
+  .takeaway { animation-name: slideUp2; }
+
+  @keyframes kb { 0%{transform:scale(1.0); opacity:0;} 3%{opacity:1;} 95%{opacity:1;} 100%{transform:scale(1.03); opacity:0;} }
+  @keyframes fadeUp { 0%,2%{opacity:0; transform:translateY(1.3cqw);} 10%{opacity:1; transform:none;} 100%{opacity:1; transform:none;} }
+  @keyframes fadeIn { 0%,4%{opacity:0;} 12%{opacity:1;} 100%{opacity:1;} }
+  @keyframes draw { 0%,4%{stroke-dashoffset:var(--len);} 16%{stroke-dashoffset:0;} 100%{stroke-dashoffset:0;} }
+  /* 頂点: 手前まで減光→cueで発光ポップ→定常。translateはvx位置ごとの中心合わせを保持 */
+  @keyframes vpopL { 0%,15%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 24%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes vpopR { 0%,28%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 33%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 37%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes vpopA { 0%,42%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 47%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 51%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes coreIn { 0%,53%{opacity:0; transform:translate(-50%,-50%) scale(.8);} 60%{opacity:1; transform:translate(-50%,-50%) scale(1.08);} 65%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes fadeSoft { 0%,54%{opacity:0;} 62%{opacity:1;} 100%{opacity:1;} }
+  @keyframes slideUp { 0%,66%{opacity:0; transform:translateY(1.2cqw);} 74%{opacity:1; transform:none;} 100%{opacity:1; transform:none;} }
+  @keyframes slideUp2 { 0%,80%{opacity:0; transform:translateY(1.2cqw);} 88%{opacity:1; transform:none;} 100%{opacity:1; transform:none;} }
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true"></div>
+  <div class="frame">
+    <div class="figno">図解 <b>02</b> / 05</div>
+    <header>
+      <div class="eyebrow">
+        <span class="tag">EP01 · ② なぜハイブリッドか</span>
+        <span class="en">THE TRILEMMA</span>
+      </div>
+      <h1>常駐する相棒の、<span class="hl">三すくみ</span></h1>
+      <p class="dek">オフライン・軽さ・賢さ。ひとつの脳に、<b>3つは揃わない</b>。</p>
+    </header>
+    <section class="tri" aria-label="三すくみの三角形">
+      <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line class="edge-side" x1="50" y1="17" x2="17" y2="80" />
+        <line class="edge-side" x1="50" y1="17" x2="83" y2="80" />
+        <line class="edge-base" x1="17" y1="80" x2="83" y2="80" />
+      </svg>
+      <div class="who who-local">普段づかい = ローカルが満たす</div>
+      <div class="vx v-apex"><span class="no-num">3</span><div class="prop">賢さ・品質</div><span class="en">SMART</span></div>
+      <div class="vx v-left"><span class="no-num">1</span><div class="prop">オフラインでも動く</div><span class="en">OFFLINE</span></div>
+      <div class="vx v-right"><span class="no-num">2</span><div class="prop">低コスト・低遅延</div><span class="en">CHEAP / FAST</span></div>
+      <div class="core"><div class="x">3 ✕ 1</div><div class="msg">3つ同時に満たす脳は、無い</div></div>
+    </section>
+    <div class="resolution">
+      <span class="kill">「常時どっちか」をやめた</span>
+      <span class="arrow">→</span>
+      <span>普段は <span class="opt local">ローカル ①②</span></span>
+      <span class="sep">／</span>
+      <span>賢さが要るときだけ <span class="opt claude">クラウド ③</span></span>
+    </div>
+    <footer class="takeaway">
+      <span class="lb">持ち帰り ★★</span>
+      <span>賢さは<span class="em-c">“常時”</span>じゃなく<span class="em-l">“必要なとき”</span>。——これが、設計判断の型。</span>
+    </footer>
+  </div>
+</main>
+
+<script>
+  /* ?t=秒 が付いたら その瞬間で静止(フレーム書き出し用)。無ければライブ再生・ループ。 */
+  (function () {
+    var p = new URLSearchParams(location.search);
+    if (p.has('t')) {
+      var t = parseFloat(p.get('t')) || 0;
+      document.documentElement.style.setProperty('--seek', (-t) + 's');
+      document.documentElement.classList.add('paused');
+    }
+  })();
+</script>
