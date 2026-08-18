@@ -15,7 +15,7 @@
     --claude: #ff9d54; --claude-deep: #f4772a; --claude-glow: rgba(255,157,84,0.5);
     --ok: #9defc0; --no: #e5484d;
     --stage-w: 1200px;
-    --T: 9s;          /* タイムライン長(ループ) */
+    --T: 18s;         /* タイムライン長(ループ) — 2倍遅め */
     --seek: 0s;       /* ?t= が入ると -秒 が入り その瞬間で静止 */
   }
   * { box-sizing: border-box; }
@@ -66,26 +66,26 @@
   .edge-base { stroke: var(--local); stroke-width: 2.4; vector-effect: non-scaling-stroke; fill: none; filter: drop-shadow(0 0 6px var(--local-glow)); --len: 66; stroke-dasharray: 66; }
   .vx {
     position: absolute; transform: translate(-50%, -50%);
-    width: 27cqw; padding: 1.35cqw 1.5cqw;
+    width: 23cqw; padding: 1.1cqw 1.35cqw;
     background: var(--ground-3); border: 1.5px solid var(--line-2);
     border-radius: 6px; text-align: center;
     box-shadow: 0 16px 46px -26px rgba(0,0,0,0.9);
   }
   .vx .no-num { display: inline-grid; place-items: center; width: 2.5cqw; height: 2.5cqw; margin-bottom: 0.5cqw; font-family: "SF Mono",ui-monospace,monospace; font-size: 1.5cqw; font-weight: 700; border-radius: 50%; }
-  .vx .prop { font-size: 1.92cqw; font-weight: 800; letter-spacing: 0.01em; }
+  .vx .prop { font-size: 1.7cqw; font-weight: 800; letter-spacing: 0.01em; }
   .vx .en { display: block; margin-top: 0.3cqw; font-size: 1.06cqw; font-weight: 700; letter-spacing: 0.22em; color: var(--ink-faint); }
-  .v-apex  { left: 50%; top: 17%; border-color: rgba(255,157,84,0.6); background: linear-gradient(180deg, rgba(244,119,42,0.15), rgba(244,119,42,0.05)), var(--ground-3); }
+  .v-apex  { left: 50%; top: 21%; border-color: rgba(255,157,84,0.6); background: linear-gradient(180deg, rgba(244,119,42,0.15), rgba(244,119,42,0.05)), var(--ground-3); }
   .v-left  { left: 17%; top: 80%; border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.15), rgba(122,92,240,0.05)), var(--ground-3); }
   .v-right { left: 83%; top: 80%; border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.15), rgba(122,92,240,0.05)), var(--ground-3); }
   .v-apex  .no-num { color: var(--claude); border: 1.5px solid var(--claude); }
   .v-left  .no-num, .v-right .no-num { color: var(--local); border: 1.5px solid var(--local); }
   .who { position: absolute; transform: translate(-50%, -50%); font-size: 1.16cqw; font-weight: 800; letter-spacing: 0.06em; padding: 0.4em 0.9em; border-radius: 2px; white-space: nowrap; }
   .who-claude { left: 50%; top: -1.5%; color: var(--claude); border: 1px solid rgba(255,157,84,0.5); background: rgba(244,119,42,0.1); }
-  .who-local  { left: 50%; top: 99%;  color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.1); }
-  .core { position: absolute; left: 50%; top: 51%; transform: translate(-50%, -50%); text-align: center; width: 30cqw; }
-  .core .x { font-family: "SF Mono",ui-monospace,monospace; font-size: 3.6cqw; font-weight: 700; color: var(--no); line-height: 1; filter: drop-shadow(0 0 12px rgba(229,72,77,0.5)); }
-  .core .msg { margin-top: 0.6cqw; font-size: 1.66cqw; font-weight: 800; letter-spacing: 0.01em; color: var(--ink); }
-  .resolution { flex: 0 0 auto; margin-top: 1.6cqw; display: flex; align-items: center; justify-content: center; gap: 1.4cqw; padding: 1.35cqw 1.8cqw; border-radius: 5px; background: linear-gradient(90deg, rgba(166,137,255,0.12), rgba(255,157,84,0.10)); border: 1px solid var(--line); font-size: 1.66cqw; font-weight: 700; letter-spacing: 0.01em; }
+  .who-local  { left: 50%; top: 98%;  color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.1); }
+  .core { position: absolute; left: 50%; top: 54%; transform: translate(-50%, -50%); text-align: center; width: 30cqw; }
+  .core .x { font-family: "SF Mono",ui-monospace,monospace; font-size: 3.15cqw; font-weight: 700; color: var(--no); line-height: 1; filter: drop-shadow(0 0 12px rgba(229,72,77,0.5)); }
+  .core .msg { margin-top: 0.5cqw; font-size: 1.52cqw; font-weight: 800; letter-spacing: 0.01em; color: var(--ink); }
+  .resolution { flex: 0 0 auto; margin-top: 2.8cqw; display: flex; align-items: center; justify-content: center; gap: 1.4cqw; padding: 1.35cqw 1.8cqw; border-radius: 5px; background: linear-gradient(90deg, rgba(166,137,255,0.12), rgba(255,157,84,0.10)); border: 1px solid var(--line); font-size: 1.66cqw; font-weight: 700; letter-spacing: 0.01em; }
   .resolution .kill { color: var(--ink-dim); } .resolution .arrow { color: var(--ink-faint); font-family: ui-monospace,monospace; font-size: 1.5cqw; }
   .resolution .opt { padding: 0.35em 0.9em; border-radius: 3px; font-weight: 800; }
   .resolution .opt.local  { color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.10); }
@@ -123,10 +123,10 @@
   @keyframes fadeIn { 0%,4%{opacity:0;} 12%{opacity:1;} 100%{opacity:1;} }
   @keyframes draw { 0%,4%{stroke-dashoffset:var(--len);} 16%{stroke-dashoffset:0;} 100%{stroke-dashoffset:0;} }
   /* 頂点: 手前まで減光→cueで発光ポップ→定常。translateはvx位置ごとの中心合わせを保持 */
-  @keyframes vpopL { 0%,15%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 24%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
-  @keyframes vpopR { 0%,28%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 33%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 37%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
-  @keyframes vpopA { 0%,42%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 47%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 51%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
-  @keyframes coreIn { 0%,53%{opacity:0; transform:translate(-50%,-50%) scale(.8);} 60%{opacity:1; transform:translate(-50%,-50%) scale(1.08);} 65%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes vpopL { 0%,15%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.03);} 24%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes vpopR { 0%,28%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 33%{opacity:1; transform:translate(-50%,-50%) scale(1.03);} 37%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes vpopA { 0%,42%{opacity:.28; transform:translate(-50%,-50%) scale(.96);} 47%{opacity:1; transform:translate(-50%,-50%) scale(1.03);} 51%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
+  @keyframes coreIn { 0%,53%{opacity:0; transform:translate(-50%,-50%) scale(.8);} 60%{opacity:1; transform:translate(-50%,-50%) scale(1.05);} 65%{transform:translate(-50%,-50%) scale(1);} 100%{opacity:1; transform:translate(-50%,-50%) scale(1);} }
   @keyframes fadeSoft { 0%,54%{opacity:0;} 62%{opacity:1;} 100%{opacity:1;} }
   @keyframes slideUp { 0%,66%{opacity:0; transform:translateY(1.2cqw);} 74%{opacity:1; transform:none;} 100%{opacity:1; transform:none;} }
   @keyframes slideUp2 { 0%,80%{opacity:0; transform:translateY(1.2cqw);} 88%{opacity:1; transform:none;} 100%{opacity:1; transform:none;} }
@@ -146,8 +146,8 @@
     </header>
     <section class="tri" aria-label="三すくみの三角形">
       <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <line class="edge-side" x1="50" y1="17" x2="17" y2="80" />
-        <line class="edge-side" x1="50" y1="17" x2="83" y2="80" />
+        <line class="edge-side" x1="50" y1="21" x2="17" y2="80" />
+        <line class="edge-side" x1="50" y1="21" x2="83" y2="80" />
         <line class="edge-base" x1="17" y1="80" x2="83" y2="80" />
       </svg>
       <div class="who who-local">普段づかい = ローカルが満たす</div>
@@ -164,7 +164,6 @@
       <span>賢さが要るときだけ <span class="opt claude">クラウド ③</span></span>
     </div>
     <footer class="takeaway">
-      <span class="lb">持ち帰り ★★</span>
       <span>賢さは<span class="em-c">“常時”</span>じゃなく<span class="em-l">“必要なとき”</span>。——これが、設計判断の型。</span>
     </footer>
   </div>
