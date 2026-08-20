@@ -1,0 +1,209 @@
+{
+  "dropped": "toggle_wifi_calling",
+  "trajectory": [
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_0",
+          "name": "reset_apn_settings",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.022839",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_0",
+      "role": "tool",
+      "content": "APN settings will reset at reboot.\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.022815"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_1",
+          "name": "reboot_device",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.022902",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_1",
+      "role": "tool",
+      "content": "Resetting APN settings...\nRestarting network services...\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.022889"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_2",
+          "name": "toggle_data",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.022959",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_2",
+      "role": "tool",
+      "content": "Mobile Data is now ON.\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.022953"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_3",
+          "name": "refuel_data",
+          "arguments": {
+            "customer_id": "C1001",
+            "line_id": "L1002",
+            "gb_amount": 2.0
+          },
+          "requestor": "assistant"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.023063",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_3",
+      "role": "tool",
+      "content": "{\"message\": \"Successfully added 2.0 GB of data for line L1002 for $4.00\", \"new_data_refueling_gb\": \"2.0\", \"charge\": \"4.0\"}",
+      "requestor": "assistant",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.023051"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_4",
+          "name": "reseat_sim_card",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.023188",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_4",
+      "role": "tool",
+      "content": "SIM card re-seated successfully.\nStatus Bar: \ud83d\udcf6\u2074 Excellent | 5G | \ud83d\udcf1 Data Enabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-20T11:37:54.023176"
+    }
+  ]
+}

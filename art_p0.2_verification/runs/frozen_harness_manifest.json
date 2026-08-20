@@ -1,0 +1,23 @@
+{
+  "manifest": {
+    "agent_model": "<frontier-model-TBD>",
+    "agent_model_args": {},
+    "agent_system_prompt_hash": "fc7ab99440c0a90d249b525b6b46ae28f0144f19c30af1ca2eede898601c5a5d",
+    "agent_policy_prompt_hash": "065b48503bf780153fc671455cdfddb85b4c6ffb11e2ea93bd940233d804c3e9",
+    "domain_policy_text_hash": "065b48503bf780153fc671455cdfddb85b4c6ffb11e2ea93bd940233d804c3e9",
+    "wrapper_class": "art_p0.BudgetEnforcingAgent",
+    "budget_overflow_policy": "atomic_raise",
+    "tool_schema_hash": "2fff9bff3eb20ba09a2e1cf23705561c1da3a60f4298b032b9c0cbe0739820f5",
+    "tool_permissions": {},
+    "user_model": "<user-sim-model-TBD>",
+    "user_model_args": {},
+    "max_steps": 100,
+    "benchmark_runtime_commit": "a2c024725189473d2d7cea3a5cfdbcc67478e41f",
+    "verified_dataset_commit": "864350a8971a8f8ee9e7b8472e2edc380a806b0c",
+    "extra": {
+      "domain": "telecom",
+      "evaluation_type": "ALL"
+    }
+  },
+  "manifest_hash": "b370c7e32c565f4bb56609ba1d39b0d8232636d5131604ea353cfba83af64824"
+}

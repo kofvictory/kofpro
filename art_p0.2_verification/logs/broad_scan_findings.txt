@@ -1,0 +1,22 @@
+P0.2 broad task-validity scan (telecom, runtime a2c0247 / verified 864350a)
+==========================================================================
+Universe: full telecom set = 2285 semantically-distinct tasks.
+D_validated primary unit: base split = 114 canonical tasks (fully 5-probe audited).
+
+Structural scan over ALL 2285 tasks:
+  refusal tasks (no mutating reference action): 32
+  refusal tasks NOT gated by ACTION/COMMUNICATE (no-op false-positive risk): 0
+
+No-op false-positive hunt (empty trajectory graded):
+  ENV_ASSERTION-only tasks in full: 2253
+  random sample graded: 600
+  no-op false positives found: 0
+
+Gold/no-op/omission generalization (random 150 tasks OUTSIDE base split):
+  gold reference PASS: 150/150
+  no-op no-false-positive: 150/150
+  omission DETECTED-or-NA: 150/150
+
+Conclusion: telecom tasks are well-formed under the five probes; no GOLD_FAIL,
+NOOP_FALSE_POSITIVE, OMISSION_NOT_DETECTED, or POLICY_MISMATCH found in base or
+in the broader sample.
