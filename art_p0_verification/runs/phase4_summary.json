@@ -1,0 +1,88 @@
+{
+  "commit_pinned": "a2c024725189473d2d7cea3a5cfdbcc67478e41f",
+  "budgets": [
+    1,
+    2,
+    4
+  ],
+  "records": [
+    {
+      "budget": 1,
+      "tool_calls_used": 1,
+      "official_reward": null,
+      "budget_exceeded": true,
+      "success_official": false,
+      "termination_reason": "ART_BUDGET_EXCEEDED",
+      "orchestrator_termination_reason": null,
+      "step_count": 3,
+      "initial_state_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "harness_hash": "62dc171e5ed180351402012742a707c32a13694fed7177421192ead28bcb9787",
+      "environment_object_id": 140659470314064,
+      "trajectory_path": "runs/trajectories/36be5148-bd5b-484e-af9d-7afa222680a0.json",
+      "run_id": "36be5148-bd5b-484e-af9d-7afa222680a0"
+    },
+    {
+      "budget": 2,
+      "tool_calls_used": 2,
+      "official_reward": null,
+      "budget_exceeded": true,
+      "success_official": false,
+      "termination_reason": "ART_BUDGET_EXCEEDED",
+      "orchestrator_termination_reason": null,
+      "step_count": 5,
+      "initial_state_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "harness_hash": "62dc171e5ed180351402012742a707c32a13694fed7177421192ead28bcb9787",
+      "environment_object_id": 140659470304176,
+      "trajectory_path": "runs/trajectories/937396c6-c402-45b2-a529-684487759dce.json",
+      "run_id": "937396c6-c402-45b2-a529-684487759dce"
+    },
+    {
+      "budget": 4,
+      "tool_calls_used": 3,
+      "official_reward": 1.0,
+      "budget_exceeded": false,
+      "success_official": true,
+      "termination_reason": "user_stop",
+      "orchestrator_termination_reason": "user_stop",
+      "step_count": 9,
+      "initial_state_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "harness_hash": "62dc171e5ed180351402012742a707c32a13694fed7177421192ead28bcb9787",
+      "environment_object_id": 140659470317568,
+      "trajectory_path": "runs/trajectories/e0338441-a9e1-45c2-849a-bfa5dd30d4fa.json",
+      "run_id": "e0338441-a9e1-45c2-849a-bfa5dd30d4fa"
+    }
+  ],
+  "matrix_invariants_errors": [],
+  "explicit_checks": {
+    "I1_budget_ceiling": true,
+    "I3_initial_state_equal": true,
+    "I4_fresh_env": true,
+    "I5_harness_equal": true,
+    "I6_persistence": true,
+    "I7_infeasible_is_failure": true,
+    "nested_monotonic_used": true,
+    "I2_atomic_overflow_raised": true,
+    "I2_atomic_no_partial_exec": true
+  },
+  "atomic_overflow_probe": {
+    "raised": true,
+    "error": {
+      "requested": 2,
+      "remaining": 1,
+      "used": 0,
+      "limit": 1
+    },
+    "budget_used_after": 0,
+    "db_unchanged": true,
+    "tasks_before": {
+      "user_1": [
+        "task_1"
+      ]
+    },
+    "tasks_after": {
+      "user_1": [
+        "task_1"
+      ]
+    }
+  }
+}

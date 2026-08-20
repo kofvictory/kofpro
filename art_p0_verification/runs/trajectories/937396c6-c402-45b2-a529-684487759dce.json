@@ -1,0 +1,141 @@
+{
+  "harness_hash": "62dc171e5ed180351402012742a707c32a13694fed7177421192ead28bcb9787",
+  "messages": [
+    {
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "channel_effects": null,
+      "chunk_id": null,
+      "contains_speech": true,
+      "content": "Hi! How can I help you today?",
+      "cost": 0.0,
+      "generation_time_seconds": null,
+      "is_audio": false,
+      "is_final_chunk": true,
+      "raw_data": null,
+      "role": "assistant",
+      "source": null,
+      "source_effects": null,
+      "speech_effects": null,
+      "timestamp": "2026-08-20T07:41:29.045656",
+      "tool_calls": null,
+      "turn_idx": 0,
+      "turn_taking_action": null,
+      "usage": null,
+      "utterance_ids": null
+    },
+    {
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "channel_effects": null,
+      "chunk_id": null,
+      "contains_speech": true,
+      "content": "Please create a task called 'Important Meeting' for user_1.",
+      "cost": null,
+      "generation_time_seconds": null,
+      "is_audio": false,
+      "is_final_chunk": true,
+      "raw_data": null,
+      "role": "user",
+      "source": null,
+      "source_effects": null,
+      "speech_effects": null,
+      "timestamp": "2026-08-20T07:41:29.045759",
+      "tool_calls": null,
+      "turn_idx": 1,
+      "turn_taking_action": null,
+      "usage": null,
+      "utterance_ids": null
+    },
+    {
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "channel_effects": null,
+      "chunk_id": null,
+      "contains_speech": true,
+      "content": null,
+      "cost": null,
+      "generation_time_seconds": null,
+      "is_audio": false,
+      "is_final_chunk": true,
+      "raw_data": null,
+      "role": "assistant",
+      "source": null,
+      "source_effects": null,
+      "speech_effects": null,
+      "timestamp": "2026-08-20T07:41:29.046243",
+      "tool_calls": [
+        {
+          "arguments": {
+            "title": "Important Meeting",
+            "user_id": "user_1"
+          },
+          "id": "call_create_1",
+          "name": "create_task",
+          "requestor": "assistant"
+        }
+      ],
+      "turn_idx": 2,
+      "turn_taking_action": null,
+      "usage": null,
+      "utterance_ids": null
+    },
+    {
+      "content": "{\"task_id\": \"task_2\", \"title\": \"Important Meeting\", \"description\": null, \"status\": \"pending\"}",
+      "error": false,
+      "id": "call_create_1",
+      "requestor": "assistant",
+      "role": "tool",
+      "timestamp": "2026-08-20T07:41:29.047989",
+      "turn_idx": 3
+    },
+    {
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "channel_effects": null,
+      "chunk_id": null,
+      "contains_speech": true,
+      "content": null,
+      "cost": null,
+      "generation_time_seconds": null,
+      "is_audio": false,
+      "is_final_chunk": true,
+      "raw_data": null,
+      "role": "assistant",
+      "source": null,
+      "source_effects": null,
+      "speech_effects": null,
+      "timestamp": "2026-08-20T07:41:29.048112",
+      "tool_calls": [
+        {
+          "arguments": {},
+          "id": "call_getusers_1",
+          "name": "get_users",
+          "requestor": "assistant"
+        }
+      ],
+      "turn_idx": 4,
+      "turn_taking_action": null,
+      "usage": null,
+      "utterance_ids": null
+    },
+    {
+      "content": "[{\"user_id\": \"user_1\", \"name\": \"Test User\", \"tasks\": [\"task_1\", \"task_2\"]}]",
+      "error": false,
+      "id": "call_getusers_1",
+      "requestor": "assistant",
+      "role": "tool",
+      "timestamp": "2026-08-20T07:41:29.048293",
+      "turn_idx": 5
+    }
+  ],
+  "resource_interface_id": "tool_budget_2",
+  "reward_info": null,
+  "run_id": "937396c6-c402-45b2-a529-684487759dce",
+  "task_id": "create_task_1",
+  "termination_reason": "ART_BUDGET_EXCEEDED"
+}

@@ -1,0 +1,278 @@
+2026-08-20 07:41:25.538 | WARNING  | tau2.utils.utils:<module>:15 - No .env file found
+2026-08-20 07:41:25.538 | INFO     | tau2.utils.utils:<module>:28 - Using data directory from source: /home/user/kofpro/art_audit/tau2-bench/data
+2026-08-20 07:41:28.737 | INFO     | tau2.utils.llm_utils:<module>:102 - LiteLLM: Cache is disabled
+2026-08-20 07:41:28.992 | DEBUG    | tau2.registry:<module>:281 - Registering default components...
+2026-08-20 07:41:28.996 | DEBUG    | tau2.registry:<module>:292 - Voice dependencies not installed, skipping voice user registration
+2026-08-20 07:41:28.997 | DEBUG    | tau2.registry:<module>:350 - Default components registered successfully. Registry info: {
+  "domains": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ],
+  "agents": [
+    "llm_agent",
+    "llm_agent_gt",
+    "llm_agent_solo",
+    "discrete_time_audio_native_agent"
+  ],
+  "users": [
+    "user_simulator",
+    "dummy_user"
+  ],
+  "task_sets": [
+    "mock",
+    "airline",
+    "retail",
+    "telecom_full",
+    "telecom_small",
+    "telecom",
+    "telecom-workflow",
+    "banking_knowledge"
+  ]
+}
+=== Phase 4: real tau Orchestrator, scripted (no-LLM) policies ===
+2026-08-20 07:41:29.037 | INFO     | tau2.orchestrator.orchestrator:_validate_mode_compatibility:477 - Orchestrator initialized in HALF_DUPLEX mode (turn-based) with agent=BudgetEnforcingAgent, user=ScriptedUser
+2026-08-20 07:41:29.037 | WARNING  | tau2.agent.base.participant:set_seed:112 - Setting seed for participant is not implemented for class ScriptedAgent
+2026-08-20 07:41:29.037 | WARNING  | tau2.agent.base.participant:set_seed:112 - Setting seed for participant is not implemented for class ScriptedUser
+2026-08-20 07:41:29.037 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 0. Sending message from Role.AGENT to Role.USER
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 0.
+From role: Role.AGENT
+To role: Role.USER
+Message: AssistantMessage
+content: Hi! How can I help you today?
+is_final_chunk: True
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 1. Sending message from Role.USER to Role.AGENT
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 1.
+From role: Role.USER
+To role: Role.AGENT
+Message: UserMessage
+content: Please create a task called 'Important Meeting' for user_1.
+is_final_chunk: True
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 2. Sending message from Role.AGENT to Role.ENV
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 2.
+From role: Role.AGENT
+To role: Role.ENV
+Message: AssistantMessage
+ToolCalls:
+ToolCall (from assistant)
+id: call_create_1
+name: create_task
+arguments:
+{
+  "user_id": "user_1",
+  "title": "Important Meeting"
+}
+is_final_chunk: True
+2026-08-20 07:41:29.038 | DEBUG    | tau2.environment.environment:get_response:482 - Response: task_id='task_2' title='Important Meeting' description=None status='pending'
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 3. Sending message from Role.ENV to Role.AGENT
+2026-08-20 07:41:29.038 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 3.
+From role: Role.ENV
+To role: Role.AGENT
+Message: ToolMessage (responding to assistant)
+timestamp: 2026-08-20T07:41:29.038444
+content: {"task_id": "task_2", "title": "Important Meeting", "description": null, "status": "pending"}
+2026-08-20 07:41:29.038 | WARNING  | tau2.orchestrator.orchestrator:run:287 - Simulation loop exited with an exception — running emergency cleanup
+B=1: used=1/1 exceeded=True reward=None success=False term=ART_BUDGET_EXCEEDED init_state_sha=74234e98afe7 harness=62dc171e5ed1 traj=yes
+2026-08-20 07:41:29.045 | INFO     | tau2.orchestrator.orchestrator:_validate_mode_compatibility:477 - Orchestrator initialized in HALF_DUPLEX mode (turn-based) with agent=BudgetEnforcingAgent, user=ScriptedUser
+2026-08-20 07:41:29.045 | WARNING  | tau2.agent.base.participant:set_seed:112 - Setting seed for participant is not implemented for class ScriptedAgent
+2026-08-20 07:41:29.045 | WARNING  | tau2.agent.base.participant:set_seed:112 - Setting seed for participant is not implemented for class ScriptedUser
+2026-08-20 07:41:29.045 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 0. Sending message from Role.AGENT to Role.USER
+2026-08-20 07:41:29.045 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 0.
+From role: Role.AGENT
+To role: Role.USER
+Message: AssistantMessage
+content: Hi! How can I help you today?
+is_final_chunk: True
+2026-08-20 07:41:29.046 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 1. Sending message from Role.USER to Role.AGENT
+2026-08-20 07:41:29.046 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 1.
+From role: Role.USER
+To role: Role.AGENT
+Message: UserMessage
+content: Please create a task called 'Important Meeting' for user_1.
+is_final_chunk: True
+2026-08-20 07:41:29.046 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 2. Sending message from Role.AGENT to Role.ENV
+2026-08-20 07:41:29.047 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 2.
+From role: Role.AGENT
+To role: Role.ENV
+Message: AssistantMessage
+ToolCalls:
+ToolCall (from assistant)
+id: call_create_1
+name: create_task
+arguments:
+{
+  "user_id": "user_1",
+  "title": "Important Meeting"
+}
+is_final_chunk: True
+2026-08-20 07:41:29.047 | DEBUG    | tau2.environment.environment:get_response:482 - Response: task_id='task_2' title='Important Meeting' description=None status='pending'
+2026-08-20 07:41:29.048 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 3. Sending message from Role.ENV to Role.AGENT
+2026-08-20 07:41:29.048 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 3.
+From role: Role.ENV
+To role: Role.AGENT
+Message: ToolMessage (responding to assistant)
+timestamp: 2026-08-20T07:41:29.047989
+content: {"task_id": "task_2", "title": "Important Meeting", "description": null, "status": "pending"}
+2026-08-20 07:41:29.048 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 4. Sending message from Role.AGENT to Role.ENV
+2026-08-20 07:41:29.048 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 4.
+From role: Role.AGENT
+To role: Role.ENV
+Message: AssistantMessage
+ToolCalls:
+ToolCall (from assistant)
+id: call_getusers_1
+name: get_users
+arguments:
+{}
+is_final_chunk: True
+2026-08-20 07:41:29.048 | DEBUG    | tau2.environment.environment:get_response:482 - Response: [User(user_id='user_1', name='Test User', tasks=['task_1', 'task_2'])]
+2026-08-20 07:41:29.048 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 5. Sending message from Role.ENV to Role.AGENT
+2026-08-20 07:41:29.048 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 5.
+From role: Role.ENV
+To role: Role.AGENT
+Message: ToolMessage (responding to assistant)
+timestamp: 2026-08-20T07:41:29.048293
+content: [{"user_id": "user_1", "name": "Test User", "tasks": ["task_1", "task_2"]}]
+2026-08-20 07:41:29.048 | WARNING  | tau2.orchestrator.orchestrator:run:287 - Simulation loop exited with an exception — running emergency cleanup
+B=2: used=2/2 exceeded=True reward=None success=False term=ART_BUDGET_EXCEEDED init_state_sha=74234e98afe7 harness=62dc171e5ed1 traj=yes
+2026-08-20 07:41:29.053 | INFO     | tau2.orchestrator.orchestrator:_validate_mode_compatibility:477 - Orchestrator initialized in HALF_DUPLEX mode (turn-based) with agent=BudgetEnforcingAgent, user=ScriptedUser
+2026-08-20 07:41:29.053 | WARNING  | tau2.agent.base.participant:set_seed:112 - Setting seed for participant is not implemented for class ScriptedAgent
+2026-08-20 07:41:29.053 | WARNING  | tau2.agent.base.participant:set_seed:112 - Setting seed for participant is not implemented for class ScriptedUser
+2026-08-20 07:41:29.053 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 0. Sending message from Role.AGENT to Role.USER
+2026-08-20 07:41:29.053 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 0.
+From role: Role.AGENT
+To role: Role.USER
+Message: AssistantMessage
+content: Hi! How can I help you today?
+is_final_chunk: True
+2026-08-20 07:41:29.053 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 1. Sending message from Role.USER to Role.AGENT
+2026-08-20 07:41:29.053 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 1.
+From role: Role.USER
+To role: Role.AGENT
+Message: UserMessage
+content: Please create a task called 'Important Meeting' for user_1.
+is_final_chunk: True
+2026-08-20 07:41:29.053 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 2. Sending message from Role.AGENT to Role.ENV
+2026-08-20 07:41:29.053 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 2.
+From role: Role.AGENT
+To role: Role.ENV
+Message: AssistantMessage
+ToolCalls:
+ToolCall (from assistant)
+id: call_create_1
+name: create_task
+arguments:
+{
+  "user_id": "user_1",
+  "title": "Important Meeting"
+}
+is_final_chunk: True
+2026-08-20 07:41:29.054 | DEBUG    | tau2.environment.environment:get_response:482 - Response: task_id='task_2' title='Important Meeting' description=None status='pending'
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 3. Sending message from Role.ENV to Role.AGENT
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 3.
+From role: Role.ENV
+To role: Role.AGENT
+Message: ToolMessage (responding to assistant)
+timestamp: 2026-08-20T07:41:29.054093
+content: {"task_id": "task_2", "title": "Important Meeting", "description": null, "status": "pending"}
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 4. Sending message from Role.AGENT to Role.ENV
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 4.
+From role: Role.AGENT
+To role: Role.ENV
+Message: AssistantMessage
+ToolCalls:
+ToolCall (from assistant)
+id: call_getusers_1
+name: get_users
+arguments:
+{}
+is_final_chunk: True
+2026-08-20 07:41:29.054 | DEBUG    | tau2.environment.environment:get_response:482 - Response: [User(user_id='user_1', name='Test User', tasks=['task_1', 'task_2'])]
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 5. Sending message from Role.ENV to Role.AGENT
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 5.
+From role: Role.ENV
+To role: Role.AGENT
+Message: ToolMessage (responding to assistant)
+timestamp: 2026-08-20T07:41:29.054310
+content: [{"user_id": "user_1", "name": "Test User", "tasks": ["task_1", "task_2"]}]
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 6. Sending message from Role.AGENT to Role.ENV
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 6.
+From role: Role.AGENT
+To role: Role.ENV
+Message: AssistantMessage
+ToolCalls:
+ToolCall (from assistant)
+id: call_getusers_2
+name: get_users
+arguments:
+{}
+is_final_chunk: True
+2026-08-20 07:41:29.054 | DEBUG    | tau2.environment.environment:get_response:482 - Response: [User(user_id='user_1', name='Test User', tasks=['task_1', 'task_2'])]
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 7. Sending message from Role.ENV to Role.AGENT
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 7.
+From role: Role.ENV
+To role: Role.AGENT
+Message: ToolMessage (responding to assistant)
+timestamp: 2026-08-20T07:41:29.054492
+content: [{"user_id": "user_1", "name": "Test User", "tasks": ["task_1", "task_2"]}]
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:829 - Step 8. Sending message from Role.AGENT to Role.USER
+2026-08-20 07:41:29.054 | DEBUG    | tau2.orchestrator.orchestrator:step:832 - Step 8.
+From role: Role.AGENT
+To role: Role.USER
+Message: AssistantMessage
+content: Your task 'Important Meeting' has been created successfully. Anything else?
+is_final_chunk: True
+2026-08-20 07:41:29.055 | WARNING  | tau2.utils.llm_utils:get_cost:494 - User message has no cost: Please create a task called 'Important Meeting' for user_1.
+2026-08-20 07:41:29.055 | WARNING  | tau2.utils.llm_utils:get_cost:488 - Agent message has no cost: None
+2026-08-20 07:41:29.055 | WARNING  | tau2.utils.llm_utils:get_cost:488 - Agent message has no cost: None
+2026-08-20 07:41:29.055 | WARNING  | tau2.utils.llm_utils:get_cost:488 - Agent message has no cost: None
+2026-08-20 07:41:29.055 | WARNING  | tau2.utils.llm_utils:get_cost:488 - Agent message has no cost: Your task 'Important Meeting' has been created successfully. Anything else?
+2026-08-20 07:41:29.055 | WARNING  | tau2.utils.llm_utils:get_cost:494 - User message has no cost: Great, thank you. ###STOP###
+2026-08-20 07:41:29.093 | DEBUG    | tau2.environment.environment:get_response:482 - Response: task_id='task_2' title='Important Meeting' description=None status='pending'
+2026-08-20 07:41:29.094 | INFO     | tau2.runner.simulation:run_simulation:87 - Simulation complete: domain=mock, task=create_task_1, reward=1.0
+B=4: used=3/4 exceeded=False reward=1.0 success=True term=user_stop init_state_sha=74234e98afe7 harness=62dc171e5ed1 traj=yes
+
+=== check_matrix_invariants (ART built-in) ===
+PASS
+
+=== Explicit invariant assertions (real runtime) ===
+{
+  "atomic_overflow_probe": {
+    "raised": true,
+    "error": {
+      "requested": 2,
+      "remaining": 1,
+      "used": 0,
+      "limit": 1
+    },
+    "budget_used_after": 0,
+    "db_unchanged": true,
+    "tasks_before": {
+      "user_1": [
+        "task_1"
+      ]
+    },
+    "tasks_after": {
+      "user_1": [
+        "task_1"
+      ]
+    }
+  }
+}
+  PASS  I1_budget_ceiling
+  PASS  I3_initial_state_equal
+  PASS  I4_fresh_env
+  PASS  I5_harness_equal
+  PASS  I6_persistence
+  PASS  I7_infeasible_is_failure
+  PASS  nested_monotonic_used
+  PASS  I2_atomic_overflow_raised
+  PASS  I2_atomic_no_partial_exec
+
+summary -> runs/phase4_summary.json
+ledger  -> runs/p0_real_matrix.jsonl
+
+PHASE4=PASS

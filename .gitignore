@@ -1,0 +1,6 @@
+# Audit working directory (tau2 clone, venvs, scratch copies).
+# The clean, self-contained deliverable is in art_p0_verification/.
+art_audit/
+**/__pycache__/
+*.egg-info/
+.pytest_cache/
