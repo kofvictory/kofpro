@@ -1,0 +1,30 @@
+{
+  "harness_id": "h1",
+  "manifest": {
+    "agent_model": "gpt-5.4-mini-2026-03-17",
+    "agent_model_args": {
+      "reasoning_effort": "low"
+    },
+    "reasoning_effort": "low",
+    "agent_system_prompt_hash": "c7b297c5b69e1571ec51ddd1c724c4f76359dd36369d2603ab96dba6cd0b3835",
+    "agent_policy_prompt_hash": "d232534fcf44f9cd94bf2540f919e1dc2e20b12ea39dfd4543b63b05cabc307f",
+    "domain_policy_text_hash": "065b48503bf780153fc671455cdfddb85b4c6ffb11e2ea93bd940233d804c3e9",
+    "wrapper_class": "art_p0.harnesses.BudgetAwareEnforcingAgent",
+    "budget_overflow_policy": "atomic_raise",
+    "tool_schema_hash": "2fff9bff3eb20ba09a2e1cf23705561c1da3a60f4298b032b9c0cbe0739820f5",
+    "tool_permissions": {},
+    "user_model": "gpt-4.1-2025-04-14",
+    "user_model_args": {},
+    "max_steps": 100,
+    "benchmark_runtime_commit": "a2c024725189473d2d7cea3a5cfdbcc67478e41f",
+    "verified_dataset_commit": "864350a8971a8f8ee9e7b8472e2edc380a806b0c",
+    "extra": {
+      "harness_id": "h1",
+      "expose_budget": true,
+      "plan_verify": false,
+      "domain": "telecom",
+      "evaluation_type": "ALL"
+    }
+  },
+  "manifest_hash": "59e525755f4cb3701cb29ab528c6065db5bd2ab0dc7dfcd1a122d3037fabab9a"
+}

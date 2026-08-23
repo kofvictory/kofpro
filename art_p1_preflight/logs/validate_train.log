@@ -1,0 +1,49 @@
+[10/74] validated
+[20/74] validated
+[30/74] validated
+[40/74] validated
+[50/74] validated
+[60/74] validated
+[70/74] validated
+[74/74] validated
+
+=== SUMMARY ===
+{
+  "domain": "telecom",
+  "split": "train",
+  "runtime_commit": "a2c024725189473d2d7cea3a5cfdbcc67478e41f",
+  "verified_dataset_commit": "864350a8971a8f8ee9e7b8472e2edc380a806b0c",
+  "n_total": 74,
+  "n_validated": 74,
+  "n_excluded": 0,
+  "n_manual_review": 3,
+  "n_refusal_tasks": 8,
+  "n_normal_tasks": 66,
+  "manifest_hash": "b370c7e32c565f4bb56609ba1d39b0d8232636d5131604ea353cfba83af64824",
+  "probe_summary": {
+    "gold": {
+      "PASS": 74,
+      "FAIL": 0
+    },
+    "noop": {
+      "PASS": 74,
+      "FAIL": 0,
+      "NA": 0
+    },
+    "omission": {
+      "DETECTED": 66,
+      "NOT_DETECTED": 0,
+      "NA": 8
+    },
+    "alternative": {
+      "PASS": 63,
+      "NOT_CONSTRUCTIBLE": 3,
+      "NA": 8
+    },
+    "policy": {
+      "PASS": 74,
+      "FAIL": 0
+    }
+  },
+  "exclusion_reason_counts": {}
+}

@@ -1,0 +1,173 @@
+{
+  "trajectory": [
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_0",
+          "name": "grant_app_permission",
+          "arguments": {
+            "app_name": "messaging",
+            "permission": "sms"
+          },
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958521",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_0",
+      "role": "tool",
+      "content": "Success. Permission 'sms' granted to app 'messaging'.\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958501"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_1",
+          "name": "grant_app_permission",
+          "arguments": {
+            "app_name": "messaging",
+            "permission": "storage"
+          },
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958569",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_1",
+      "role": "tool",
+      "content": "Success. Permission 'storage' granted to app 'messaging'.\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958564"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_2",
+          "name": "reseat_sim_card",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958608",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_2",
+      "role": "tool",
+      "content": "SIM card re-seated successfully.\nStatus Bar: \ud83d\udcf6\u2074 Excellent | 5G | \ud83d\udcf1 Data Enabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958604"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_3",
+          "name": "enable_roaming",
+          "arguments": {
+            "customer_id": "C1001",
+            "line_id": "L1002"
+          },
+          "requestor": "assistant"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958644",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_3",
+      "role": "tool",
+      "content": "Roaming enabled successfully",
+      "requestor": "assistant",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:19.958634"
+    }
+  ]
+}

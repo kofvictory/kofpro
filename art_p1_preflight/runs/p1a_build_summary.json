@@ -1,0 +1,28 @@
+{
+  "eligible_pool": 71,
+  "n_scientific": 24,
+  "n_preflight": 3,
+  "harness_hashes": {
+    "h0": "67e36ec8a5136f10d539a10766e4dad0003eff75a56652cb4834773bd599db6d",
+    "h1": "59e525755f4cb3701cb29ab528c6065db5bd2ab0dc7dfcd1a122d3037fabab9a",
+    "h2": "621fc3fd4a0047aca5180f4ff63c2b8c716037f9fb1250d6d570a6c9ccdc0065"
+  },
+  "design_rows": 432,
+  "preflight_rows": 9,
+  "selection_seed": 20260317,
+  "rollout_seeds": [
+    1000,
+    2000
+  ],
+  "preflight_seed": 424242,
+  "m_x_distribution": {
+    "0": 4,
+    "1": 13,
+    "2": 7
+  },
+  "family_distribution": {
+    "mms_issue": 10,
+    "mobile_data_issue": 9,
+    "service_issue": 5
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "dropped": "set_network_mode_preference",
+  "trajectory": [
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_0",
+          "name": "disconnect_vpn",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:29.132634",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_0",
+      "role": "tool",
+      "content": "VPN disconnected successfully.\nStatus Bar: \ud83d\udcf6\u00b9 Poor | 2G | \ud83d\udcf1 Data Enabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:29.132619"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_1",
+          "name": "toggle_roaming",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:29.132676",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_1",
+      "role": "tool",
+      "content": "Data Roaming is now ON.\nStatus Bar: \ud83d\udcf6\u00b9 Poor | 2G | \ud83d\udcf1 Data Enabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:29.132672"
+    }
+  ]
+}

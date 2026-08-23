@@ -1,0 +1,290 @@
+{
+  "trajectory": [
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_0",
+          "name": "reset_apn_settings",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736375",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_0",
+      "role": "tool",
+      "content": "APN settings will reset at reboot.\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736357"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_1",
+          "name": "reboot_device",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736424",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_1",
+      "role": "tool",
+      "content": "Resetting APN settings...\nRestarting network services...\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736419"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_2",
+          "name": "send_payment_request",
+          "arguments": {
+            "customer_id": "C1001",
+            "bill_id": "B1234321"
+          },
+          "requestor": "assistant"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736467",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_2",
+      "role": "tool",
+      "content": "Payment request sent to the customer for bill B1234321",
+      "requestor": "assistant",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736458"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_3",
+          "name": "make_payment",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736510",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_3",
+      "role": "tool",
+      "content": "Payment of 65.0 USD has been made for bill B1234321.",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736506"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_4",
+          "name": "resume_line",
+          "arguments": {
+            "customer_id": "C1001",
+            "line_id": "L1002"
+          },
+          "requestor": "assistant"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736603",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_4",
+      "role": "tool",
+      "content": "{\"message\": \"Line resumed successfully\", \"line\": {\"line_id\": \"L1002\", \"phone_number\": \"555-123-2002\", \"status\": \"Active\", \"plan_id\": \"P1002\", \"device_id\": \"D1002\", \"data_used_gb\": 8.7, \"data_refueling_gb\": 0.0, \"roaming_enabled\": true, \"contract_end_date\": \"2026-12-31\", \"last_plan_change_date\": \"2024-12-15\", \"last_sim_replacement_date\": \"2025-01-20\", \"suspension_start_date\": null}}",
+      "requestor": "assistant",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736598"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_5",
+          "name": "reboot_device",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736641",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_5",
+      "role": "tool",
+      "content": "Restarting network services...\nStatus Bar: \ud83d\udcf5 No Signal | \ud83d\udcf5 Data Disabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736637"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_6",
+          "name": "reseat_sim_card",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736717",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_6",
+      "role": "tool",
+      "content": "SIM card re-seated successfully.\nStatus Bar: \ud83d\udcf6\u2074 Excellent | 5G | \ud83d\udcf1 Data Enabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:35.736710"
+    }
+  ]
+}

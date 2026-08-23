@@ -1,0 +1,330 @@
+{
+  "route": "reversed",
+  "trajectory": [
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_0",
+          "name": "toggle_roaming",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.227999",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_0",
+      "role": "tool",
+      "content": "Data Roaming is now ON.\nStatus Bar: \u2708\ufe0f Airplane Mode | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.227987"
+    },
+    {
+      "role": "assistant",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_1",
+          "name": "enable_roaming",
+          "arguments": {
+            "customer_id": "C1001",
+            "line_id": "L1002"
+          },
+          "requestor": "assistant"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228037",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_1",
+      "role": "tool",
+      "content": "Roaming enabled successfully",
+      "requestor": "assistant",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228030"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_2",
+          "name": "reseat_sim_card",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228073",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_2",
+      "role": "tool",
+      "content": "SIM card re-seated successfully.\nStatus Bar: \u2708\ufe0f Airplane Mode | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228068"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_3",
+          "name": "toggle_data",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228105",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_3",
+      "role": "tool",
+      "content": "Mobile Data is now ON.\nStatus Bar: \u2708\ufe0f Airplane Mode | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228101"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_4",
+          "name": "reboot_device",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228135",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_4",
+      "role": "tool",
+      "content": "Restarting network services...\nStatus Bar: \u2708\ufe0f Airplane Mode | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228131"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_5",
+          "name": "reset_apn_settings",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228163",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_5",
+      "role": "tool",
+      "content": "APN settings will reset at reboot.\nStatus Bar: \u2708\ufe0f Airplane Mode | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228159"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_6",
+          "name": "set_network_mode_preference",
+          "arguments": {
+            "mode": "4g_5g_preferred"
+          },
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228196",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_6",
+      "role": "tool",
+      "content": "Preferred Network Mode set to: 4g_5g_preferred\nStatus Bar: \u2708\ufe0f Airplane Mode | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228192"
+    },
+    {
+      "role": "user",
+      "content": null,
+      "tool_calls": [
+        {
+          "id": "probe_7",
+          "name": "toggle_airplane_mode",
+          "arguments": {},
+          "requestor": "user"
+        }
+      ],
+      "is_audio": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228228",
+      "cost": null,
+      "usage": null,
+      "raw_data": null,
+      "generation_time_seconds": null,
+      "audio_format": null,
+      "audio_path": null,
+      "audio_script_gold": null,
+      "speech_effects": null,
+      "source_effects": null,
+      "channel_effects": null,
+      "turn_taking_action": null,
+      "utterance_ids": null,
+      "chunk_id": null,
+      "is_final_chunk": true,
+      "source": null,
+      "contains_speech": true
+    },
+    {
+      "id": "probe_7",
+      "role": "tool",
+      "content": "Airplane Mode is now OFF.\nStatus Bar: \ud83d\udcf6\u2074 Excellent | 5G | \ud83d\udcf1 Data Enabled | \ud83d\udd0b 80%",
+      "requestor": "user",
+      "error": false,
+      "turn_idx": null,
+      "timestamp": "2026-08-23T01:12:12.228224"
+    }
+  ]
+}

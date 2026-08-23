@@ -1,0 +1,10 @@
+P1a preflight provenance
+tau2_runtime_commit=a2c024725189473d2d7cea3a5cfdbcc67478e41f (clean working tree)
+verified_dataset_commit=864350a8971a8f8ee9e7b8472e2edc380a806b0c
+python=3.12.3
+agent_model=gpt-5.4-mini-2026-03-17 (reasoning_effort=low)
+user_model=gpt-4.1-2025-04-14
+selection_seed=20260317  rollout_seeds=[1000,2000]  preflight_seed=424242
+harness_hashes: h0=67e36ec8a5136f10 h1=59e525755f4cb370 h2=621fc3fd4a0047ac
+eligible_train_pool=71  scientific=24  preflight=3  design_rows=432  preflight_rows=9
+credentials=NONE (9 paid rollouts NOT executed)

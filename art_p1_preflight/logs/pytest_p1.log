@@ -1,0 +1,8 @@
+...............................................                          [100%]
+=============================== warnings summary ===============================
+tau2-bench/src/tau2/voice/utils/audio_preprocessing.py:4
+  /home/user/kofpro/art_audit/tau2-bench/src/tau2/voice/utils/audio_preprocessing.py:4: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+47 passed, 1 warning in 11.34s
