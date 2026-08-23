@@ -30,7 +30,8 @@ MAX_STEPS = 100
 HARNESS_IDS = ("h0", "h1", "h2")
 
 # --- seeds (fixed in code) ---------------------------------------------------
-SELECTION_SEED = 20260317          # stratified task selection
+SELECTION_SEED = 20260317          # stratified SCIENTIFIC task selection (frozen)
+PREFLIGHT_SELECTION_SEED = 20260318  # preflight-only task selection (v2)
 ROLLOUT_SEEDS = (1000, 2000)       # two replicate rollout seeds (scientific)
 PREFLIGHT_SEED = 424242            # single preflight rollout seed
 
@@ -183,6 +184,70 @@ def stratified_select(
     )
 
 
+def select_preflight_by_mx(
+    pool_meta: list[dict],
+    *,
+    n_preflight: int = N_PREFLIGHT,
+    seed: int = PREFLIGHT_SELECTION_SEED,
+) -> list[str]:
+    """Preflight-task selection v2: one task per distinct m_x level.
+
+    Rationale (P1 MAJOR finding): the v1 preflight tasks all had ``m_x == 1``,
+    so at MID budget they exercised only one point of the resource interface.
+    Preflight exists to verify instrumentation and to check that the budget
+    ceiling can actually engage, so it must span the m_x levels present in the
+    eligible population -- here {0, 1, 2}, giving B_mid in {2, 2, 3}.
+
+    Selection is deterministic given (pool, seed):
+      1. group the pool by ``m_x``; take the ``n_preflight`` lowest levels;
+      2. choose the family assignment that MAXIMIZES the number of distinct
+         families across levels (ties broken by sorted family tuple), so
+         families are spread as far as the pool allows;
+      3. within each (level, family) cell pick the first task of a seeded
+         shuffle of the sorted cell.
+
+    ``pool_meta`` must already exclude the scientific sample, so disjointness
+    is structural. Preflight tasks are development/calibration data and can
+    never enter the scientific sample.
+    """
+    import itertools
+
+    by_level: dict[int, dict[str, list[str]]] = {}
+    for m in pool_meta:
+        by_level.setdefault(m["m_x"], {}).setdefault(m["family"], []).append(m["task_id"])
+    rng = random.Random(seed)
+    for lvl in by_level:
+        for fam in by_level[lvl]:
+            by_level[lvl][fam].sort()
+            rng.shuffle(by_level[lvl][fam])
+
+    levels = sorted(by_level)[:n_preflight]
+    if not levels:
+        return []
+
+    # Maximize distinct families across the chosen levels (small search space).
+    fam_options = [sorted(by_level[lvl]) for lvl in levels]
+    best: tuple | None = None
+    for combo in itertools.product(*fam_options):
+        score = len(set(combo))
+        key = (-score, combo)
+        if best is None or key < best[0]:
+            best = (key, combo)
+    chosen_fams = best[1]
+
+    picked = [by_level[lvl][fam][0] for lvl, fam in zip(levels, chosen_fams)]
+
+    # If the pool had fewer distinct m_x levels than n_preflight, top up
+    # deterministically from the largest remaining cells (documented fallback).
+    if len(picked) < n_preflight:
+        remaining = sorted(
+            (t for lvl in by_level for fam in by_level[lvl] for t in by_level[lvl][fam]
+             if t not in picked)
+        )
+        picked.extend(remaining[: n_preflight - len(picked)])
+    return sorted(picked)
+
+
 def sha256_of_obj(obj: Any) -> str:
     payload = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -199,6 +264,52 @@ def scientific_success_strict(success_official, budget_exceeded) -> Any:
     if success_official is None:
         return None
     return bool(success_official)
+
+
+def ceiling_engaged(used_calls: int, tool_budget_limit: int, budget_exceeded: bool) -> bool:
+    """Did the resource ceiling actually bind on this run?
+
+        ceiling_engaged = (used_calls == B) OR budget_exceeded
+
+    A run where the agent never reached its ceiling provides no information
+    about the resource interface, so this is the key preflight diagnostic for
+    whether the budget manipulation can bite at all on this domain.
+    """
+    return bool(budget_exceeded) or int(used_calls) == int(tool_budget_limit)
+
+
+def summarize_ceiling_engagement(records: list[dict]) -> dict:
+    """Classify preflight ceiling engagement.
+
+    GREEN  : >= 3 of 9 runs engaged AND engagement seen on >= 2 distinct tasks
+    YELLOW : 1-2 of 9 runs engaged
+    RED    : 0 runs engaged
+    """
+    engaged = [r for r in records if r.get("ceiling_engaged")]
+    n = len(engaged)
+    tasks_engaged = sorted({r["task_id"] for r in engaged})
+    if n >= 3 and len(tasks_engaged) >= 2:
+        verdict = "GREEN"
+    elif 1 <= n <= 2:
+        verdict = "YELLOW"
+    elif n == 0:
+        verdict = "RED"
+    else:
+        # >=3 engaged but concentrated on a single task: fails the GREEN
+        # diversity requirement; report as YELLOW with an explicit note.
+        verdict = "YELLOW"
+    return {
+        "verdict": verdict,
+        "n_runs": len(records),
+        "n_ceiling_engaged": n,
+        "n_distinct_tasks_engaged": len(tasks_engaged),
+        "tasks_engaged": tasks_engaged,
+        "criteria": {
+            "GREEN": ">=3/9 engaged AND >=2 distinct tasks",
+            "YELLOW": "1-2/9 engaged (or >=3 concentrated on one task)",
+            "RED": "0/9 engaged",
+        },
+    }
 
 
 def _condition_hash(harness_hash: str, task_id: str, seed: int, budget: int) -> str:

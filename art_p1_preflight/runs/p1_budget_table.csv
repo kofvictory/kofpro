@@ -23,6 +23,6 @@ task_id,set,family,gold_tool_calls,budget_low,budget_mid,budget_high
 [service_issue]airplane_mode_on|break_apn_settings|unseat_sim_card[PERSONA:None],scientific,service_issue,0,1,2,3
 [service_issue]airplane_mode_on|lock_sim_card_pin|overdue_bill_suspension|unseat_sim_card[PERSONA:Easy],scientific,service_issue,1,1,2,3
 [service_issue]airplane_mode_on|overdue_bill_suspension|unseat_sim_card[PERSONA:Easy],scientific,service_issue,2,2,3,4
-[mms_issue]bad_wifi_calling|data_mode_off|data_usage_exceeded[PERSONA:Easy],preflight,mms_issue,1,1,2,3
+[mms_issue]airplane_mode_on|bad_network_preference|bad_wifi_calling|break_app_storage_permission|unseat_sim_card[PERSONA:Hard],preflight,mms_issue,0,1,2,3
 [mobile_data_issue]data_saver_mode_on|data_usage_exceeded[PERSONA:Easy],preflight,mobile_data_issue,1,1,2,3
-[service_issue]contract_end_suspension|lock_sim_card_pin[PERSONA:Hard],preflight,service_issue,1,1,2,3
+[service_issue]airplane_mode_on|break_apn_settings|overdue_bill_suspension|unseat_sim_card[PERSONA:None],preflight,service_issue,2,2,3,4

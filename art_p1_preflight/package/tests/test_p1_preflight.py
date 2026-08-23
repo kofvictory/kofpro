@@ -187,6 +187,71 @@ def test_p1_u12_budget_overflow_forces_failure():
     assert C.scientific_success_strict(None, False) is None
 
 
+def test_p1_u13_preflight_spans_mx_levels(art):
+    """P1-U13: preflight tasks span distinct m_x levels (v2 re-selection).
+
+    v1 preflight was all m_x==1, exercising a single point of the resource
+    interface. v2 must cover the distinct m_x levels available in the pool.
+    """
+    d = json.load(open(art / "p1_preflight_tasks.json"))
+    tasks = {t.id: t for t in get_tasks(C.DOMAIN)}
+    mxs = [C.gold_assistant_tool_calls(tasks[t]) for t in d["task_ids"]]
+    assert len(set(mxs)) == len(d["task_ids"]) == C.N_PREFLIGHT, mxs
+    assert set(mxs) == {0, 1, 2}, mxs
+    fams = [C.task_family(t) for t in d["task_ids"]]
+    assert len(set(fams)) == 3, fams  # families maximally spread
+
+
+def test_p1_u13b_preflight_selection_deterministic(art):
+    """v2 preflight selection is deterministic given (pool, seed)."""
+    sample = json.load(open(art / "p1_task_sample.json"))
+    sci = set(sample["task_ids"])
+    tasks = {t.id: t for t in get_tasks(C.DOMAIN)}
+    pool = [{"task_id": t, "family": C.task_family(t),
+             "m_x": C.gold_assistant_tool_calls(tasks[t])}
+            for t in sample["eligible_population"] if t not in sci]
+    a = C.select_preflight_by_mx(pool, seed=C.PREFLIGHT_SELECTION_SEED)
+    b = C.select_preflight_by_mx(pool, seed=C.PREFLIGHT_SELECTION_SEED)
+    assert a == b == json.load(open(art / "p1_preflight_tasks.json"))["task_ids"]
+    assert not (set(a) & sci)
+
+
+def test_p1_u14_ceiling_engaged_semantics():
+    """P1-U14: ceiling_engaged = (used == B) OR budget_exceeded."""
+    assert C.ceiling_engaged(2, 2, False) is True     # exactly at ceiling
+    assert C.ceiling_engaged(1, 2, False) is False    # below ceiling
+    assert C.ceiling_engaged(0, 3, False) is False
+    assert C.ceiling_engaged(1, 2, True) is True      # overflow, any usage
+    assert C.ceiling_engaged(3, 3, True) is True
+
+
+def test_p1_u14b_ceiling_summary_thresholds():
+    """GREEN/YELLOW/RED classification thresholds."""
+    def rec(task, eng):
+        return {"task_id": task, "ceiling_engaged": eng}
+    none_ = [rec(f"t{i}", False) for i in range(9)]
+    assert C.summarize_ceiling_engagement(none_)["verdict"] == "RED"
+    one = none_[:8] + [rec("tA", True)]
+    assert C.summarize_ceiling_engagement(one)["verdict"] == "YELLOW"
+    two = none_[:7] + [rec("tA", True), rec("tB", True)]
+    assert C.summarize_ceiling_engagement(two)["verdict"] == "YELLOW"
+    green = none_[:6] + [rec("tA", True), rec("tA", True), rec("tB", True)]
+    assert C.summarize_ceiling_engagement(green)["verdict"] == "GREEN"
+    # >=3 engaged but all on ONE task -> not GREEN (diversity requirement)
+    concentrated = none_[:6] + [rec("tA", True)] * 3
+    assert C.summarize_ceiling_engagement(concentrated)["verdict"] == "YELLOW"
+
+
+def test_p1_u15_scientific_sample_unchanged(art):
+    """The frozen 24-task scientific sample must not move when preflight is
+    re-selected: seed and artifact hash are self-consistent."""
+    sample = json.load(open(art / "p1_task_sample.json"))
+    assert sample["selection_seed"] == C.SELECTION_SEED
+    assert len(sample["task_ids"]) == C.N_SCIENTIFIC
+    body = {k: v for k, v in sample.items() if k != "artifact_sha256"}
+    assert C.sha256_of_obj(body) == sample["artifact_sha256"]
+
+
 def _split_path() -> Path:
     here = Path(__file__).resolve()
     for base in [Path.cwd(), *here.parents]:

@@ -75,27 +75,76 @@ def main() -> int:
             agent_model_args={}, user_model_args={},
         )
         rec = run_p1_rollout(spec, ledger=ledger, trajectory_store=store, run_id=r["run_id"])
-        logs.append(rec)
-        print(f"{r['run_id']} {r['harness_id']} used={rec['tool_calls_used']}/{rec['tool_budget_limit']} "
-              f"strict={rec['success_strict']} official={rec['success_official']} "
-              f"overflow={rec['budget_exceeded']} cost={rec.get('cost_usd')}")
+        md = rec.get("metadata", {})
+        flat = {
+            "run_id": r["run_id"], "task_id": r["task_id"], "harness_id": r["harness_id"],
+            "budget_limit": rec["tool_budget_limit"],
+            "used_tool_calls": rec["tool_calls_used"],
+            "budget_exceeded": rec["budget_exceeded"],
+            "ceiling_engaged": md.get("ceiling_engaged"),
+            "success_strict": rec["success_strict"],
+            "success_official": rec["success_official"],
+            "input_tokens": rec.get("input_tokens"),
+            "output_tokens": rec.get("output_tokens"),
+            "tokens": md.get("tokens"),
+            "agent_cost": md.get("agent_cost"),
+            "user_cost": md.get("user_cost"),
+            "total_cost": rec.get("cost_usd"),
+            "wall_seconds": rec.get("wall_seconds"),
+            "turns": rec.get("turns_used"),
+            "termination_reason": rec.get("termination_reason"),
+        }
+        logs.append(flat)
+        print(f"{r['run_id']} {r['harness_id']} B={flat['budget_limit']} "
+              f"used={flat['used_tool_calls']} ceiling={flat['ceiling_engaged']} "
+              f"strict={flat['success_strict']} official={flat['success_official']} "
+              f"overflow={flat['budget_exceeded']} cost={flat['total_cost']} "
+              f"wall={flat['wall_seconds']:.1f}s term={flat['termination_reason']}")
 
-    # cost projection (from ACTUAL observed cost; reconstructed only if missing)
-    costs = [x.get("cost_usd") for x in logs if x.get("cost_usd") is not None]
-    summary = {"n_runs": len(logs)}
+    (out / "preflight_runs_table.json").write_text(json.dumps(logs, indent=2, default=str) + "\n")
+
+    # --- ceiling engagement classification --------------------------------
+    ceiling = C.summarize_ceiling_engagement(logs)
+
+    # --- cost projection (ACTUAL observed cost preferred) -----------------
+    costs = [x["total_cost"] for x in logs if x.get("total_cost") is not None]
+    agent_costs = [x["agent_cost"] for x in logs if x.get("agent_cost") is not None]
+    user_costs = [x["user_cost"] for x in logs if x.get("user_cost") is not None]
+    walls = [x["wall_seconds"] for x in logs if x.get("wall_seconds") is not None]
+    by_harness = {}
+    for hid in ("h0", "h1", "h2"):
+        sub = [x for x in logs if x["harness_id"] == hid]
+        tin = [x["input_tokens"] for x in sub if x.get("input_tokens") is not None]
+        tout = [x["output_tokens"] for x in sub if x.get("output_tokens") is not None]
+        by_harness[hid] = {
+            "n": len(sub),
+            "mean_input_tokens": (sum(tin) / len(tin)) if tin else None,
+            "mean_output_tokens": (sum(tout) / len(tout)) if tout else None,
+            "mean_wall_seconds": (sum(x["wall_seconds"] for x in sub) / len(sub)) if sub else None,
+        }
+
+    summary = {"n_runs": len(logs), "ceiling_engagement": ceiling, "by_harness": by_harness}
     if costs:
         c_run = sum(costs) / len(costs)
         summary.update({
+            "cost_source": "observed_provider_cost",
             "mean_cost_per_run": c_run,
             "median_cost_per_run": statistics.median(costs),
-            "min_cost": min(costs), "max_cost": max(costs),
-            "C_432": 432 * c_run,
-            "C_safe_1.2x": 1.2 * 432 * c_run,
-            "cost_source": "observed_provider_cost",
+            "min_cost_per_run": min(costs), "max_cost_per_run": max(costs),
+            "mean_agent_cost": (sum(agent_costs) / len(agent_costs)) if agent_costs else None,
+            "mean_user_cost": (sum(user_costs) / len(user_costs)) if user_costs else None,
+            "mean_wall_seconds": (sum(walls) / len(walls)) if walls else None,
+            "C_432_projected": 432 * c_run,
+            "C_432_with_20pct_margin": 1.2 * 432 * c_run,
         })
     else:
-        summary["note"] = "no provider cost metadata; reconstruct from tokens x pinned pricing"
+        summary["cost_source"] = "UNAVAILABLE"
+        summary["note"] = (
+            "no provider cost metadata returned; reconstruct from observed token "
+            "usage x pinned model pricing and label the result RECONSTRUCTED"
+        )
     (out / "preflight_cost_summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
+    print("\n=== CEILING ENGAGEMENT: " + ceiling["verdict"] + " ===")
     print(json.dumps(summary, indent=2, default=str))
     return 0
 

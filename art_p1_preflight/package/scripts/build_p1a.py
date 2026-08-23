@@ -69,8 +69,23 @@ def main() -> int:
         return 2
 
     # --- deterministic stratified selection ----------------------------------
+    # SCIENTIFIC sample: frozen (seed SELECTION_SEED) -- never re-selected.
     sel = C.stratified_select(meta, seed=C.SELECTION_SEED)
-    assert not (set(sel.scientific) & set(sel.preflight))
+    scientific = list(sel.scientific)
+
+    # PREFLIGHT sample v2: re-selected to span the m_x levels (see
+    # C.select_preflight_by_mx). Drawn from the pool EXCLUDING the scientific
+    # sample, so disjointness is structural. No paid rollout has been executed,
+    # so re-selecting preflight-only tasks costs nothing scientifically.
+    sci_set = set(scientific)
+    pool_meta = [m for m in meta if m["task_id"] not in sci_set]
+    preflight = C.select_preflight_by_mx(pool_meta, seed=C.PREFLIGHT_SELECTION_SEED)
+    assert not (sci_set & set(preflight)), "scientific/preflight overlap"
+
+    sel = C.Selection(
+        scientific=scientific, preflight=preflight,
+        strata=sel.strata, eligible=sel.eligible, seed=sel.seed,
+    )
 
     # --- manifests (one per harness) -----------------------------------------
     env = registry.get_env_constructor(C.DOMAIN)()
@@ -138,13 +153,31 @@ def main() -> int:
 
     pre_art = {
         "purpose": "P1a preflight-only tasks (development/calibration; never scientific)",
+        "selection_version": "v2_m_x_spanning",
+        "selection_rule": (
+            "one task per distinct gold-assistant-tool-call level m_x, drawn from "
+            "(eligible - scientific), families maximally distinct; deterministic "
+            "given (pool, PREFLIGHT_SELECTION_SEED)"
+        ),
+        "v2_rationale": (
+            "v1 preflight tasks all had m_x=1, exercising a single point of the "
+            "resource interface at MID budget; v2 spans m_x in {0,1,2} so budget "
+            "ceiling engagement can actually be observed."
+        ),
         "domain": C.DOMAIN, "split": C.SPLIT,
         "runtime_commit": C.RUNTIME_COMMIT, "dataset_commit": C.VERIFIED_DATASET_COMMIT,
-        "selection_seed": C.SELECTION_SEED,
+        "preflight_selection_seed": C.PREFLIGHT_SELECTION_SEED,
+        "scientific_selection_seed_unchanged": C.SELECTION_SEED,
         "eligible_population_size": len(eligible),
+        "selection_pool_size": len(pool_meta),
         "n_selected": len(sel.preflight),
         "disjoint_from_scientific": not (set(sel.preflight) & set(sel.scientific)),
         "stratification": {"selected": strat_info(sel.preflight)},
+        "per_task": [
+            {"task_id": t, "family": meta_by_id[t]["family"], "m_x": meta_by_id[t]["m_x"],
+             "budget_mid": budgets_for(t)[1]["mid"]}
+            for t in sel.preflight
+        ],
         "task_ids": sel.preflight,
     }
     pre_art["artifact_sha256"] = C.sha256_of_obj(pre_art)

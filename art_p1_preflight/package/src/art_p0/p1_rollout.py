@@ -195,10 +195,14 @@ def run_p1_rollout(
         record.wall_seconds = time.perf_counter() - t0
         record.turns_used = sum(1 for m in messages if _role_of(m) == "assistant")
         # success_strict: budget overflow always fails (P0.1 I7 / §18)
-        from .p1_config import scientific_success_strict
+        from .p1_config import ceiling_engaged, scientific_success_strict
 
         record.success_strict = scientific_success_strict(
             record.success_official, record.budget_exceeded
+        )
+        # Did the resource ceiling actually bind? (used == B) OR overflow
+        record.metadata["ceiling_engaged"] = ceiling_engaged(
+            record.tool_calls_used, record.tool_budget_limit, record.budget_exceeded
         )
         usage = _sum_usage(messages)
         record.input_tokens = usage["prompt_tokens"]

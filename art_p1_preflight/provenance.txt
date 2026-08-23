@@ -8,3 +8,8 @@ selection_seed=20260317  rollout_seeds=[1000,2000]  preflight_seed=424242
 harness_hashes: h0=67e36ec8a5136f10 h1=59e525755f4cb370 h2=621fc3fd4a0047ac
 eligible_train_pool=71  scientific=24  preflight=3  design_rows=432  preflight_rows=9
 credentials=NONE (9 paid rollouts NOT executed)
+--- v2 update ---
+preflight_selection=v2_m_x_spanning (seed 20260318); spans m_x {0,1,2}, 3 distinct families
+scientific_24=UNCHANGED (identical task_ids and artifact_sha256)
+tests=52/52 PASS; P0.1 regression I1-I7 PASS
+paid_rollouts_executed=0 (credentials absent); ceiling verdict=UNDETERMINED
