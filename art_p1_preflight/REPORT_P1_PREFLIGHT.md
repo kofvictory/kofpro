@@ -5,9 +5,13 @@ P1 configuration (models, 3 harnesses, budgets, task sample, 432-run design),
 run all tests, and — only if credentials exist — run **exactly 9** paid preflight
 rollouts. **The 432 scientific rollouts were NOT executed and must not be.**
 
-**Verdict: ✅ P1 PREFLIGHT READY — NOT EXECUTED** (API credentials absent; all
-implementation and offline verification complete; one MAJOR design observation
-for human review — see §J).
+**Verdict: ✅ P1 PREFLIGHT READY — NOT EXECUTED.** All implementation, freezing
+and offline verification are complete (52/52 tests). The 9 paid rollouts did not
+run for two independent reasons: **(1)** no API credentials in the environment,
+and **(2)** a **BLOCKING** sandbox network policy that refuses egress to
+`api.openai.com` (403 on CONNECT at the agent proxy) — so they cannot run here
+even once a key is supplied. Ceiling verdict is **UNDETERMINED** and cost
+projection is **deferred**; see §H, §I and the MAJOR/BLOCKING items in §J.
 
 ---
 
@@ -165,7 +169,22 @@ thresholds · U15 scientific 24 unchanged (hash self-consistent)**.
 
 ## H. Preflight results
 
-**NOT EXECUTED — API credentials are not present in the environment.**
+**NOT EXECUTED — two independent blockers (verified 2026-08-29).**
+
+1. **No API credentials.** No `.env` exists at
+   `art_audit/tau2-bench/.env` (only `.env.example`), and
+   `OPENAI_API_KEY` / `AZURE_API_KEY` / `AZURE_OPENAI_API_KEY` /
+   `OPENROUTER_API_KEY` / `LITELLM_API_KEY` are all unset.
+2. **BLOCKING — sandbox egress policy denies the provider host.** This remote
+   execution environment routes outbound HTTPS through an agent proxy whose
+   network policy **rejects `api.openai.com`**. Probe result:
+   `api.openai.com -> HTTP 000`, and the proxy status endpoint logs
+   `{"kind":"connect_rejected","detail":"gateway answered 403 to CONNECT
+   (policy denial or upstream failure)","host":"api.openai.com:443"}`.
+   **Consequence: the 9 paid rollouts cannot run in this container even once
+   credentials are supplied.** No workaround was attempted — disabling TLS
+   verification or bypassing the proxy is prohibited.
+
 `scripts/run_preflight.py` re-checked the environment, found no credentials, and
 exited **without any API call**, emitting
 `P1 PREFLIGHT READY — API CREDENTIALS NOT PRESENT`. Confirmed afterwards:
@@ -218,6 +237,7 @@ usage × pinned model pricing and **labeled "RECONSTRUCTED"**.
 | --- | --- |
 | **MAJOR** | **Telecom agent tool-call budget is intrinsically small.** Because Telecom is dual-control, most gold actions are **user-side** device toggles; the **agent's** gold tool-call count is `m_x ∈ {0,1,2}` across the entire train pool (0→14, 1→38, 2→22 of 74). Normalized budgets are therefore `B∈{1,2,3,4}`, and the budget ceiling may rarely bind for the agent. The `h1−h0` / budget-response contrast may be weak on Telecom. This is surfaced for **human design review** before authorizing the 432 runs; it is **not** patched (no adaptive redesign — §23). It does not affect measurement validity (budget semantics are exact), only the expected effect size. **The v2 preflight re-selection (§E) and the new `ceiling_engaged` diagnostic exist precisely to let the 9-run preflight measure whether this risk is real before any scientific spend.** |
 | **MINOR (resolved)** | **v1 preflight tasks were `m_x`-degenerate.** All three v1 preflight tasks had `m_x=1`, so the 9 runs would all have probed one point of the resource interface and could not have distinguished "ceiling never engages" from "we never sampled where it would". Fixed by the v2 re-selection spanning `m_x ∈ {0,1,2}` with 3 distinct families. Legitimate because **zero paid rollouts had been executed** — no result influenced the change (not adaptive modification under §23), and the scientific 24 are provably unchanged (U15). |
+| **BLOCKING (environment, not code)** | **Provider egress is denied by the sandbox network policy.** `api.openai.com:443` is refused at the agent proxy with a 403 on CONNECT (logged 2026-08-29T11:16:33Z). The preflight executor, harnesses, logging, and cost/ceiling instrumentation are complete and tested, but **no paid rollout can be executed from this environment**. Resolution is operational: run the preflight in an environment whose network policy allows the provider host (see the Claude Code on the web environment/network-policy docs: https://code.claude.com/docs/en/claude-code-on-the-web), or run it on a machine with direct provider access. Nothing in the frozen design needs to change to do so. |
 | INFORMATIONAL | **Instruction ambiguity, recorded.** The re-selection request arrived with one corrupted character (`preflight専用3 taskだけを 「�」 をそれぞれ代表するように再選択`). Interpreted as **`m_x` levels**, because (a) the preflight design is fixed at MID budget so "budget levels" cannot vary within it, (b) `m_x ∈ {0,1,2}` has exactly 3 levels for exactly 3 preflight slots, and (c) it directly serves the stated `ceiling_engaged` objective. Recorded here rather than silently chosen, per the standing instruction to document interpretation risks. Preflight tasks can never enter the scientific sample, so this choice cannot bias P1a. |
 | INFORMATIONAL | 20/74 Telecom gold trajectories have `m_x=0` assistant calls (agent only communicates / escalates). `m'=max(1,m_x)` still yields a valid `B_low=1`, so `B_low` may exceed the reference agent tool-call count for these — expected under the §12 floor, not a defect. |
 | INFORMATIONAL | Telecom was **not** in the tau2-bench-verified human corrections (Retail/Airline only); train-split validity rests on the P0.2 audit (all probes clean here). |

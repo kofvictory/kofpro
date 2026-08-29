@@ -13,3 +13,9 @@ preflight_selection=v2_m_x_spanning (seed 20260318); spans m_x {0,1,2}, 3 distin
 scientific_24=UNCHANGED (identical task_ids and artifact_sha256)
 tests=52/52 PASS; P0.1 regression I1-I7 PASS
 paid_rollouts_executed=0 (credentials absent); ceiling verdict=UNDETERMINED
+--- preflight execution attempt 2026-08-29 ---
+result=NOT EXECUTED (0 paid rollouts)
+blocker_1=no .env / no API key env vars present
+blocker_2=BLOCKING sandbox egress policy: api.openai.com:443 -> 403 on CONNECT at agent proxy
+ceiling_verdict=UNDETERMINED (requires 9 executed runs)
+cost_projection=DEFERRED
