@@ -1,0 +1,222 @@
+<title>コフと僕 EP01 ｜ 図解03 二段タイムアウト</title>
+<style>
+  /* =========================================================================
+     コフと僕 EP01 · 図解03 「二段タイムアウト(死活確認↔処理待ち)」
+     図解01/02と同一デザインシステム(ダーク単一ワールド・映像書き出し用)
+     紫=ローカル(Ollama)  橙=Claude  緑=死活OK  赤=誤フォールバック
+     ========================================================================= */
+  :root {
+    --ground:   #0a0912;
+    --ground-2: #100e1b;
+    --ground-3: #171426;
+    --line:     rgba(181, 170, 224, 0.14);
+    --line-2:   rgba(181, 170, 224, 0.30);
+    --ink:      #ece9f6;
+    --ink-dim:  #a49bc0;
+    --ink-faint:#6a627f;
+
+    --local:      #a689ff;
+    --local-deep: #7a5cf0;
+    --local-glow: rgba(166, 137, 255, 0.55);
+    --claude:     #ff9d54;
+    --ok:         #5fd6a0;
+    --ok-glow:    rgba(95, 214, 160, 0.5);
+    --no:         #e5484d;
+    --no-glow:    rgba(229, 72, 77, 0.5);
+
+    /* 時間軸スケール: 0〜260s = 0〜100% */
+    --p120: 46.15%;
+    --p150: 57.69%;
+    --p240: 92.31%;
+
+    --stage-w: 1200px;
+  }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 3vmin;
+    background:
+      radial-gradient(120% 90% at 18% -10%, #16122a 0%, rgba(22,18,42,0) 55%),
+      radial-gradient(130% 100% at 92% 112%, #1a1020 0%, rgba(26,16,32,0) 50%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","YuGothic","Noto Sans JP","Meiryo",system-ui,sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  .stage {
+    position: relative; width: min(94vw, var(--stage-w)); aspect-ratio: 16 / 9;
+    container-type: inline-size; overflow: hidden; border-radius: 6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 40%), var(--ground-2);
+    box-shadow: 0 0 0 1px var(--line), 0 40px 120px -40px rgba(0,0,0,0.85), inset 0 0 140px -40px rgba(0,0,0,0.6);
+  }
+
+  .net { position: absolute; inset: 0; pointer-events: none; opacity: 0.5; }
+  .net::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 50% 45%, #000 30%, transparent 88%);
+  }
+
+  .frame { position: absolute; inset: 0; padding: 4.8cqw 6cqw 4.2cqw; display: flex; flex-direction: column; }
+
+  .eyebrow { display: flex; align-items: center; gap: 1.1cqw; font-size: 1.26cqw; font-weight: 700; letter-spacing: 0.16em; color: var(--ink-dim); }
+  .eyebrow .tag { color: var(--local); padding: 0.35em 0.85em; border: 1px solid var(--local-glow); border-radius: 2px; background: rgba(166,137,255,0.08); letter-spacing: 0.1em; }
+  .eyebrow .en { color: var(--ink-faint); letter-spacing: 0.3em; font-weight: 600; }
+  h1 { margin: 1.6cqw 0 0; font-size: 3.7cqw; line-height: 1.12; font-weight: 800; letter-spacing: 0.005em; text-wrap: balance; }
+  h1 .s { color: var(--ok); } h1 .l { color: var(--local); }
+  .dek { margin: 1.1cqw 0 0; font-size: 1.6cqw; color: var(--ink-dim); letter-spacing: 0.02em; }
+  .dek b { color: var(--ink); font-weight: 700; }
+
+  .figno { position: absolute; top: 4.8cqw; right: 6cqw; font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.22cqw; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-faint); }
+  .figno b { color: var(--local); }
+
+  /* ── タイムライン ─────────────────────────────────────────────────── */
+  .plot { flex: 1 1 auto; margin-top: 2.4cqw; display: flex; flex-direction: column; justify-content: center; gap: 1.4cqw; }
+
+  .lane { display: flex; align-items: stretch; gap: 1.4cqw; }
+  .rlabel {
+    flex: 0 0 15cqw; display: flex; flex-direction: column; justify-content: center; gap: 0.3cqw;
+    text-align: right; padding-right: 0.4cqw;
+  }
+  .rlabel .tt { font-family: "SF Mono",ui-monospace,monospace; font-size: 1.4cqw; font-weight: 800; letter-spacing: 0.08em; }
+  .rlabel .ds { font-size: 1.12cqw; font-weight: 700; color: var(--ink-dim); line-height: 1.25; }
+  .lane.before .rlabel .tt { color: var(--no); }
+  .lane.after  .rlabel .tt { color: var(--ok); }
+
+  .track { position: relative; flex: 1 1 auto; height: 7cqw; }
+
+  /* 150s 応答ガイド(両レーンで同じ位置=揃える) */
+  .g150 { position: absolute; left: var(--p150); top: -1cqw; bottom: -1cqw; width: 0; border-left: 1.5px dashed rgba(236,233,246,0.55); z-index: 4; }
+
+  /* バー共通 */
+  .bar { position: absolute; top: 1.4cqw; height: 4.2cqw; border-radius: 4px; display: flex; align-items: center; padding: 0 1cqw; font-size: 1.26cqw; font-weight: 800; letter-spacing: 0.02em; overflow: hidden; }
+
+  /* BEFORE: 旧1本タイマー */
+  .bar-old {
+    left: 0; width: var(--p120);
+    background: linear-gradient(180deg, rgba(229,72,77,0.28), rgba(229,72,77,0.12));
+    border: 1.5px solid rgba(229,72,77,0.6); color: #ffc9cb;
+  }
+  .fire { position: absolute; left: var(--p120); top: 0.2cqw; bottom: 0.2cqw; width: 0; border-left: 2.5px solid var(--no); z-index: 5; filter: drop-shadow(0 0 6px var(--no-glow)); }
+  .fire .lab {
+    position: absolute; left: 0.5cqw; top: -0.2cqw; white-space: nowrap;
+    font-size: 1.16cqw; font-weight: 800; color: var(--no);
+  }
+  .gap {
+    position: absolute; left: var(--p120); width: calc(var(--p150) - var(--p120)); top: 1.4cqw; height: 4.2cqw;
+    background: repeating-linear-gradient(-45deg, rgba(229,72,77,0.28) 0 6px, transparent 6px 12px);
+    border-top: 1.5px dashed rgba(229,72,77,0.5); border-bottom: 1.5px dashed rgba(229,72,77,0.5);
+  }
+  .gap .lab { position: absolute; left: 50%; bottom: -2.3cqw; transform: translateX(-50%); white-space: nowrap; font-size: 1.12cqw; font-weight: 800; color: var(--no); }
+
+  /* AFTER: 二段構え */
+  .bar-gen {
+    left: 0; width: var(--p240);
+    background: linear-gradient(180deg, rgba(122,92,240,0.30), rgba(122,92,240,0.12));
+    border: 1.5px solid rgba(166,137,255,0.6); color: #d6c6ff;
+    justify-content: flex-start; padding-left: 3.4cqw;
+  }
+  .ping { position: absolute; left: 0; top: 1.4cqw; height: 4.2cqw; width: 2cqw; background: var(--ok); border-radius: 4px 0 0 4px; z-index: 3; box-shadow: 0 0 14px -2px var(--ok-glow); }
+  .ping-lab { position: absolute; left: 0; top: -1.7cqw; white-space: nowrap; font-size: 1.16cqw; font-weight: 800; color: var(--ok); }
+
+  /* 応答マーカー(150s) */
+  .resp { position: absolute; left: var(--p150); top: 2.1cqw; transform: translate(-50%, -50%); z-index: 6;
+          width: 2.8cqw; height: 2.8cqw; border-radius: 50%; display: grid; place-items: center;
+          font-family: ui-monospace,monospace; font-size: 1.5cqw; font-weight: 700; }
+  .resp.ok    { top: 3.5cqw; color: var(--ok); background: var(--ground-3); border: 2px solid var(--ok); box-shadow: 0 0 18px -2px var(--ok-glow); }
+  .resp.ghost { top: 3.5cqw; color: var(--ink-faint); background: var(--ground-2); border: 2px dashed var(--ink-faint); }
+  .resp .rlab { position: absolute; left: 1.7cqw; top: 50%; transform: translateY(-50%); white-space: nowrap; font-size: 1.14cqw; font-weight: 700; }
+  .resp.ok .rlab    { color: var(--ok); }
+  .resp.ghost .rlab { color: var(--ink-faint); }
+
+  /* 軸 */
+  .axis { display: flex; gap: 1.4cqw; margin-top: 0.4cqw; }
+  .axis .spacer { flex: 0 0 15cqw; }
+  .axis .line { position: relative; flex: 1 1 auto; height: 3cqw; border-top: 1.5px solid var(--line-2); }
+  .tick { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+  .tick::before { content: ""; width: 1.5px; height: 0.7cqw; background: var(--line-2); }
+  .tick span { margin-top: 0.3cqw; font-family: "SF Mono",ui-monospace,monospace; font-size: 1.14cqw; font-weight: 700; color: var(--ink-faint); letter-spacing: 0.02em; }
+  .tick.t0   { left: 0; }
+  .tick.t120 { left: var(--p120); } .tick.t120 span { color: var(--no); }
+  .tick.t150 { left: var(--p150); } .tick.t150 span { color: var(--ink); }
+  .tick.t240 { left: var(--p240); } .tick.t240 span { color: var(--local); }
+  .tick.t150 .top { position: absolute; bottom: 3.4cqw; white-space: nowrap; font-family: inherit; font-size: 1.16cqw; font-weight: 800; color: var(--ink); }
+
+  /* 持ち帰りフッター */
+  .takeaway {
+    flex: 0 0 auto; margin-top: 1.4cqw; display: flex; align-items: center; gap: 1.5cqw;
+    padding: 1.3cqw 1.8cqw; border-radius: 5px;
+    background: linear-gradient(90deg, rgba(95,214,160,0.10), rgba(166,137,255,0.08));
+    border: 1px solid var(--line); font-size: 1.62cqw; font-weight: 700; color: var(--ink);
+  }
+  .takeaway .lb { flex: 0 0 auto; font-size: 1.16cqw; font-weight: 800; letter-spacing: 0.1em; color: var(--ground); background: linear-gradient(120deg, var(--ok), var(--local)); padding: 0.5em 1em; border-radius: 2px; }
+  .takeaway .em { color: var(--ok); }
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true"></div>
+
+  <div class="frame">
+    <div class="figno">図解 <b>03</b> / 05</div>
+
+    <header>
+      <div class="eyebrow">
+        <span class="tag">EP01 · ⑦ 知見の山場</span>
+        <span class="en">TWO-STAGE TIMEOUT</span>
+      </div>
+      <h1><span class="s">死活確認は短く</span>、<span class="l">処理待ちは長く</span>。</h1>
+      <p class="dek">「生きてるか」と「答えを待つ」を、<b>同じタイマーで測らない</b>。</p>
+    </header>
+
+    <section class="plot" aria-label="二段タイムアウトの時間軸ビフォーアフター">
+      <!-- BEFORE -->
+      <div class="lane before">
+        <div class="rlabel">
+          <div class="tt">BEFORE ✕</div>
+          <div class="ds">1本のタイマーで<br>両方を測る</div>
+        </div>
+        <div class="track">
+          <div class="bar bar-old">旧タイマー = 120s</div>
+          <div class="gap"><span class="lab">生きてるのに、逃げる</span></div>
+          <div class="fire"><span class="lab">120sで発火 ✕</span></div>
+          <div class="g150"></div>
+          <div class="resp ghost">◦<span class="rlab">応答は150s＝間に合わず誤フォールバック</span></div>
+        </div>
+      </div>
+
+      <!-- AFTER -->
+      <div class="lane after">
+        <div class="rlabel">
+          <div class="tt">AFTER ✓</div>
+          <div class="ds">① ping と ② 生成に<br>分ける</div>
+        </div>
+        <div class="track">
+          <div class="bar bar-gen">② 生成タイムアウト = 最大 240s</div>
+          <div class="ping"></div>
+          <div class="ping-lab">① ping 2.5s → 生きてる ✓</div>
+          <div class="g150"></div>
+          <div class="resp ok">✓<span class="rlab">150sで完走。ローカルのまま</span></div>
+        </div>
+      </div>
+
+      <!-- 軸 -->
+      <div class="axis">
+        <div class="spacer"></div>
+        <div class="line">
+          <div class="tick t0"><span>0</span></div>
+          <div class="tick t120"><span>120s</span></div>
+          <div class="tick t150"><span class="top">初回フル応答 ≈150s</span><span>150s</span></div>
+          <div class="tick t240"><span>240s</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="takeaway">
+      <span class="lb">持ち帰り No.1</span>
+      <span>外部サービスに頼るなら、<span class="em">死活確認</span>と<span class="em">処理完了待ち</span>は、別のタイマーで測る。</span>
+    </footer>
+  </div>
+</main>

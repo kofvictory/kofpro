@@ -1,0 +1,154 @@
+<title>コフと僕 EP01 ｜ OP図解 端末の中の相棒（PET/ネットナビ概念・IPフリー）</title>
+<style>
+  /* =========================================================================
+     EP01 OP(①夢パート)用イメージ図: 「端末の中に住むAI相棒」の概念
+     ★IPセーフ設計: 公式エグゼのPET/キャラデザ/ロゴは一切不使用。
+       ・端末=汎用のニュートラルな携帯ガジェット(PET固有形状を避ける)
+       ・中のキャラ=完全オリジナルの抽象AI(ロックマンでもコフでもない・ティール系)
+       ・「PET/ネットナビ」の語はラベルに使用=ナレの言葉と同じオマージュ扱い(絵は借りない)
+     16:9・夢パートの懐かしいトーン。図解シリーズと同系のダークベース。
+     ========================================================================= */
+  :root {
+    --ground:  #0a0912;
+    --ground-2:#100e1b;
+    --ground-3:#171426;
+    --line:    rgba(181,170,224,0.14);
+    --line-2:  rgba(181,170,224,0.30);
+    --ink:     #ece9f6;
+    --ink-dim: #a49bc0;
+    --ink-faint:#6a627f;
+    --navi:    #5fd6c0;    /* オリジナル抽象AI=ティール(コフ紫/ロックマン青と差別化) */
+    --navi-deep:#2fb59c;
+    --navi-glow:rgba(95,214,192,0.55);
+    --warm:    #ffcf8a;    /* 懐かしさの暖色グロー */
+    --device:  #2a2740;
+    --stage-w: 1200px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 3vmin;
+    background:
+      radial-gradient(90% 80% at 70% 40%, rgba(95,214,192,0.10), transparent 60%),
+      radial-gradient(80% 70% at 20% 90%, rgba(255,207,138,0.10), transparent 55%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","YuGothic","Noto Sans JP","Meiryo",system-ui,sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  .stage {
+    position: relative; width: min(94vw, var(--stage-w)); aspect-ratio: 16/9;
+    container-type: inline-size; overflow: hidden; border-radius: 6px;
+    background:
+      radial-gradient(120% 130% at 72% 45%, #16182a 0%, rgba(16,14,27,0) 55%),
+      linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0) 40%), var(--ground-2);
+    box-shadow: 0 0 0 1px var(--line), 0 40px 120px -40px rgba(0,0,0,0.85), inset 0 0 140px -40px rgba(0,0,0,0.6);
+  }
+  .net { position:absolute; inset:0; pointer-events:none; opacity:.4; }
+  .net::before{ content:""; position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.045) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.045) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 55% 50%, #000 30%, transparent 88%); }
+
+  .frame { position:absolute; inset:0; padding:5cqw 6cqw; display:grid; grid-template-columns: 1fr 1.05fr; align-items:center; gap:3cqw; }
+
+  /* 左: 語り */
+  .lead .eyebrow { display:flex; align-items:center; gap:1cqw; font-size:1.28cqw; font-weight:700; letter-spacing:.16em; color:var(--ink-dim); }
+  .lead .eyebrow .tag { color:var(--warm); padding:.35em .85em; border:1px solid rgba(255,207,138,.4); border-radius:2px; background:rgba(255,207,138,.07); letter-spacing:.1em; }
+  .lead .eyebrow .en { color:var(--ink-faint); letter-spacing:.3em; font-weight:600; }
+  .lead h1 { margin:2cqw 0 0; font-size:4.1cqw; line-height:1.16; font-weight:800; text-wrap:balance; }
+  .lead h1 .hl { color:var(--navi); }
+  .lead .cap { margin:2cqw 0 0; font-size:1.62cqw; line-height:1.75; color:var(--ink-dim); letter-spacing:.01em; }
+  .lead .cap b { color:var(--ink); font-weight:700; }
+  .lead .foot { margin-top:2.4cqw; font-size:1.16cqw; color:var(--ink-faint); letter-spacing:.02em; }
+
+  /* 右: イメージ図 */
+  .art { position:relative; height:100%; }
+
+  /* 汎用端末(PET固有形状を避けたニュートラルなガジェット) */
+  .device {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0.7);
+    width:34cqw; height:44cqw; border-radius:4cqw;
+    background:linear-gradient(160deg, #35314f, #201d33 60%, #17142400);
+    background-color:var(--device);
+    border:0.5cqw solid #433d63;
+    box-shadow: 0 0 0 0.9cqw #14121f, 0 3cqw 7cqw rgba(0,0,0,.6), inset 0 1cqw 3cqw rgba(255,255,255,.05);
+  }
+  .device .speaker { position:absolute; left:50%; top:2.6cqw; transform:translateX(-50%); width:8cqw; height:0.8cqw; border-radius:1cqw; background:rgba(0,0,0,.4); }
+  .device .home { position:absolute; left:50%; bottom:2.2cqw; transform:translateX(-50%); width:3.4cqw; height:3.4cqw; border-radius:50%; border:0.35cqw solid #5a5480; }
+  /* 画面 */
+  .screen {
+    position:absolute; left:50%; top:47%; transform:translate(-50%,-50%);
+    width:26cqw; height:30cqw; border-radius:2cqw; overflow:hidden;
+    background:radial-gradient(120% 120% at 50% 30%, #133b39 0%, #0a1a22 70%, #071016 100%);
+    box-shadow: inset 0 0 4cqw rgba(0,0,0,.6), inset 0 0 0 0.3cqw rgba(95,214,192,.25);
+  }
+  .screen .scan { position:absolute; inset:0; background:repeating-linear-gradient(0deg, rgba(95,214,192,.06) 0 1px, transparent 1px 3px); opacity:.5; }
+
+  /* オリジナル抽象AI(ネットナビ相当・完全独自) */
+  .navi { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); width:12cqw; height:15cqw; }
+  .navi .body {
+    position:absolute; left:50%; top:0; transform:translateX(-50%);
+    width:11cqw; height:13.5cqw; border-radius:46% 46% 42% 42%/50% 50% 44% 44%;
+    background:radial-gradient(120% 110% at 40% 28%, #d6fff5 0%, var(--navi) 42%, var(--navi-deep) 82%, #1c8f7c 100%);
+    box-shadow:0 0 5cqw var(--navi-glow), inset 0 -1.4cqw 3cqw rgba(0,0,0,.25);
+  }
+  .navi .eye { position:absolute; top:40%; width:1.7cqw; height:2.3cqw; border-radius:50%; background:#0c211f; box-shadow:inset 0 -.3cqw .5cqw rgba(255,255,255,.3); }
+  .navi .eye.l { left:32%; } .navi .eye.r { right:32%; }
+  .navi .sh { position:absolute; top:43%; width:.6cqw; height:.9cqw; border-radius:50%; background:#fff; opacity:.9; }
+  .navi .sh.l { left:37%; } .navi .sh.r { right:41%; }
+  .navi .antenna { position:absolute; left:50%; top:-2.2cqw; transform:translateX(-50%); width:.5cqw; height:2.4cqw; background:linear-gradient(var(--navi),transparent); }
+  .navi .antenna::after{ content:""; position:absolute; left:50%; top:-1cqw; transform:translateX(-50%); width:1.4cqw; height:1.4cqw; border-radius:50%; background:var(--navi); box-shadow:0 0 2cqw var(--navi-glow); }
+  /* 手を振る小さな腕 */
+  .navi .arm { position:absolute; top:58%; width:2.6cqw; height:0.9cqw; border-radius:1cqw; background:var(--navi-deep); }
+  .navi .arm.l { left:-1cqw; transform:rotate(28deg); } .navi .arm.r { right:-1.4cqw; transform:rotate(-40deg); }
+
+  /* ラベル(callout) — 近接＋色で示す(端末=暖色/ナビ=ティール)。矢印線は短く */
+  .callout { position:absolute; display:flex; flex-direction:column; gap:.3cqw; z-index:5; }
+  .callout .t { font-size:1.7cqw; font-weight:800; letter-spacing:.02em; }
+  .callout .d { font-size:1.18cqw; font-weight:600; color:var(--ink-dim); }
+  .callout.device-l { right:1.5cqw; top:3cqw; text-align:right; align-items:flex-end; }
+  .callout.device-l .t { color:var(--warm); }
+  .callout.navi-l { left:1cqw; bottom:4cqw; }
+  .callout.navi-l .t { color:var(--navi); }
+
+  .figno { position:absolute; top:5cqw; right:6cqw; font-family:"SF Mono","JetBrains Mono",ui-monospace,monospace; font-size:1.18cqw; font-weight:700; letter-spacing:.12em; color:var(--ink-faint); }
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true"></div>
+  <div class="figno">OP ｜ 憧れの原点</div>
+
+  <div class="frame">
+    <!-- 語り -->
+    <div class="lead">
+      <div class="eyebrow"><span class="tag">EP01 · ① 夢パート</span><span class="en">THE INSPIRATION</span></div>
+      <h1>端末の中に、<br><span class="hl">相棒</span>がいた。</h1>
+      <p class="cap">手のひらサイズの端末に、<b>暮らしを助けてくれるAIの相棒</b>が住んでいる——<br>そんな存在に、子供の頃ずっと憧れていました。</p>
+      <p class="foot">※イメージ図（実在ゲームの絵・キャラクターは不使用のオリジナル）</p>
+    </div>
+
+    <!-- イメージ図 -->
+    <div class="art" aria-label="端末の中に住むAI相棒の概念図">
+      <!-- 端末 -->
+      <div class="device" aria-hidden="true">
+        <span class="speaker"></span>
+        <div class="screen">
+          <span class="scan"></span>
+          <div class="navi">
+            <span class="antenna"></span>
+            <span class="arm l"></span><span class="arm r"></span>
+            <span class="body"></span>
+            <span class="eye l"></span><span class="eye r"></span>
+            <span class="sh l"></span><span class="sh r"></span>
+          </div>
+        </div>
+        <span class="home"></span>
+      </div>
+
+      <!-- ラベル -->
+      <div class="callout device-l"><span class="t">PET</span><span class="d">＝ 手のひらの携帯端末</span></div>
+      <div class="callout navi-l"><span class="t">ネットナビ</span><span class="d">＝ 端末の中に住むAI相棒</span></div>
+    </div>
+  </div>
+</main>

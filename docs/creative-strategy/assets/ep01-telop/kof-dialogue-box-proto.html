@@ -1,0 +1,160 @@
+<title>コフと僕 EP01 ｜ テロップ試作「コフの会話窓」</title>
+<style>
+  /* =========================================================================
+     EP01 テロップ試作: 「コフの会話窓」(物語層テロップ用)
+     エグゼの実フォント/UIは使わず、合法ピクセルフォント DotGothic16(OFL)＋
+     自作アバター=コフのポートレートで“ネットナビ風会話窓”を再現(オマージュの昇華)。
+     ・情報層(数値/技術テロップ)はゴシックのまま=可読性優先。本窓は【コフが喋る瞬間だけ】使う。
+     ・最終テロップはCapCutでDotGothic16を使用(無料OFL)。liveはCSPで埋込不可→monospaceにフォールバック。
+       確定プレビューはheadless renderのPNG。
+     ========================================================================= */
+  :root {
+    --ground:  #0a0912;
+    --panel:   rgba(15, 13, 27, 0.86);
+    --ink:     #f4f2fb;
+    --ink-dim: #b9b1d0;
+    --violet:  #a689ff;
+    --violet-deep: #7a5cf0;
+    --mint:    #9fe8cf;       /* レトロ会話窓の“ライト内枠”をエグゼの緑に寄せず淡ミントで */
+    --orange:  #ff9d54;
+    --pixel: "DotGothic16", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #000; }
+
+  .stage {
+    position: relative; width: 100vw; aspect-ratio: 16 / 9;
+    container-type: inline-size; overflow: hidden;
+    background: #05040a;
+  }
+
+  /* ── 背後の“映像”シミュ(デスクトップをぼかし＋暗く=テロップが載る前提を見せる) ── */
+  .bgsim { position: absolute; inset: 0; filter: blur(1.2cqw) saturate(0.8); opacity: 0.5; }
+  .bgsim::before, .bgsim::after {
+    content: ""; position: absolute; border-radius: 1cqw;
+    background: linear-gradient(180deg, #1e1a2e, #14111f);
+    border: 1px solid rgba(181,170,224,0.18);
+  }
+  .bgsim::before { right: 10cqw; top: 6cqw; width: 40cqw; height: 30cqw; transform: rotate(-2deg); }
+  .bgsim::after  { right: 30cqw; top: 20cqw; width: 34cqw; height: 26cqw; transform: rotate(2deg); }
+  .vignette {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(120% 90% at 50% 30%, transparent 40%, rgba(0,0,0,0.55) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.55));
+  }
+  /* うっすらスキャンライン(CRT質感・極薄) */
+  .scan { position: absolute; inset: 0; pointer-events: none; opacity: 0.35;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px); }
+
+  /* ── ロワーサード: 会話窓 ─────────────────────────────────────────── */
+  .lower { position: absolute; left: 6cqw; right: 6cqw; bottom: 6cqw; }
+
+  /* 話者名タブ */
+  .nametab {
+    display: inline-flex; align-items: center; gap: 0.8cqw;
+    font-family: var(--pixel); font-size: 2.4cqw; color: #0a0912; font-weight: 400;
+    background: linear-gradient(180deg, #c9b7ff, var(--violet));
+    padding: 0.5cqw 1.6cqw 0.4cqw; border-radius: 0.6cqw 0.6cqw 0 0;
+    border: 0.3cqw solid #d8ccff; border-bottom: none;
+    box-shadow: 0 0.3cqw 0 rgba(0,0,0,0.3);
+    letter-spacing: 0.06em;
+  }
+  .nametab .en { font-size: 0.62em; color: #2a1e55; letter-spacing: 0.14em; }
+
+  /* 会話窓本体 (二重枠のレトロ会話ボックス) */
+  .dbox {
+    position: relative;
+    display: flex; align-items: center; gap: 2.4cqw;
+    padding: 2.2cqw 2.6cqw;
+    background: var(--panel);
+    border: 0.35cqw solid var(--violet-deep);
+    border-radius: 0 1cqw 1cqw 1cqw;
+    box-shadow:
+      inset 0 0 0 0.28cqw rgba(159,232,207,0.55),   /* ライト内枠(淡ミント) */
+      inset 0 0 5cqw rgba(122,92,240,0.14),
+      0 1.4cqw 4cqw rgba(0,0,0,0.6);
+    backdrop-filter: blur(0.4cqw);
+  }
+  /* 角のピクセルアクセント(4隅) */
+  .dbox::before, .dbox::after {
+    content: ""; position: absolute; width: 0.9cqw; height: 0.9cqw;
+    background: var(--mint);
+  }
+  .dbox::before { left: 0.9cqw; top: 0.9cqw; box-shadow: 0 0 0 0 var(--mint); }
+  .dbox::after  { right: 0.9cqw; bottom: 0.9cqw; }
+
+  /* ポートレート枠(コフ) */
+  .portrait {
+    flex: 0 0 auto; position: relative;
+    width: 13cqw; height: 13cqw; border-radius: 0.8cqw;
+    background: radial-gradient(120% 120% at 30% 20%, #221c3a, #0d0b18);
+    border: 0.3cqw solid rgba(159,232,207,0.5);
+    box-shadow: inset 0 0 3cqw rgba(0,0,0,0.6);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .kof {
+    position: relative; width: 10.5cqw; height: 10.5cqw; border-radius: 26%;
+    background: radial-gradient(circle at 36% 30%, #d9c9ff 0%, var(--violet) 38%, var(--violet-deep) 78%, #5a3fd0 100%);
+    box-shadow: 0 0 3cqw rgba(122,92,240,0.7), inset 0 -1cqw 2.4cqw rgba(0,0,0,0.3);
+  }
+  .kof .eye { position: absolute; top: 38%; width: 16%; height: 24%; border-radius: 45%; background: #17122b; box-shadow: inset 0 -0.25cqw 0.5cqw rgba(255,255,255,0.28); }
+  .kof .eye.l { left: 24%; } .kof .eye.r { right: 24%; }
+  .kof .shine { position: absolute; top: 41%; width: 4.5%; height: 7%; border-radius: 50%; background: #fff; opacity: 0.92; }
+  .kof .shine.l { left: 29%; } .kof .shine.r { right: 33%; }
+
+  /* セリフ本文 */
+  .dtext {
+    flex: 1 1 auto; align-self: center;   /* 親.dboxのalign-items:centerで縦中央。中身は通常ブロック */
+    font-family: var(--pixel); color: var(--ink);
+    font-size: 2.7cqw; line-height: 1.78; letter-spacing: 0.02em;
+    white-space: nowrap;   /* 改行は<br>のみ=自動折返しでの孤立を防ぐ */
+    text-shadow: 0 0.2cqw 0 rgba(0,0,0,0.6);
+  }
+  .dtext .em { color: var(--violet); }
+  .dtext .npu { color: var(--orange); }
+
+  /* 送り三角(▽) */
+  .arrow {
+    position: absolute; right: 2.2cqw; bottom: 1.4cqw;
+    font-family: var(--pixel); font-size: 2.6cqw; color: var(--mint);
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 0%,60%{opacity:1} 61%,100%{opacity:0} }
+  @media (prefers-reduced-motion: reduce) { .arrow { animation: none; } }
+
+  /* 使い分けの注記(プレビュー用・実映像には出さない) */
+  .note {
+    position: absolute; left: 6cqw; top: 4cqw;
+    font-family: "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    font-size: 1.5cqw; font-weight: 700; color: var(--ink-dim); letter-spacing: 0.02em;
+    background: rgba(0,0,0,0.4); padding: 0.6cqw 1.2cqw; border-radius: 0.5cqw;
+    border: 1px solid rgba(181,170,224,0.2);
+  }
+  .note b { color: var(--mint); }
+</style>
+
+<main class="stage">
+  <div class="bgsim" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="scan" aria-hidden="true"></div>
+
+  <div class="note">物語層テロップ ＝ <b>コフが喋る瞬間だけ</b>（数値・技術テロップはゴシック維持）</div>
+
+  <div class="lower">
+    <div class="nametab">コフ <span class="en">KOFU</span></div>
+    <div class="dbox">
+      <div class="portrait">
+        <div class="kof" aria-hidden="true">
+          <span class="eye l"></span><span class="eye r"></span>
+          <span class="shine l"></span><span class="shine r"></span>
+        </div>
+      </div>
+      <div class="dtext">
+        ——それじゃ、続きは次回。<br>
+        …次こそ、ちゃんと<span class="npu">NPU</span>で動いてみせるよ。
+      </div>
+      <span class="arrow" aria-hidden="true">▽</span>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,217 @@
+<title>コフと僕 EP01 ｜ 図解04C 真犯人:CPU 69%(⑥ビートC)</title>
+<style>
+  /* =========================================================================
+     コフと僕 EP01 · 図解04 「生成中の使用率 — NPU 0% / CPU 69%」
+     図解01-03と同一デザインシステム(ダーク単一ワールド・映像書き出し用)
+     配色(dataviz検証済/dark): NPU=#7a5cf0(冷・器) / CPU=#f2554e(熱・実働)
+       validate_palette.js → Lightness/Chroma/CVD(ΔE26.5)/Contrast 全PASS
+     ※静止フレームのためホバー層は非搭載(各系列は別パネル+大ラベルで識別=色単独でない)
+     ========================================================================= */
+  :root {
+    --ground:   #0a0912;
+    --ground-2: #100e1b;
+    --ground-3: #171426;
+    --line:     rgba(181, 170, 224, 0.14);
+    --line-2:   rgba(181, 170, 224, 0.28);
+    --ink:      #ece9f6;
+    --ink-dim:  #a49bc0;
+    --ink-faint:#6a627f;
+
+    --npu:      #7a5cf0;   /* 冷・本命(器) */
+    --npu-soft: rgba(122, 92, 240, 0.5);
+    --cpu:      #f2554e;   /* 熱・実際の働き手 */
+    --cpu-soft: rgba(242, 85, 78, 0.5);
+
+    --stage-w: 1200px;
+  }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 0;
+    background:
+      radial-gradient(120% 90% at 15% -10%, #16122a 0%, rgba(22,18,42,0) 55%),
+      radial-gradient(130% 100% at 92% 112%, #24121a 0%, rgba(36,18,26,0) 50%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","YuGothic","Noto Sans JP","Meiryo",system-ui,sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  .stage {
+    position: relative; width: 100vw; aspect-ratio: 16 / 9;
+    container-type: inline-size; overflow: hidden; border-radius: 6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 40%), var(--ground-2);
+    box-shadow: 0 0 0 1px var(--line), 0 40px 120px -40px rgba(0,0,0,0.85), inset 0 0 140px -40px rgba(0,0,0,0.6);
+  }
+
+  .net { position: absolute; inset: 0; pointer-events: none; opacity: 0.5; }
+  .net::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 50% 45%, #000 30%, transparent 88%);
+  }
+
+  .frame { position: absolute; inset: 0; padding: 4cqw 6cqw 3.6cqw; display: flex; flex-direction: column; }
+
+  .eyebrow { display: flex; align-items: center; gap: 1.1cqw; font-size: 1.26cqw; font-weight: 700; letter-spacing: 0.16em; color: var(--ink-dim); }
+  .eyebrow .tag { color: var(--npu); padding: 0.35em 0.85em; border: 1px solid var(--npu-soft); border-radius: 2px; background: rgba(122,92,240,0.08); letter-spacing: 0.1em; }
+  .eyebrow .en { color: var(--ink-faint); letter-spacing: 0.3em; font-weight: 600; }
+  h1 { margin: 1.3cqw 0 0; font-size: 3.5cqw; line-height: 1.1; font-weight: 800; letter-spacing: 0.005em; }
+  h1 .z { color: var(--npu); }
+  .dek { margin: 0.9cqw 0 0; font-size: 1.55cqw; color: var(--ink-dim); letter-spacing: 0.02em; }
+  .dek b { color: var(--ink); font-weight: 700; }
+
+  .figno { position: absolute; top: 4cqw; right: 6cqw; font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.22cqw; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-faint); }
+  .figno b { color: var(--npu); }
+
+  /* ── パネル(2段) ─────────────────────────────────────────────────── */
+  .panels { flex: 1 1 auto; margin-top: 1.6cqw; display: flex; flex-direction: column; gap: 1.3cqw; justify-content: center; }
+  .panel {
+    display: flex; align-items: stretch; gap: 2cqw;
+    padding: 1.1cqw 1.8cqw; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--ground-3);
+  }
+  .panel.npu { border-color: rgba(122,92,240,0.4); }
+  .panel.cpu { border-color: rgba(242,85,78,0.4); }
+
+  /* 読み取り値ブロック */
+  .readout { flex: 0 0 26cqw; display: flex; flex-direction: column; justify-content: center; }
+  .readout .comp { display: flex; align-items: baseline; gap: 0.8cqw; font-size: 1.7cqw; font-weight: 800; letter-spacing: 0.04em; }
+  .readout .comp .en { font-family: "SF Mono",ui-monospace,monospace; font-size: 1.05cqw; font-weight: 600; color: var(--ink-faint); letter-spacing: 0.1em; }
+  .npu .comp { color: var(--npu); } .cpu .comp { color: var(--cpu); }
+  .readout .big { font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-weight: 800; line-height: 0.9; letter-spacing: -0.01em; }
+  .npu .big { font-size: 6.7cqw; color: var(--npu); text-shadow: 0 0 30px rgba(122,92,240,0.45); }
+  .cpu .big { font-size: 6.7cqw; color: var(--cpu); text-shadow: 0 0 30px rgba(242,85,78,0.4); }
+  .readout .sub { margin-top: 0.4cqw; font-size: 1.24cqw; font-weight: 700; }
+  .npu .sub { color: var(--ink-dim); } .cpu .sub { color: var(--ink-dim); }
+  .npu .sub b { color: var(--npu); } .cpu .sub b { color: var(--cpu); }
+
+  /* グラフ */
+  .graph { position: relative; flex: 1 1 auto; height: 9.8cqw; }
+  .graph svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .grid { stroke: rgba(181,170,224,0.12); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .npu-line { fill: none; stroke: var(--npu); stroke-width: 2.4; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 4px var(--npu-soft)); }
+  .cpu-line { fill: none; stroke: var(--cpu); stroke-width: 2.4; vector-effect: non-scaling-stroke; }
+  .cpu-area { fill: url(#cpuGrad); }
+  .npu-area { fill: rgba(122,92,240,0.06); }
+  .genband { fill: rgba(255,255,255,0.028); }
+  .genline { stroke: var(--ink-faint); stroke-width: 1.4; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+
+  .graph .ylab { position: absolute; left: 0.4cqw; font-family: "SF Mono",ui-monospace,monospace; font-size: 0.95cqw; font-weight: 600; color: var(--ink-faint); transform: translateY(-50%); }
+  .graph .y100 { top: 4%; } .graph .y50 { top: 50%; } .graph .y0 { top: 96%; }
+  .graph .genlab {
+    position: absolute; top: 0.5cqw; left: 21%;
+    font-size: 1.06cqw; font-weight: 800; letter-spacing: 0.08em; color: var(--ink-dim);
+    padding: 0.2em 0.7em; border: 1px solid var(--line-2); border-radius: 2px; background: rgba(0,0,0,0.25);
+  }
+  .graph .flatlab {
+    position: absolute; bottom: 1.2cqw; right: 2%;
+    font-size: 1.12cqw; font-weight: 800; color: var(--npu); letter-spacing: 0.04em;
+  }
+
+  /* 持ち帰りフッター */
+  .takeaway {
+    flex: 0 0 auto; margin-top: 1.6cqw; display: flex; align-items: center; gap: 1.5cqw;
+    padding: 1.3cqw 1.8cqw; border-radius: 5px;
+    background: linear-gradient(90deg, rgba(242,85,78,0.10), rgba(122,92,240,0.10));
+    border: 1px solid var(--line); font-size: 1.62cqw; font-weight: 700; color: var(--ink);
+  }
+  .takeaway .lb { flex: 0 0 auto; font-size: 1.16cqw; font-weight: 800; letter-spacing: 0.12em; color: var(--ground); background: linear-gradient(120deg, var(--cpu), var(--npu)); padding: 0.5em 1em; border-radius: 2px; }
+  .takeaway .en-c { color: var(--cpu); } .takeaway .en-n { color: var(--npu); }
+
+  /* ── 点灯段階(ビートB〜E) 02トリレンマと同一機構 ───────────────── */
+  .hide{ visibility:hidden; }               /* レイアウトは保持=位置ずれ無し */
+  .dim{ opacity:.32; }
+  .frame.step .takeaway{ visibility:hidden; }
+
+  /* 下段(takeawayと同じバンド=空き)に置く。パネルへ食い込ませない */
+  .verdict{ position:absolute; left:50%; bottom:3.4cqw; transform:translateX(-50%); z-index:8;
+    display:flex; align-items:center; gap:1.2cqw; padding:1.15cqw 2cqw; border-radius:6px;
+    background:linear-gradient(90deg, rgba(122,92,240,0.20), rgba(242,85,78,0.18)), var(--ground-3);
+    border:1px solid var(--line-2); box-shadow:0 20px 52px -20px rgba(0,0,0,0.92);
+    font-size:1.62cqw; font-weight:800; letter-spacing:0.02em; white-space:nowrap; color:var(--ink); }
+  .verdict .lb{ font-size:1.02cqw; font-weight:800; letter-spacing:0.14em; color:var(--ink-faint); }
+  .verdict .n{ color:var(--npu); } .verdict .c{ color:var(--cpu); }
+  .verdict .ar{ color:var(--ink-faint); font-family:ui-monospace,monospace; }
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true"></div>
+
+  <div class="frame step">
+    <div class="figno">STEP <b>2</b> / 3</div>
+
+    <header>
+      <div class="eyebrow">
+        <span class="tag">EP01 · ⑥ 実際の働き手：CPU</span>
+        <span class="en">THE REAL WORKER</span>
+      </div>
+      <h1>生成中の使用率 — NPUは、<span class="z">ずっと0%</span></h1>
+      <p class="dek">動いていたのは、<b>こっち</b>。CPUが<b>69%</b>で全開だった。</p>
+    </header>
+
+    <section class="panels" aria-label="生成中のNPUとCPUの使用率">
+      <!-- NPU -->
+      <div class="panel npu">
+        <div class="readout">
+          <div class="comp">NPU <span class="en">Hexagon</span></div>
+          <div class="big">0<span style="font-size:0.5em">%</span></div>
+          <div class="sub"><b>本命のはず</b>——なのに、張り付いて動かない</div>
+        </div>
+        <div class="graph">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
+            <rect class="genband" x="40" y="0" width="160" height="60" />
+            <line class="grid" x1="0" y1="15" x2="200" y2="15" />
+            <line class="grid" x1="0" y1="30" x2="200" y2="30" />
+            <line class="grid" x1="0" y1="45" x2="200" y2="45" />
+            <path class="npu-area" d="M0,60 L0,59.4 L200,59.4 L200,60 Z" />
+            <path class="npu-line" d="M0,59.4 L200,59.4" />
+            <line class="genline" x1="40" y1="0" x2="40" y2="60" />
+          </svg>
+          <span class="ylab y100">100</span>
+          <span class="ylab y50">50</span>
+          <span class="ylab y0">0</span>
+          <span class="genlab">生成中</span>
+          <span class="flatlab">▬ フラット 0%</span>
+        </div>
+      </div>
+
+      <!-- CPU -->
+      <div class="panel cpu">
+        <div class="readout">
+          <div class="comp">CPU <span class="en">Snapdragon X</span></div>
+          <div class="big">69<span style="font-size:0.5em">%</span></div>
+          <div class="sub"><b>3.2 GHz</b>で全開——実際に推論していたのはこっち</div>
+        </div>
+        <div class="graph">
+          <svg viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="cpuGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="rgba(242,85,78,0.42)" />
+                <stop offset="1" stop-color="rgba(242,85,78,0.04)" />
+              </linearGradient>
+            </defs>
+            <rect class="genband" x="40" y="0" width="160" height="60" />
+            <line class="grid" x1="0" y1="15" x2="200" y2="15" />
+            <line class="grid" x1="0" y1="30" x2="200" y2="30" />
+            <line class="grid" x1="0" y1="45" x2="200" y2="45" />
+            <path class="cpu-area" d="M0,60 L0,52.8 L18,53.4 L34,52.2 L40,51.6 L48,25.2 L56,18.6 L66,21 L78,17.4 L92,21.6 L108,18 L124,20.4 L140,17.4 L156,21 L172,18.6 L188,19.8 L200,19.2 L200,60 Z" />
+            <path class="cpu-line" d="M0,52.8 L18,53.4 L34,52.2 L40,51.6 L48,25.2 L56,18.6 L66,21 L78,17.4 L92,21.6 L108,18 L124,20.4 L140,17.4 L156,21 L172,18.6 L188,19.8 L200,19.2" />
+            <line class="genline" x1="40" y1="0" x2="40" y2="60" />
+          </svg>
+          <span class="ylab y100">100</span>
+          <span class="ylab y50">50</span>
+          <span class="ylab y0">0</span>
+          <span class="genlab">生成開始 →</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="takeaway">
+      <span class="lb">見えた事実</span>
+      <span>「NPUで動いてる」の正体は<span class="en-c">CPU</span>。本命の<span class="en-n">NPU</span>は、まだ <span class="en-n">0%</span> ＝ 次回への宿題。</span>
+    </footer>
+  </div>
+</main>

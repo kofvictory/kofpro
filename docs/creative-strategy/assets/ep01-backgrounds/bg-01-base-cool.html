@@ -1,0 +1,58 @@
+<title>コフと僕 EP01 ｜ 背景プレート① base-cool（論理・実装・ニュートラル）</title>
+<style>
+  /* =========================================================================
+     EP01 背景プレート① : BASE-COOL（論理 / 実装 / ニュートラルの下地）
+     用途: ②三すくみ・③テーゼ(figureが紫→オレンジを担う)・④⑤実装 + 汎用の中立ストレッチ
+     ★全画面16:9・1920x1080・テロップ/図解/ナレの「下地」= 主張しすぎない静かな地。
+     ★IPセーフ: 抽象(グリッド/グラデ/グロー)のみ。エグゼ/PET/キャラ意匠は一切不使用。
+     ★配色は ep01-figures と同一トークン(ダーク紫地+ラベンダーグリッド+navi teal+warm)。
+     ★可読性設計: 中央〜下1/3を暗く静かに保ち、テロップが乗る前提。装飾は上/隅に寄せる。
+     ========================================================================= */
+  :root{
+    --ground-a:#0b0a16;   /* 中心の持ち上げ */
+    --ground-b:#0a0912;   /* 主地 */
+    --ground-c:#08070f;   /* 縁の沈み */
+    --grid:rgba(181,170,224,1);
+    --grid-op:0.05;
+    --g1c:rgba(95,214,192,0.10);   /* navi teal グロー(上右) */
+    --g1pos:72% 28%;
+    --g1size:42% 46%;
+    --g2c:rgba(255,207,138,0.05);  /* warm グロー(下左・かすか) */
+    --g2pos:16% 90%;
+    --floor:0.42;   /* 下辺の沈み(テロップ可読) */
+    --vig:rgba(4,3,10,0.9);
+    --vig-edge:rgba(3,2,8,0.78);
+  }
+  html,body{margin:0;padding:0;background:var(--ground-c);}
+  body{width:1920px;height:1080px;overflow:hidden;position:relative;
+    -webkit-font-smoothing:antialiased;}
+  .layer{position:absolute;inset:0;pointer-events:none;}
+  .ground{background:
+    radial-gradient(120% 105% at 50% 40%, var(--ground-a) 0%, var(--ground-b) 52%, var(--ground-c) 100%);}
+  .glow{background:
+    radial-gradient(var(--g1size) at var(--g1pos), var(--g1c), transparent 62%),
+    radial-gradient(50% 52% at var(--g2pos), var(--g2c), transparent 64%);}
+  .grid{opacity:var(--grid-op);
+    background-image:
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg,  var(--grid) 0 1px, transparent 1px 64px);
+    -webkit-mask-image:radial-gradient(115% 92% at 50% 38%, #000 18%, transparent 80%);
+            mask-image:radial-gradient(115% 92% at 50% 38%, #000 18%, transparent 80%);}
+  /* 下辺=テロップ安全帯: 沈めて文字を乗せやすく */
+  .floor{background:linear-gradient(0deg, rgba(0,0,0,var(--floor)) 0%, rgba(0,0,0,0.16) 14%, transparent 30%);}
+  /* 縁のヴィネット(額装) */
+  .vignette{
+    box-shadow:inset 0 0 320px 70px var(--vig);
+    background:radial-gradient(125% 120% at 50% 46%, transparent 58%, var(--vig-edge) 100%);}
+  /* ごく微細な走査線(質感・ほぼ不可視) */
+  .scan{opacity:.35;mix-blend-mode:overlay;
+    background:repeating-linear-gradient(0deg, rgba(181,170,224,0.04) 0 1px, transparent 1px 3px);
+    -webkit-mask-image:radial-gradient(120% 100% at 50% 40%, #000 40%, transparent 92%);
+            mask-image:radial-gradient(120% 100% at 50% 40%, #000 40%, transparent 92%);}
+</style>
+<div class="layer ground"></div>
+<div class="layer glow"></div>
+<div class="layer grid"></div>
+<div class="layer scan"></div>
+<div class="layer floor"></div>
+<div class="layer vignette"></div>

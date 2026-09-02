@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "project": "コフと僕 EP01",
+    "purpose": "各章の全画面背景プレート(テロップ/図解/ナレの下地)",
+    "canvas": "1920x1080 / 16:9",
+    "render": "headless Chrome --headless=new --screenshot --force-device-scale-factor=1 --window-size=1920,1080",
+    "ip_safe": "抽象(グリッド/グラデ/グロー)のみ。公式エグゼ/PET/キャラ意匠・ロゴは一切不使用",
+    "token_base": "ep01-figures と同一系統(ダーク紫地 + ラベンダーグリッド + navi teal + warm)",
+    "design_policy": "1ベース系 → 4ムード変奏(統一感優先)。全10章を4枚でカバーし再利用する",
+    "capcut_usage": "静止PNGを最背面レイヤーに全画面で敷き、寄り/パン(Ken Burns)で微動を付ける。図解・テロップはこの上に重ねる",
+    "readability": "中央〜下1/3を沈めてテロップ可読を確保(装飾は上/隅に寄せている)",
+    "created": "2026-08-01",
+    "note": "8/2公開EP01本編向けの最小セット即納版。EP02では本JSONから自動生成(派生)に拡張可"
+  },
+  "palette": {
+    "ground_center": "#0a0912",
+    "ground_edge": "#08070f",
+    "grid_lavender": "rgba(181,170,224,a)",
+    "navi_teal": "#5fd6c0",
+    "warm_nostalgia": "#ffcf8a",
+    "alarm_crimson": "#c0435a"
+  },
+  "moods": [
+    {
+      "id": "base-cool",
+      "file": "bg-01-base-cool.html",
+      "png": "bg-01-base-cool.png",
+      "tone": "論理 / 実装 / ニュートラル",
+      "for_chapters": ["②三すくみ", "③テーゼ", "④実装", "⑤実装"],
+      "note": "既定の下地(ワークホース)。③は figure が紫→オレンジの役者交代色を担うので背景は中立",
+      "tokens": {
+        "ground": ["#0b0a16", "#0a0912", "#08070f"],
+        "grid_op": 0.05,
+        "glow1": {"color": "rgba(95,214,192,0.10)", "pos": "72% 28%", "size": "42% 46%"},
+        "glow2": {"color": "rgba(255,207,138,0.05)", "pos": "16% 90%"},
+        "floor": 0.42,
+        "vignette": "rgba(4,3,10,0.9)"
+      }
+    },
+    {
+      "id": "warm-bright",
+      "file": "bg-02-warm-bright.html",
+      "png": "bg-02-warm-bright.png",
+      "tone": "完成形 / 解決 / 前向き",
+      "for_chapters": ["①完成形デモ", "⑦解決(フォールバック回復)", "⑧宿題→前向き"],
+      "note": "気持ちよさ/快感/希望。base-coolより持ち上げ、warmが主役(上中央)",
+      "tokens": {
+        "ground": ["#141126", "#100d1e", "#0b0916"],
+        "grid_op": 0.06,
+        "glow1": {"color": "rgba(255,207,138,0.13)", "pos": "50% 20%", "size": "56% 52%"},
+        "glow2": {"color": "rgba(95,214,192,0.09)", "pos": "82% 62%"},
+        "floor": 0.36,
+        "vignette": "rgba(8,5,14,0.82)"
+      }
+    },
+    {
+      "id": "deep-tense",
+      "file": "bg-03-deep-tense.html",
+      "png": "bg-03-deep-tense.png",
+      "tone": "緊張 / 低点",
+      "for_chapters": ["⓪コールドオープン(NPU 0%)", "⑥谷(CPU推論・お預け)"],
+      "note": "最暗・冷。tealを沈め、縁に淡いクリムゾンのヴィネット=不穏/警戒。ヴィネット最強で閉塞感",
+      "tokens": {
+        "ground": ["#08070f", "#060510", "#040309"],
+        "grid_op": 0.03,
+        "glow1": {"color": "rgba(95,214,192,0.05)", "pos": "60% 24%", "size": "38% 42%"},
+        "glow2": {"color": "rgba(192,67,90,0.07)", "pos": "84% 82%"},
+        "floor": 0.5,
+        "vignette": "rgba(46,10,20,0.92)"
+      }
+    },
+    {
+      "id": "dream-bookend",
+      "file": "bg-04-dream-bookend.html",
+      "png": "bg-04-dream-bookend.png",
+      "tone": "夢 / 締め / 円環",
+      "for_chapters": ["①夢パート(OP)", "⑧夢への回帰の一瞬", "⑨まとめ/ブックエンド"],
+      "note": "懐かしさ=warmブルームを中央にやわらかく大きく。grid霞ませ。湿っぽくしすぎない(沈み浅め)",
+      "tokens": {
+        "ground": ["#0e0b1c", "#0b0916", "#090713"],
+        "grid_op": 0.035,
+        "grid_blur": "0.6px",
+        "glow1": {"color": "rgba(255,207,138,0.15)", "pos": "50% 42%", "size": "64% 60%"},
+        "glow2": {"color": "rgba(95,214,192,0.07)", "pos": "28% 76%"},
+        "floor": 0.32,
+        "vignette": "rgba(12,7,18,0.78)"
+      }
+    }
+  ],
+  "chapter_map": {
+    "⓪ コールドオープン": "deep-tense",
+    "① 夢パート(OP)": "dream-bookend",
+    "① 完成形デモ(本編)": "warm-bright",
+    "② 三すくみ": "base-cool",
+    "③ テーゼ": "base-cool",
+    "④ 実装": "base-cool",
+    "⑤ 実装(別人感/賢いモード)": "base-cool",
+    "⑥ 谷": "deep-tense",
+    "⑦ 解決": "warm-bright",
+    "⑧ 宿題/CTA/夢への回帰": "warm-bright(夢への回帰の一瞬だけ dream-bookend)",
+    "⑨ まとめ/ブックエンド": "dream-bookend"
+  },
+  "eyecatch": {
+    "purpose": "⓪コールドオープン→①夢パートの暗転に差すタイトルカード(提案採用)。掴んでから名乗る+冷→暖の橋",
+    "text": {
+      "title": "憧れの相棒AIを本気で自作してみる！(18字)",
+      "series": "EP.01 ◇ コフと僕",
+      "font_title": "Noto Serif CJK JP(明朝・物語側)",
+      "font_series": "Noto Sans CJK JP(ゴシック・情報側)"
+    },
+    "no_number_here": "0%数字はここに出さない=⓪とサムネの役目。カードは広いエモ側",
+    "frames": [
+      {"id": "cold", "file": "title-eyecatch-cold.html", "png": "title-eyecatch-cold.png", "role": "入口=0%残像(冷)", "bg": "deep-tense"},
+      {"id": "warm", "file": "title-eyecatch-warm.html", "png": "title-eyecatch-warm.png", "role": "到達点=夢(暖)・①へ渡す", "bg": "dream-bookend"}
+    ],
+    "capcut": "⓪(0%)→暗転0.3-0.5s→cold→クロスフェード0.5-1s→warm→①。尺1.5-2.5秒/文字立ち上げ+軽ズーム/BGM継続+SE一発/静止させない。warm1枚でも成立"
+  }
+}
