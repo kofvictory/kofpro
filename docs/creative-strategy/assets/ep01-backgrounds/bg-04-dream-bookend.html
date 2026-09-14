@@ -1,0 +1,54 @@
+<title>コフと僕 EP01 ｜ 背景プレート④ dream-bookend（夢・締め・OP回帰）</title>
+<style>
+  /* =========================================================================
+     EP01 背景プレート④ : DREAM-BOOKEND（夢 / 締め / 円環の下地）
+     用途: ①夢パート(OP・子供の頃の憧れ)・⑨まとめ/ブックエンド(OPへ回帰)
+     ★懐かしさ=warmブルームを中央にやわらかく大きく。teal支え・grid霞ませる。
+     ★湿っぽくしすぎない=沈みは浅め、光を上へ抜く(希望・円環が閉じつつ開く)。
+     ★全画面16:9・1920x1080・IPセーフ(抽象のみ)。ep01共通トークン。
+     ========================================================================= */
+  :root{
+    --ground-a:#0e0b1c;   /* 温かいダーク紫 */
+    --ground-b:#0b0916;
+    --ground-c:#090713;
+    --grid:rgba(198,186,236,1);
+    --grid-op:0.035;               /* 霞ませる */
+    --g1c:rgba(255,207,138,0.15);  /* warm 記憶のブルーム(中央・大) */
+    --g1pos:50% 42%;
+    --g1size:64% 60%;
+    --g2c:rgba(95,214,192,0.07);   /* teal 支え(下左) */
+    --g2pos:28% 76%;
+    --floor:0.32;
+    --vig:rgba(12,7,18,0.78);
+    --vig-edge:rgba(9,5,14,0.64);
+  }
+  html,body{margin:0;padding:0;background:var(--ground-c);}
+  body{width:1920px;height:1080px;overflow:hidden;position:relative;
+    -webkit-font-smoothing:antialiased;}
+  .layer{position:absolute;inset:0;pointer-events:none;}
+  .ground{background:
+    radial-gradient(120% 108% at 50% 44%, var(--ground-a) 0%, var(--ground-b) 52%, var(--ground-c) 100%);}
+  .glow{background:
+    radial-gradient(var(--g1size) at var(--g1pos), var(--g1c), transparent 66%),
+    radial-gradient(52% 54% at var(--g2pos), var(--g2c), transparent 64%);}
+  .grid{opacity:var(--grid-op);filter:blur(0.6px);
+    background-image:
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 68px),
+      repeating-linear-gradient(0deg,  var(--grid) 0 1px, transparent 1px 68px);
+    -webkit-mask-image:radial-gradient(120% 96% at 50% 42%, #000 22%, transparent 84%);
+            mask-image:radial-gradient(120% 96% at 50% 42%, #000 22%, transparent 84%);}
+  .floor{background:linear-gradient(0deg, rgba(0,0,0,var(--floor)) 0%, rgba(0,0,0,0.12) 14%, transparent 30%);}
+  .vignette{
+    box-shadow:inset 0 0 300px 60px var(--vig);
+    background:radial-gradient(128% 122% at 50% 44%, transparent 60%, var(--vig-edge) 100%);}
+  .scan{opacity:.3;mix-blend-mode:overlay;
+    background:repeating-linear-gradient(0deg, rgba(198,186,236,0.035) 0 1px, transparent 1px 3px);
+    -webkit-mask-image:radial-gradient(120% 100% at 50% 42%, #000 40%, transparent 92%);
+            mask-image:radial-gradient(120% 100% at 50% 42%, #000 40%, transparent 92%);}
+</style>
+<div class="layer ground"></div>
+<div class="layer glow"></div>
+<div class="layer grid"></div>
+<div class="layer scan"></div>
+<div class="layer floor"></div>
+<div class="layer vignette"></div>

@@ -1,0 +1,54 @@
+<title>コフと僕 EP01 ｜ 背景プレート② warm-bright（完成形・解決・前向き）</title>
+<style>
+  /* =========================================================================
+     EP01 背景プレート② : WARM-BRIGHT（完成形 / 解決 / 前向きの下地）
+     用途: ①完成形デモ・⑦解決(フォールバック回復)・⑧宿題→前向きに開く
+     ★「気持ちよさ / 快感 / 希望」の温度。base-coolより持ち上げ・warm主役。
+     ★全画面16:9・1920x1080・IPセーフ(抽象のみ)。ep01共通トークン。
+     ★中央〜下1/3はテロップ可読のため沈める(装飾は上に寄せる)。
+     ========================================================================= */
+  :root{
+    --ground-a:#141126;   /* 中心の持ち上げ(明るめ) */
+    --ground-b:#100d1e;
+    --ground-c:#0b0916;
+    --grid:rgba(190,180,230,1);
+    --grid-op:0.06;
+    --g1c:rgba(255,207,138,0.13);  /* warm ブルーム(上中央・主役) */
+    --g1pos:50% 20%;
+    --g1size:56% 52%;
+    --g2c:rgba(95,214,192,0.09);   /* teal 支え(下右) */
+    --g2pos:82% 62%;
+    --floor:0.36;
+    --vig:rgba(8,5,14,0.82);
+    --vig-edge:rgba(6,4,12,0.68);
+  }
+  html,body{margin:0;padding:0;background:var(--ground-c);}
+  body{width:1920px;height:1080px;overflow:hidden;position:relative;
+    -webkit-font-smoothing:antialiased;}
+  .layer{position:absolute;inset:0;pointer-events:none;}
+  .ground{background:
+    radial-gradient(120% 105% at 50% 40%, var(--ground-a) 0%, var(--ground-b) 52%, var(--ground-c) 100%);}
+  .glow{background:
+    radial-gradient(var(--g1size) at var(--g1pos), var(--g1c), transparent 62%),
+    radial-gradient(50% 52% at var(--g2pos), var(--g2c), transparent 64%);}
+  .grid{opacity:var(--grid-op);
+    background-image:
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg,  var(--grid) 0 1px, transparent 1px 64px);
+    -webkit-mask-image:radial-gradient(115% 92% at 50% 38%, #000 18%, transparent 80%);
+            mask-image:radial-gradient(115% 92% at 50% 38%, #000 18%, transparent 80%);}
+  .floor{background:linear-gradient(0deg, rgba(0,0,0,var(--floor)) 0%, rgba(0,0,0,0.14) 14%, transparent 30%);}
+  .vignette{
+    box-shadow:inset 0 0 320px 70px var(--vig);
+    background:radial-gradient(125% 120% at 50% 46%, transparent 58%, var(--vig-edge) 100%);}
+  .scan{opacity:.35;mix-blend-mode:overlay;
+    background:repeating-linear-gradient(0deg, rgba(190,180,230,0.04) 0 1px, transparent 1px 3px);
+    -webkit-mask-image:radial-gradient(120% 100% at 50% 40%, #000 40%, transparent 92%);
+            mask-image:radial-gradient(120% 100% at 50% 40%, #000 40%, transparent 92%);}
+</style>
+<div class="layer ground"></div>
+<div class="layer glow"></div>
+<div class="layer grid"></div>
+<div class="layer scan"></div>
+<div class="layer floor"></div>
+<div class="layer vignette"></div>

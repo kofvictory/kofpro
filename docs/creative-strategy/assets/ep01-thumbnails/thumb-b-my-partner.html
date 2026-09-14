@@ -1,0 +1,166 @@
+<title>コフと僕 EP01 ｜ サムネB案「僕の相棒を作った」</title>
+<style>
+  /* =========================================================================
+     EP01 サムネイル B案(物語) 「僕の相棒を作った」 — 1280×720 フルブリード
+     エモ軸。ただしAITuber誤認を構図で回避:
+     顔アップにせず「実機デスクトップ(コード+タスクUI)の上にコフが浮く」を見せ、
+     NPU 0%バッジで実測系の文脈を残す(GPTレビュー整合)
+     ========================================================================= */
+  :root {
+    --ground:  #0a0912;
+    --panel:   #171426;
+    --panel-2: #1e1a2e;
+    --line:    rgba(181,170,224,0.22);
+    --ink:     #f4f2fb;
+    --ink-dim: #a49bc0;
+    --violet:  #a689ff;
+    --violet-deep: #7a5cf0;
+    --orange:  #ff9d54;
+    --green:   #7fd9a6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #000; }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+    overflow: hidden;
+    background:
+      radial-gradient(100% 140% at 78% 30%, rgba(122,92,240,0.28) 0%, rgba(122,92,240,0) 60%),
+      radial-gradient(80% 110% at 90% 95%, rgba(244,119,42,0.16) 0%, rgba(244,119,42,0) 55%),
+      linear-gradient(150deg, #131028 0%, var(--ground) 60%, #070610 100%);
+  }
+  .stage::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.045) 0 1px, transparent 1px 8cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.045) 0 1px, transparent 1px 8cqw);
+    mask-image: radial-gradient(120% 100% at 50% 50%, #000 30%, transparent 90%);
+  }
+
+  /* ── 右側: 実機デスクトップの舞台 ─────────────────────────────────── */
+  /* エディタ(コード)ウィンドウ */
+  .win {
+    position: absolute;
+    border-radius: 1.1cqw;
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line);
+    box-shadow: 0 2.4cqw 6cqw rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+  .win .bar { height: 3cqw; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 0.8cqw; padding: 0 1.4cqw; }
+  .win .dot { width: 1cqw; height: 1cqw; border-radius: 50%; background: rgba(255,255,255,0.18); }
+
+  .editor { right: 20cqw; top: 8cqw; width: 34cqw; height: 30cqw; transform: rotate(-2deg); }
+  .editor .code { padding: 1.6cqw; display: flex; flex-direction: column; gap: 1.2cqw; }
+  .editor .ln { height: 1.5cqw; border-radius: 0.75cqw; background: rgba(166,137,255,0.35); }
+  .editor .ln.o { background: rgba(255,157,84,0.4); }
+  .editor .ln.d { background: rgba(255,255,255,0.12); }
+  .editor .ln.w60 { width: 60%; } .editor .ln.w80 { width: 80%; } .editor .ln.w45 { width: 45%; } .editor .ln.w70 { width: 70%; } .editor .ln.w35 { width: 35%; }
+
+  /* タスクUIカード */
+  .tasks { right: 5cqw; top: 22cqw; width: 26cqw; height: 24cqw; transform: rotate(1.5deg); }
+  .tasks .row { display: flex; align-items: center; gap: 1.2cqw; padding: 1.5cqw 1.6cqw; border-bottom: 1px solid rgba(181,170,224,0.12); }
+  .tasks .chk { width: 2.2cqw; height: 2.2cqw; border-radius: 0.6cqw; border: 0.3cqw solid var(--ink-dim); flex: 0 0 auto; }
+  .tasks .chk.done { border-color: var(--green); background: rgba(127,217,166,0.25); position: relative; }
+  .tasks .chk.done::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--green); font-size: 1.7cqw; font-weight: 900; }
+  .tasks .tln { height: 1.4cqw; border-radius: 0.7cqw; background: rgba(236,233,246,0.22); flex: 1 1 auto; }
+  .tasks .row.hot .tln { background: rgba(255,157,84,0.4); }
+
+  /* ── コフ(浮遊・中央右) — 顔アップにしない ─────────────────────── */
+  .kof {
+    position: absolute; right: 24cqw; top: 30cqw;
+    width: 15cqw; height: 15cqw; border-radius: 26%;
+    background: radial-gradient(circle at 36% 30%, #d9c9ff 0%, var(--violet) 38%, var(--violet-deep) 78%, #5a3fd0 100%);
+    box-shadow:
+      0 0 6cqw rgba(122,92,240,0.75),
+      0 2.4cqw 5cqw rgba(0,0,0,0.55),
+      inset 0 -1.4cqw 3cqw rgba(0,0,0,0.3);
+  }
+  .kof .eye { position: absolute; top: 38%; width: 16%; height: 24%; border-radius: 45%; background: #17122b; box-shadow: inset 0 -0.3cqw 0.6cqw rgba(255,255,255,0.28); }
+  .kof .eye.l { left: 24%; } .kof .eye.r { right: 24%; }
+  .kof .shine { position: absolute; top: 41%; width: 4.5%; height: 7%; border-radius: 50%; background: #fff; opacity: 0.92; }
+  .kof .shine.l { left: 29%; } .kof .shine.r { right: 33%; }
+  /* 浮遊感の影 */
+  .kof-shadow {
+    position: absolute; right: 25.5cqw; top: 47.5cqw;
+    width: 12cqw; height: 2.2cqw; border-radius: 50%;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(122,92,240,0.4), transparent 75%);
+    filter: blur(0.5cqw);
+  }
+
+  /* ── コピー(左・縦積み大) ───────────────────────────────────────── */
+  .copy {
+    position: absolute; left: 4.5cqw; top: 12cqw;
+    /* タイトル書体=明朝(本人決定2026-07-17): ゴシック一色のYTサムネで差別化+物語の温度。
+       最終はPNG書き出し(CSPでlive埋込不可→liveは各OSの明朝にフォールバック) */
+    font-family: "Noto Serif CJK JP","Noto Serif JP","Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
+    font-weight: 900; line-height: 1.22; letter-spacing: 0.01em;
+    font-size: 10.4cqw; color: var(--ink);
+    text-shadow: 0 0.8cqw 2.8cqw rgba(0,0,0,0.8);
+  }
+  .copy .pt {
+    color: transparent;
+    background: linear-gradient(100deg, #c3adff 5%, #e2d5ff 48%, #ffc08a 100%);
+    -webkit-background-clip: text; background-clip: text;
+    text-shadow: none; /* 継承shadowはclip:textの塗りの上に被り暗くなる(blink挙動) */
+    filter: drop-shadow(0 0.7cqw 1.6cqw rgba(0,0,0,0.9));
+  }
+
+  /* ── NPU 0% バッジ(左下=実測系の文脈を残す) ────────────────────── */
+  .badge {
+    position: absolute; left: 4.5cqw; bottom: 7.5cqw;
+    display: flex; align-items: baseline; gap: 1.2cqw;
+    font-family: "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    font-weight: 900; color: var(--ink);
+    background: rgba(10,9,18,0.72);
+    border: 0.35cqw solid rgba(166,137,255,0.8);
+    border-radius: 1.2cqw;
+    padding: 1.2cqw 2.4cqw;
+    font-size: 4.2cqw;
+    text-shadow: 0 0.4cqw 1.2cqw rgba(0,0,0,0.6);
+  }
+  .badge .z { color: var(--violet); font-size: 1.25em; }
+  .badge .q { color: var(--ink-dim); font-size: 0.62em; font-weight: 800; }
+</style>
+
+<main class="stage">
+  <!-- 実機の舞台 -->
+  <div class="win editor" aria-hidden="true">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+    <div class="code">
+      <div class="ln w60"></div>
+      <div class="ln d w80"></div>
+      <div class="ln o w45"></div>
+      <div class="ln d w70"></div>
+      <div class="ln w35"></div>
+      <div class="ln d w60"></div>
+      <div class="ln o w70"></div>
+      <div class="ln d w45"></div>
+    </div>
+  </div>
+
+  <div class="win tasks" aria-hidden="true">
+    <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+    <div class="row"><span class="chk done"></span><span class="tln"></span></div>
+    <div class="row hot"><span class="chk"></span><span class="tln"></span></div>
+    <div class="row"><span class="chk"></span><span class="tln"></span></div>
+    <div class="row"><span class="chk done"></span><span class="tln"></span></div>
+  </div>
+
+  <div class="kof" aria-hidden="true">
+    <span class="eye l"></span><span class="eye r"></span>
+    <span class="shine l"></span><span class="shine r"></span>
+  </div>
+  <div class="kof-shadow" aria-hidden="true"></div>
+
+  <!-- コピー -->
+  <div class="copy">
+    僕の<span class="pt">相棒</span>を<br>作った
+  </div>
+
+  <!-- 実測バッジ -->
+  <div class="badge"><span class="q">なのに</span><span>NPU <span class="z">0%</span></span></div>
+</main>

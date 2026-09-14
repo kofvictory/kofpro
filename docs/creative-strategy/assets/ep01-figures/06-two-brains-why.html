@@ -1,0 +1,123 @@
+<title>コフと僕 EP01 ｜ 図解06 頭脳が2つある、なぜ?（①ビートD / ②ビートA 想起）</title>
+<style>
+  /* =========================================================================
+     EP01 図解06: 「同じキャラなのに、頭脳が2つある。なぜ?」
+     出典: EP01_SCRIPT ①ビートD(引きの問い)=受け身コフ/能動コフを左右+中央「?」。
+           ②ビートA(問いの設定)で一瞬想起。この1枚で兼用。
+     ★設計: コフ本体=共通ティール(=「同じキャラ」)/ 頭脳コアの色だけ差す。
+       左=紫(ローカル/Ollama・受け身) / 右=オレンジ(賢い/Claude・能動)
+       =①ビートCの別人感&③テーゼの「役者交代」色コードに一致。
+     ★IPセーフ: 完全オリジナルの抽象AI(エグゼ/PET/ナビ意匠は不使用)。
+     ★16:9・1920x1080・figuresトークン(ダーク紫地+ラベンダーグリッド+navi teal)。
+     ========================================================================= */
+  :root{
+    --ground-a:#0b0a16; --ground-b:#0a0912; --ground-c:#08070f;
+    --grid:rgba(181,170,224,1);
+    --teal:#5fd6c0; --teal-line:rgba(95,214,192,.5);
+    --ink:#ece9f6; --ink-dim:#a79ec4; --ink-faint:#6a627f;
+    --purple:#b085ec; --purple-glow:rgba(176,133,236,.55);
+    --orange:#ff9e57; --orange-glow:rgba(255,158,87,.5);
+  }
+  html,body{margin:0;padding:0;background:var(--ground-c);}
+  body{width:1920px;height:1080px;overflow:hidden;position:relative;
+    font-family:"Noto Sans CJK JP",sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  .layer{position:absolute;inset:0;pointer-events:none;}
+  .ground{background:radial-gradient(120% 105% at 50% 42%, var(--ground-a) 0%, var(--ground-b) 52%, var(--ground-c) 100%);}
+  .glow{background:
+    radial-gradient(38% 42% at 24% 40%, var(--purple-glow), transparent 66%),
+    radial-gradient(38% 42% at 76% 40%, var(--orange-glow), transparent 66%);
+    opacity:.5;}
+  .grid{opacity:.05;
+    background-image:
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 64px),
+      repeating-linear-gradient(0deg,  var(--grid) 0 1px, transparent 1px 64px);
+    -webkit-mask-image:radial-gradient(115% 92% at 50% 42%, #000 18%, transparent 82%);
+            mask-image:radial-gradient(115% 92% at 50% 42%, #000 18%, transparent 82%);}
+  .vignette{box-shadow:inset 0 0 320px 70px rgba(4,3,10,.9);
+    background:radial-gradient(125% 120% at 50% 46%, transparent 58%, rgba(3,2,8,.78) 100%);}
+
+  /* ===== シーン ===== */
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:56px;}
+  .topcap{font-size:38px;font-weight:700;letter-spacing:.14em;color:var(--ink-dim);text-indent:.14em;}
+  .row{display:flex;align-items:center;gap:88px;}
+
+  /* コフ 1体 */
+  .unit{display:flex;flex-direction:column;align-items:center;gap:22px;width:280px;}
+  .mode{font-size:24px;font-weight:600;letter-spacing:.08em;color:var(--ink-faint);}
+  .kof{position:relative;display:flex;flex-direction:column;align-items:center;}
+  .head{position:relative;width:162px;height:162px;border-radius:50%;
+    border:3px solid var(--teal-line);
+    background:radial-gradient(circle at 50% 42%, rgba(95,214,192,.06), rgba(10,9,18,.9) 70%);
+    display:grid;place-items:center;box-shadow:0 0 0 8px rgba(10,9,18,.6), inset 0 0 26px rgba(0,0,0,.5);}
+  /* 頭脳コア(=差し替わる部分/色) */
+  .core{position:relative;width:104px;height:104px;border-radius:50%;
+    background:radial-gradient(circle, var(--c) 0%, color-mix(in srgb, var(--c) 30%, transparent) 46%, transparent 72%);
+    box-shadow:0 0 46px 6px var(--cg);}
+  .core::after{content:"";position:absolute;inset:20px;border-radius:50%;
+    border:2px solid var(--c);opacity:.7;
+    box-shadow:0 0 14px var(--cg), inset 0 0 12px var(--cg);}
+  .core::before{content:"";position:absolute;inset:38px;border-radius:50%;
+    background:var(--c);box-shadow:0 0 20px 4px var(--cg);}
+  /* 単眼バイザー(AI感・共通) */
+  .visor{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
+    width:80px;height:15px;border-radius:8px;
+    background:linear-gradient(90deg, transparent, var(--teal), transparent);
+    box-shadow:0 0 16px 1px rgba(95,214,192,.5);opacity:.9;}
+  /* 本体(共通=「同じキャラ」) */
+  .body{width:198px;height:138px;margin-top:-8px;border-radius:52px 52px 44px 44px;
+    border:3px solid var(--teal-line);
+    background:linear-gradient(180deg, rgba(95,214,192,.10), rgba(95,214,192,.015) 70%);
+    box-shadow:inset 0 8px 30px rgba(0,0,0,.35);position:relative;}
+  .body::after{content:"";position:absolute;left:50%;top:26px;transform:translateX(-50%);
+    width:44px;height:44px;border-radius:50%;border:2px solid var(--teal-line);opacity:.5;}
+
+  .name{font-size:32px;font-weight:800;color:var(--c);line-height:1.2;text-align:center;}
+  .name span{display:block;font-size:20px;font-weight:600;letter-spacing:.16em;
+    color:var(--ink-dim);margin-top:5px;}
+
+  /* 左=紫 / 右=オレンジ */
+  .left  { --c:var(--purple); --cg:var(--purple-glow); }
+  .right { --c:var(--orange); --cg:var(--orange-glow); }
+
+  /* 中央 ? */
+  .q{font-size:300px;font-weight:800;line-height:.8;color:var(--ink);
+    text-shadow:0 0 46px rgba(181,170,224,.55), 0 0 12px rgba(255,255,255,.25);
+    transform:translateY(-10px);}
+
+  .botcap{display:flex;align-items:baseline;gap:26px;}
+  .botcap .t{font-size:46px;font-weight:800;color:var(--ink);letter-spacing:.02em;}
+  .botcap .t b{color:var(--teal);}
+  .botcap .why{font-size:42px;font-weight:800;color:var(--teal);letter-spacing:.05em;
+    text-shadow:0 0 22px rgba(95,214,192,.4);}
+</style>
+<div class="layer ground"></div>
+<div class="layer glow"></div>
+<div class="layer grid"></div>
+<div class="layer vignette"></div>
+<div class="scene">
+  <div class="topcap">同じキャラ。</div>
+  <div class="row">
+    <div class="unit left">
+      <div class="mode">受け身モード</div>
+      <div class="kof">
+        <div class="head"><div class="core"></div><div class="visor"></div></div>
+        <div class="body"></div>
+      </div>
+      <div class="name">ローカル<span>Ollama</span></div>
+    </div>
+
+    <div class="q">?</div>
+
+    <div class="unit right">
+      <div class="mode">能動モード</div>
+      <div class="kof">
+        <div class="head"><div class="core"></div><div class="visor"></div></div>
+        <div class="body"></div>
+      </div>
+      <div class="name">賢い<span>Claude</span></div>
+    </div>
+  </div>
+  <div class="botcap"><span class="t">なのに、<b>頭脳が2つある。</b></span><span class="why">なぜ？</span></div>
+</div>

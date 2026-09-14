@@ -1,0 +1,514 @@
+<title>コフと僕 EP01 ｜ 図解01 同じ関数呼び出し、違う届き方</title>
+<style>
+  /* =========================================================================
+     コフと僕 EP01 · 図解01 「Tool Calling の分岐」
+     単一ビジュアルワールドとして "ダーク" に意図的にコミット
+     (映像素材のため。視聴者のテーマに関わらず同一フレームで書き出せるよう固定)
+     配色システム: 紫=ローカル/器(Ollama)  橙=Claude/魂  — アバターskinと共通
+     ========================================================================= */
+  :root {
+    --ground:   #0a0912;
+    --ground-2: #100e1b;
+    --ground-3: #171426;
+    --line:     rgba(181, 170, 224, 0.14);
+    --line-2:   rgba(181, 170, 224, 0.28);
+    --ink:      #ece9f6;
+    --ink-dim:  #a49bc0;
+    --ink-faint:#6a627f;
+
+    --local:      #a689ff;   /* Ollama / ローカル / 器 */
+    --local-deep: #7a5cf0;
+    --local-glow: rgba(166, 137, 255, 0.55);
+
+    --claude:      #ff9d54;  /* Claude / 魂 */
+    --claude-deep: #f4772a;
+    --claude-glow: rgba(255, 157, 84, 0.5);
+
+    --stage-w: 1200px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 3vmin;
+    background:
+      radial-gradient(120% 90% at 18% -10%, #16122a 0%, rgba(22,18,42,0) 55%),
+      radial-gradient(130% 100% at 92% 112%, #1a1020 0%, rgba(26,16,32,0) 50%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic",
+                 "YuGothic", "Noto Sans JP", "Meiryo", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ── 16:9 の書き出しステージ。cqw で内部を全スケール ───────────────── */
+  .stage {
+    position: relative;
+    width: min(94vw, var(--stage-w));
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+    overflow: hidden;
+    border-radius: 6px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 40%),
+      var(--ground-2);
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 40px 120px -40px rgba(0,0,0,0.85),
+      inset 0 0 140px -40px rgba(0,0,0,0.6);
+  }
+
+  /* ── 背景: ネットの回路トレース(エグゼ文脈・極薄) ───────────────── */
+  .net {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .net::before {
+    /* 微細グリッド */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 50% 40%, #000 30%, transparent 88%);
+  }
+  .net svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ── 版面 ─────────────────────────────────────────────────────────── */
+  .frame {
+    position: absolute;
+    inset: 0;
+    padding: 3.8cqw 6.2cqw 3.4cqw;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── ヘッダー ─────────────────────────────────────────────────────── */
+  header { flex: 0 0 auto; }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 1.1cqw;
+    font-size: 1.28cqw;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--ink-dim);
+  }
+  .eyebrow .tag {
+    color: var(--local);
+    padding: 0.35em 0.85em;
+    border: 1px solid var(--local-glow);
+    border-radius: 2px;
+    background: rgba(166,137,255,0.08);
+    letter-spacing: 0.14em;
+  }
+  .eyebrow .en {
+    color: var(--ink-faint);
+    letter-spacing: 0.34em;
+    font-weight: 600;
+  }
+  h1 {
+    margin: 1.4cqw 0 0;
+    font-size: 3.6cqw;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: 0.005em;
+    text-wrap: balance;
+  }
+  h1 .hl {
+    color: transparent;
+    background: linear-gradient(100deg, var(--local) 0%, #c9b6ff 50%, var(--claude) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .dek {
+    margin: 1cqw 0 0;
+    font-size: 1.6cqw;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .dek b { color: var(--ink); font-weight: 700; }
+
+  /* ── 比較グリッド ─────────────────────────────────────────────────── */
+  .compare {
+    flex: 1 1 auto;
+    margin-top: 1.6cqw;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 1fr;
+    align-content: center;
+    row-gap: 1cqw;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: stretch;
+    column-gap: 1.6cqw;
+  }
+
+  /* 軸ラベル(左列) */
+  .axis {
+    display: flex;
+    align-items: center;
+    gap: 1.1cqw;
+    font-size: 1.62cqw;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.03em;
+  }
+  .axis .step {
+    flex: 0 0 auto;
+    width: 2.7cqw;
+    height: 2.7cqw;
+    display: grid;
+    place-items: center;
+    font-family: "SF Mono", "JetBrains Mono", "Cascadia Code", ui-monospace, monospace;
+    font-size: 1.5cqw;
+    font-weight: 700;
+    color: var(--ink-dim);
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+  }
+  .axis .sub {
+    display: block;
+    font-size: 1.12cqw;
+    font-weight: 600;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    margin-top: 0.35cqw;
+  }
+
+  /* 列ヘッダー */
+  .heads .axis { color: var(--ink-faint); font-weight: 600; font-size: 1.2cqw; letter-spacing: 0.18em; }
+  .head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9cqw;
+    padding: 0 0 1cqw;
+    border-bottom: 2px solid;
+    font-weight: 800;
+  }
+  .head .name { font-size: 2cqw; letter-spacing: 0.01em; }
+  .head .kind {
+    font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1.2cqw;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .head--local  { color: var(--local);  border-color: var(--local); }
+  .head--claude { color: var(--claude); border-color: var(--claude); }
+  .head .kind   { color: var(--ink-faint); }
+
+  /* データセル共通 */
+  .cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.45cqw;
+    padding: 1.15cqw 1.6cqw;
+    border-radius: 5px;
+    border: 1px solid var(--line);
+    background: var(--ground-3);
+    min-height: 5.8cqw;
+  }
+  .cell code {
+    font-family: "SF Mono", "JetBrains Mono", "Cascadia Code", ui-monospace, monospace;
+    font-size: 2cqw;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .cell .note {
+    font-size: 1.24cqw;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+
+  /* row1: 同じ(統合バー) */
+  .row--same .unified {
+    grid-column: 2 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.3cqw;
+    padding: 1cqw;
+    border-radius: 5px;
+    border: 1px dashed var(--line-2);
+    background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.014) 0 8px, transparent 8px 16px);
+    font-size: 1.72cqw;
+    font-weight: 700;
+    color: var(--ink-dim);
+  }
+  .row--same .unified code {
+    font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1.66cqw;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .row--same .unified .same-tag {
+    font-size: 1.16cqw;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: #7fd9a6;
+    padding: 0.3em 0.8em;
+    border: 1px solid rgba(127,217,166,0.4);
+    border-radius: 2px;
+  }
+
+  /* 分岐キャレット */
+  .split-caret {
+    grid-column: 2 / 4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1cqw;
+    margin: -0.3cqw 0;
+    color: var(--ink-faint);
+    font-size: 1.1cqw;
+    letter-spacing: 0.3em;
+    font-weight: 700;
+  }
+  .split-caret::before,
+  .split-caret::after {
+    content: "";
+    height: 1px;
+    width: 16%;
+    background: linear-gradient(90deg, transparent, var(--line-2));
+  }
+  .split-caret::after { background: linear-gradient(90deg, var(--line-2), transparent); }
+
+  /* row2: 罠(主役) */
+  .row--trap .axis .flag {
+    margin-left: 0.4cqw;
+    font-size: 1.16cqw;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #ffd27a;
+    padding: 0.32em 0.85em;
+    border: 1px solid rgba(255,210,122,0.45);
+    border-radius: 2px;
+    background: rgba(255,190,90,0.08);
+    white-space: nowrap;
+  }
+  .row--trap .cell {
+    min-height: 6.8cqw;
+    border-width: 1.5px;
+    box-shadow: 0 18px 50px -30px rgba(0,0,0,0.9);
+  }
+  .cell--local  { border-color: rgba(166,137,255,0.55); background: linear-gradient(180deg, rgba(122,92,240,0.16), rgba(122,92,240,0.05)); }
+  .cell--claude { border-color: rgba(255,157,84,0.5);  background: linear-gradient(180deg, rgba(244,119,42,0.15), rgba(244,119,42,0.045)); }
+  .cell--local  code { color: #d6c6ff; }
+  .cell--claude code { color: #ffd0a3; }
+  .cell .shape {
+    font-size: 1.2cqw;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  /* row3: 結果 */
+  .row--result .cell { min-height: 4.8cqw; }
+  .result {
+    display: flex;
+    align-items: center;
+    gap: 1.1cqw;
+    font-size: 1.85cqw;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .result .mark {
+    flex: 0 0 auto;
+    width: 2.4cqw; height: 2.4cqw;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    font-size: 1.35cqw;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .result--ok   { color: #9defc0; }
+  .result--ok   .mark { color: #9defc0; border: 1.5px solid rgba(157,239,192,0.6); box-shadow: 0 0 22px -4px rgba(157,239,192,0.5); }
+  .result--fail { color: var(--ink-faint); }
+  .result--fail .val {
+    position: relative;
+    text-decoration: line-through;
+    text-decoration-color: rgba(229,72,77,0.7);
+    text-decoration-thickness: 2px;
+  }
+  .result--fail .mark { color: #e5484d; border: 1.5px dashed rgba(229,72,77,0.6); }
+  .result--fail small {
+    display: block;
+    font-size: 1.12cqw;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(229,72,77,0.85);
+    margin-top: 0.3cqw;
+  }
+  .cell--fail { background: linear-gradient(180deg, rgba(40,36,52,0.6), rgba(30,26,40,0.35)); border-color: var(--line); }
+
+  /* ── 持ち帰りフッター ─────────────────────────────────────────────── */
+  .takeaway {
+    flex: 0 0 auto;
+    margin-top: 1.4cqw;
+    display: flex;
+    align-items: center;
+    gap: 1.6cqw;
+    padding: 1.1cqw 1.8cqw;
+    border-radius: 5px;
+    background: linear-gradient(90deg, rgba(166,137,255,0.1), rgba(255,157,84,0.08));
+    border: 1px solid var(--line);
+    font-size: 1.58cqw;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .takeaway .lb {
+    flex: 0 0 auto;
+    font-size: 1.2cqw;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: var(--ground);
+    background: linear-gradient(120deg, var(--local), var(--claude));
+    padding: 0.5em 1em;
+    border-radius: 2px;
+  }
+  .takeaway q { quotes: none; }
+  .takeaway .em { color: var(--claude); }
+
+  /* フィギュア番号(セット内位置=意味を持つ) */
+  .figno {
+    position: absolute;
+    top: 3.8cqw; right: 6.2cqw;
+    font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1.24cqw;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+  }
+  .figno b { color: var(--local); }
+
+  /* トラップ node の微弱パルス(スクショに影響しない程度) */
+  @keyframes trapPulse {
+    0%, 100% { opacity: 0.35; }
+    50%      { opacity: 0.75; }
+  }
+  .trap-node { animation: trapPulse 3.6s ease-in-out infinite; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trap-node { animation: none; }
+  }
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true">
+    <svg viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice" fill="none">
+      <g stroke="rgba(166,137,255,0.22)" stroke-width="1">
+        <path d="M-20 150 H210 L250 190 V330" />
+        <path d="M250 190 H130" />
+        <circle cx="210" cy="150" r="3.5" fill="rgba(166,137,255,0.5)" stroke="none"/>
+      </g>
+      <g stroke="rgba(255,157,84,0.2)" stroke-width="1">
+        <path d="M1220 520 H1000 L960 480 V300" />
+        <path d="M960 480 H1080" />
+        <circle cx="1000" cy="520" r="3.5" fill="rgba(255,157,84,0.5)" stroke="none"/>
+      </g>
+      <g class="trap-node">
+        <circle cx="600" cy="338" r="46" stroke="rgba(255,210,122,0.35)" stroke-width="1"/>
+        <circle cx="600" cy="338" r="76" stroke="rgba(255,210,122,0.16)" stroke-width="1"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="frame">
+    <div class="figno">図解 <b>01</b> / 05</div>
+
+    <header>
+      <div class="eyebrow">
+        <span class="tag">EP01 · ④ 翻訳レイヤー</span>
+        <span class="en">THE TRANSLATION LAYER</span>
+      </div>
+      <h1>同じ関数呼び出し、<span class="hl">違う届き方</span></h1>
+      <p class="dek">全部は覚えなくていい。いやらしいのは、<b>真ん中の一行</b>だけ。</p>
+    </header>
+
+    <section class="compare" aria-label="ローカルとClaudeのTool Calling比較">
+      <!-- 列ヘッダー -->
+      <div class="row heads">
+        <div class="axis">ステージ</div>
+        <div class="head head--local">
+          <span class="name">ローカル</span>
+          <span class="kind">Ollama</span>
+        </div>
+        <div class="head head--claude">
+          <span class="name">Claude</span>
+          <span class="kind">API</span>
+        </div>
+      </div>
+
+      <!-- row1: 定義(同じ) -->
+      <div class="row row--same">
+        <div class="axis">
+          <span class="step">1</span>
+          <span>定義の包み方<span class="sub">HOW IT'S DEFINED</span></span>
+        </div>
+        <div class="unified">
+          <code>JSON スキーマ</code> で関数を宣言
+          <span class="same-tag">ここは同じ</span>
+        </div>
+      </div>
+
+      <div class="row"><div class="split-caret">▽ ここから分かれる ▽</div></div>
+
+      <!-- row2: 受け取り(罠・主役) -->
+      <div class="row row--trap">
+        <div class="axis">
+          <span class="step">2</span>
+          <span>受け取り方<span class="sub">HOW ARGS ARRIVE</span></span>
+          <span class="flag">いちばんいやらしい</span>
+        </div>
+        <div class="cell cell--local">
+          <span class="shape">JSON 文字列</span>
+          <code>"{ \"taskId\": 42 }"</code>
+          <span class="note">引数がテキストのまま飛んでくる</span>
+        </div>
+        <div class="cell cell--claude">
+          <span class="shape">オブジェクト</span>
+          <code>{ taskId: 42 }</code>
+          <span class="note">そのまま触れる形で届く</span>
+        </div>
+      </div>
+
+      <!-- row3: 結果 -->
+      <div class="row row--result">
+        <div class="axis">
+          <span class="step">3</span>
+          <span>そのまま使うと<span class="sub">THE CONSEQUENCE</span></span>
+        </div>
+        <div class="cell cell--local cell--fail">
+          <span class="result result--fail">
+            <span class="mark">×</span>
+            <span><span class="val">静かに落ちる</span><small>エラーすら、出ない</small></span>
+          </span>
+        </div>
+        <div class="cell cell--claude">
+          <span class="result result--ok">
+            <span class="mark">✓</span>
+            <span>そのまま動く</span>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="takeaway">
+      <span class="lb">持ち帰り</span>
+      <span>危ないのは <span class="em">"受け取り方"</span> の一行だけ。<q>だから翻訳レイヤーが要る。</q></span>
+    </footer>
+  </div>
+</main>

@@ -2,6 +2,8 @@
 
 仕事〜生活を一元管理するライフログ管理アプリ。
 
+> 📚 関連ドキュメント: [docs/creative-strategy/](docs/creative-strategy/) — YouTube・マネタイズ・写真プロジェクトの AI 相談用プロンプトひな型集(オーナーコンテキストは [CLAUDE.md](CLAUDE.md))
+
 ## 画面構成
 
 | 画面 | パス | 説明 |

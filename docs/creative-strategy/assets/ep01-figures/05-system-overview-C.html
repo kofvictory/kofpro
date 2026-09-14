@@ -1,0 +1,218 @@
+<title>コフと僕 EP01 ｜ 図解05C 繋ぐ2層:翻訳と分岐(全景ビートC)</title>
+<style>
+  /* =========================================================================
+     コフと僕 EP01 · 図解05 「システム全景 — 頭脳だけ差し替える」
+     図解01-04と同一デザインシステム(ダーク単一ワールド・映像書き出し用)
+     テーゼ(③): 人格=外(固定) / 頭脳=交換可能。紫=ローカル(器)/橙=Claude(魂)
+     ========================================================================= */
+  :root {
+    --ground:   #0a0912;
+    --ground-2: #100e1b;
+    --ground-3: #171426;
+    --ground-4: #1e1a2e;
+    --line:     rgba(181, 170, 224, 0.14);
+    --line-2:   rgba(181, 170, 224, 0.28);
+    --ink:      #ece9f6;
+    --ink-dim:  #a49bc0;
+    --ink-faint:#6a627f;
+
+    --local:      #a689ff;
+    --local-deep: #7a5cf0;
+    --local-glow: rgba(166, 137, 255, 0.5);
+    --claude:     #ff9d54;
+    --claude-deep:#f4772a;
+    --claude-glow:rgba(255, 157, 84, 0.5);
+    --fix:        #7fd9a6;   /* 固定 */
+
+    --stage-w: 1200px;
+  }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 0;
+    background:
+      radial-gradient(110% 80% at 14% -10%, #16122a 0%, rgba(22,18,42,0) 55%),
+      radial-gradient(120% 90% at 92% 112%, #1a1020 0%, rgba(26,16,32,0) 50%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","YuGothic","Noto Sans JP","Meiryo",system-ui,sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+
+  .stage {
+    position: relative; width: 100vw; aspect-ratio: 16 / 9;
+    container-type: inline-size; overflow: hidden; border-radius: 6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 40%), var(--ground-2);
+    box-shadow: 0 0 0 1px var(--line), 0 40px 120px -40px rgba(0,0,0,0.85), inset 0 0 140px -40px rgba(0,0,0,0.6);
+  }
+
+  .net { position: absolute; inset: 0; pointer-events: none; opacity: 0.5; }
+  .net::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 50% 45%, #000 30%, transparent 88%);
+  }
+
+  .frame { position: absolute; inset: 0; padding: 3.8cqw 6cqw 3.4cqw; display: flex; flex-direction: column; }
+
+  .eyebrow { display: flex; align-items: center; gap: 1.1cqw; font-size: 1.24cqw; font-weight: 700; letter-spacing: 0.16em; color: var(--ink-dim); }
+  .eyebrow .tag { color: var(--local); padding: 0.35em 0.85em; border: 1px solid var(--local-glow); border-radius: 2px; background: rgba(166,137,255,0.08); letter-spacing: 0.1em; }
+  .eyebrow .en { color: var(--ink-faint); letter-spacing: 0.3em; font-weight: 600; }
+  h1 { margin: 1.2cqw 0 0; font-size: 3.3cqw; line-height: 1.1; font-weight: 800; letter-spacing: 0.005em; }
+  h1 .hl { color: transparent; background: linear-gradient(100deg, var(--local), #c9b6ff 55%, var(--claude)); -webkit-background-clip: text; background-clip: text; }
+  .dek { margin: 0.8cqw 0 0; font-size: 1.5cqw; color: var(--ink-dim); letter-spacing: 0.02em; }
+  .dek b { color: var(--ink); font-weight: 700; }
+
+  .figno { position: absolute; top: 3.8cqw; right: 6cqw; font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.2cqw; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-faint); }
+  .figno b { color: var(--local); }
+
+  /* ── 積層スタック ─────────────────────────────────────────────────── */
+  .stack { flex: 1 1 auto; margin-top: 1cqw; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+
+  .conn { width: 0; height: 0.9cqw; border-left: 2px solid var(--line-2); }
+
+  .layer {
+    width: 82cqw; display: flex; align-items: center; gap: 1.4cqw;
+    padding: 0.8cqw 1.6cqw; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--ground-3);
+  }
+  .layer .lname { flex: 0 0 auto; font-size: 1.5cqw; font-weight: 800; letter-spacing: 0.02em; }
+  .layer .ldesc { flex: 1 1 auto; font-size: 1.34cqw; font-weight: 600; color: var(--ink-dim); letter-spacing: 0.01em; }
+  .layer .ldesc code { font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.2cqw; color: var(--ink); }
+  .layer .badge { flex: 0 0 auto; font-size: 1.08cqw; font-weight: 800; letter-spacing: 0.1em; padding: 0.35em 0.85em; border-radius: 2px; white-space: nowrap; }
+  .badge.fix  { color: var(--fix);      border: 1px solid rgba(127,217,166,0.45); background: rgba(127,217,166,0.08); }
+  .badge.glue { color: var(--ink-dim);  border: 1px solid var(--line-2); background: rgba(0,0,0,0.2); }
+
+  /* コフ(顔) */
+  .kof { width: auto; gap: 1cqw; padding: 0.9cqw 1.8cqw; border-color: var(--line-2); background: linear-gradient(180deg, rgba(166,137,255,0.1), rgba(255,157,84,0.06)), var(--ground-3); }
+  .kof .dot { width: 2.4cqw; height: 2.4cqw; border-radius: 50%; background: radial-gradient(circle at 38% 34%, #d9c9ff, var(--local) 45%, var(--claude-deep) 120%); box-shadow: 0 0 16px -2px var(--local-glow); }
+  .kof .kname { font-size: 1.66cqw; font-weight: 800; }
+  .kof .krole { font-size: 1.16cqw; font-weight: 700; color: var(--ink-faint); }
+
+  .layer.persona   .lname { color: var(--fix); }
+  .layer.translate .lname { color: var(--ink); }
+  .layer.route     .lname { color: var(--ink); }
+
+  /* 頭脳レイヤー(交換可能) */
+  .brainwrap { width: 82cqw; }
+  .brainhead { display: flex; align-items: center; justify-content: center; gap: 1cqw; margin-bottom: 0.55cqw; }
+  .brainhead .t { font-size: 1.3cqw; font-weight: 800; letter-spacing: 0.04em; color: var(--ink); }
+  .brainhead .swap { font-size: 1.1cqw; font-weight: 800; letter-spacing: 0.1em; color: var(--ink-faint); padding: 0.3em 0.8em; border: 1px dashed var(--line-2); border-radius: 2px; }
+  .brains { display: grid; grid-template-columns: 1fr 1fr 0.86fr; gap: 1.4cqw; }
+  .brain { padding: 0.8cqw 1.4cqw; border-radius: 6px; border: 1.5px solid; display: flex; flex-direction: column; gap: 0.15cqw; }
+  .brain .bt { font-size: 1.46cqw; font-weight: 800; }
+  .brain .bd { font-size: 1.14cqw; font-weight: 600; color: var(--ink-dim); }
+  .brain.local  { border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.16), rgba(122,92,240,0.05)); }
+  .brain.local  .bt { color: var(--local); }
+  .brain.cloud  { border-color: rgba(255,157,84,0.55); background: linear-gradient(180deg, rgba(244,119,42,0.15), rgba(244,119,42,0.05)); }
+  .brain.cloud  .bt { color: var(--claude); }
+  .brain.npu    { border-style: dashed; border-color: rgba(166,137,255,0.4); background: repeating-linear-gradient(-45deg, rgba(166,137,255,0.05) 0 7px, transparent 7px 14px); }
+  .brain.npu .bt { color: var(--local); opacity: 0.85; }
+  .brain.npu .bd { color: var(--ink-faint); }
+  .brain .tagline { font-size: 0.98cqw; font-weight: 800; letter-spacing: 0.08em; }
+  .brain.npu .tagline { color: var(--local); opacity: 0.8; }
+
+  /* 頭脳へファンする分岐コネクタ */
+  .fan { position: relative; width: 82cqw; height: 1.1cqw; }
+  .fan::before { content: ""; position: absolute; left: 50%; top: 0; width: 0; height: 0.55cqw; border-left: 2px solid var(--line-2); }
+  .fan::after { content: ""; position: absolute; left: 16.6%; right: 16.6%; top: 0.55cqw; height: 0; border-top: 2px solid var(--line-2); }
+
+  /* 持ち帰りフッター */
+  .takeaway {
+    flex: 0 0 auto; margin-top: 0.9cqw; display: flex; align-items: center; gap: 1.4cqw;
+    padding: 1.1cqw 1.8cqw; border-radius: 5px;
+    background: linear-gradient(90deg, rgba(127,217,166,0.09), rgba(166,137,255,0.09), rgba(255,157,84,0.08));
+    border: 1px solid var(--line); font-size: 1.56cqw; font-weight: 700; color: var(--ink);
+  }
+  .takeaway .lb { flex: 0 0 auto; font-size: 1.14cqw; font-weight: 800; letter-spacing: 0.12em; color: var(--ground); background: linear-gradient(120deg, var(--fix), var(--local), var(--claude)); padding: 0.5em 1em; border-radius: 2px; }
+  .takeaway .ef { color: var(--fix); } .takeaway .el { color: var(--local); } .takeaway .ec { color: var(--claude); }
+
+  /* ── 点灯段階(全景ビートB〜E) 図解02-04と同一機構 ── */
+  .hide{ visibility:hidden; }            /* レイアウト保持=積層の位置ずれ無し */
+  .frame.step .takeaway{ visibility:hidden; }
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true"></div>
+
+  <div class="frame step">
+    <div class="figno">STEP <b>2</b> / 3</div>
+
+    <header>
+      <div class="eyebrow">
+        <span class="tag">EP01 · 全景：繋ぐ2層</span>
+        <span class="en">THE GLUE</span>
+      </div>
+      <h1>コフの全体像 — <span class="hl">頭脳だけ、差し替える</span></h1>
+      <p class="dek">間を2つの層が繋ぐ——<b>④翻訳</b>(方言を正規化)と<b>⑤ルーティング</b>(どの脳へ)。</p>
+    </header>
+
+    <section class="stack" aria-label="システム全景の積層図">
+      <!-- コフ -->
+      <div class="layer kof">
+        <span class="dot"></span>
+        <span class="kname">コフ</span>
+        <span class="krole">顔・入口(ユーザーが触るのはここ)</span>
+      </div>
+      <div class="conn c1"></div>
+
+      <!-- 人格レイヤー -->
+      <div class="layer persona">
+        <span class="lname">人格レイヤー</span>
+        <span class="ldesc">systemPrompt(役・脚本) ＋ ツール(道具) ＝ コフの&ldquo;らしさ&rdquo;</span>
+        <span class="badge fix">固定</span>
+      </div>
+      <div class="conn c2"></div>
+
+      <!-- ④ 翻訳レイヤー -->
+      <div class="layer translate">
+        <span class="lname">④ 翻訳レイヤー</span>
+        <span class="ldesc">Anthropic形式 ⇄ OpenAI(Ollama)形式 の方言を<b style="color:var(--ink)">1つに正規化</b></span>
+        <span class="badge glue">接着剤</span>
+      </div>
+      <div class="conn c3"></div>
+
+      <!-- ⑤ ルーティング -->
+      <div class="layer route">
+        <span class="lname">⑤ ルーティング <code>/api/agent</code></span>
+        <span class="ldesc">賢いモード→Claude直行 ｜ 既定→ローカルping ｜ 落ち→フォールバック</span>
+        <span class="badge glue">分岐</span>
+      </div>
+
+      <!-- ファン -->
+      <div class="fan hide"></div>
+
+      <!-- 頭脳レイヤー -->
+      <div class="brainwrap hide">
+        <div class="brainhead">
+          <span class="t">頭脳レイヤー</span>
+          <span class="swap">⇄ 交換可能</span>
+        </div>
+        <div class="brains">
+          <div class="brain local">
+            <span class="bt">ローカルの脳</span>
+            <span class="bd">Ollama 7B ／ いまはCPUで推論</span>
+            <span class="tagline" style="color:var(--local)">普段づかい</span>
+          </div>
+          <div class="brain cloud">
+            <span class="bt">クラウドの脳</span>
+            <span class="bd">Claude ／ 賢さが要るときだけ</span>
+            <span class="tagline" style="color:var(--claude)">必要なとき</span>
+          </div>
+          <div class="brain npu">
+            <span class="bt">NPU</span>
+            <span class="bd">Hexagon ／ まだ 0%・未接続</span>
+            <span class="tagline">次回の宿題</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="takeaway">
+      <span class="lb">テーゼ</span>
+      <span>人格は<span class="ef">&ldquo;外&rdquo;(固定)</span>、頭脳は<span class="el">&ldquo;中&rdquo;</span><span class="ec">(交換可能)</span>。だから頭脳を替えても、コフはコフのまま。</span>
+    </footer>
+  </div>
+</main>

@@ -1,0 +1,249 @@
+<title>コフと僕 EP01 ｜ 図解02B 三すくみ点灯① オフライン(②ビートB)</title>
+<style>
+  /* =========================================================================
+     コフと僕 EP01 · 図解02 「三すくみ(トリレンマ)」
+     図解01と同一デザインシステム(ダーク単一ワールド・映像書き出し用)
+     紫=ローカル/器(Ollama)  橙=Claude/魂  — アバターskin & 図解01と共通
+     ========================================================================= */
+  :root {
+    --ground:   #0a0912;
+    --ground-2: #100e1b;
+    --ground-3: #171426;
+    --line:     rgba(181, 170, 224, 0.14);
+    --line-2:   rgba(181, 170, 224, 0.30);
+    --ink:      #ece9f6;
+    --ink-dim:  #a49bc0;
+    --ink-faint:#6a627f;
+
+    --local:      #a689ff;   /* ローカル / 器 */
+    --local-deep: #7a5cf0;
+    --local-glow: rgba(166, 137, 255, 0.55);
+
+    --claude:      #ff9d54;  /* Claude / 魂 */
+    --claude-deep: #f4772a;
+    --claude-glow: rgba(255, 157, 84, 0.5);
+
+    --ok:   #9defc0;
+    --no:   #e5484d;
+
+    --stage-w: 1200px;
+  }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; min-height: 100vh;
+    display: grid; place-items: center;
+    padding: 0;
+    background:
+      radial-gradient(120% 90% at 18% -10%, #16122a 0%, rgba(22,18,42,0) 55%),
+      radial-gradient(130% 100% at 92% 112%, #1a1020 0%, rgba(26,16,32,0) 50%),
+      var(--ground);
+    color: var(--ink);
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic",
+                 "YuGothic", "Noto Sans JP", "Meiryo", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+    overflow: hidden;
+    border-radius: 6px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0) 40%),
+      var(--ground-2);
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 40px 120px -40px rgba(0,0,0,0.85),
+      inset 0 0 140px -40px rgba(0,0,0,0.6);
+  }
+
+  .net { position: absolute; inset: 0; pointer-events: none; opacity: 0.5; }
+  .net::before {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw),
+      repeating-linear-gradient(0deg,  rgba(181,170,224,0.05) 0 1px, transparent 1px 7cqw);
+    mask-image: radial-gradient(120% 100% at 50% 45%, #000 30%, transparent 88%);
+  }
+  /* 雰囲気グロー: 底辺=紫 / 頂点=橙 */
+  .net::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(28% 34% at 50% 24%, var(--claude-glow), transparent 70%),
+      radial-gradient(46% 30% at 50% 82%, var(--local-glow), transparent 72%);
+    opacity: 0.4;
+  }
+
+  .frame { position: absolute; inset: 0; padding: 5.2cqw 6cqw 4.4cqw; display: flex; flex-direction: column; }
+
+  /* ヘッダー */
+  .eyebrow { display: flex; align-items: center; gap: 1.1cqw; font-size: 1.28cqw; font-weight: 700; letter-spacing: 0.18em; color: var(--ink-dim); }
+  .eyebrow .tag { color: var(--local); padding: 0.35em 0.85em; border: 1px solid var(--local-glow); border-radius: 2px; background: rgba(166,137,255,0.08); letter-spacing: 0.12em; }
+  .eyebrow .en { color: var(--ink-faint); letter-spacing: 0.34em; font-weight: 600; }
+  h1 { margin: 1.7cqw 0 0; font-size: 3.7cqw; line-height: 1.12; font-weight: 800; letter-spacing: 0.005em; text-wrap: balance; }
+  h1 .hl { color: transparent; background: linear-gradient(100deg, var(--local) 0%, #c9b6ff 45%, var(--claude) 120%); -webkit-background-clip: text; background-clip: text; }
+  .dek { margin: 1.3cqw 0 0; font-size: 1.68cqw; color: var(--ink-dim); letter-spacing: 0.02em; }
+  .dek b { color: var(--ink); font-weight: 700; }
+
+  .figno { position: absolute; top: 5.2cqw; right: 6cqw; font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.24cqw; font-weight: 700; letter-spacing: 0.12em; color: var(--ink-faint); }
+  .figno b { color: var(--local); }
+
+  /* ── 三角形の作図領域 ─────────────────────────────────────────────── */
+  .tri { position: relative; flex: 1 1 auto; margin: 2cqw 2cqw 0; }
+
+  .edges { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .edge-side { stroke: var(--line-2); stroke-width: 1.4; stroke-dasharray: 5 5; vector-effect: non-scaling-stroke; fill: none; }
+  .edge-base { stroke: var(--local); stroke-width: 2.4; vector-effect: non-scaling-stroke; fill: none; filter: drop-shadow(0 0 6px var(--local-glow)); }
+
+  /* 頂点カード */
+  .vx {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 27cqw; padding: 1.35cqw 1.5cqw;
+    background: var(--ground-3); border: 1.5px solid var(--line-2);
+    border-radius: 6px; text-align: center;
+    box-shadow: 0 16px 46px -26px rgba(0,0,0,0.9);
+  }
+  .vx .no-num {
+    display: inline-grid; place-items: center;
+    width: 2.5cqw; height: 2.5cqw; margin-bottom: 0.5cqw;
+    font-family: "SF Mono","JetBrains Mono",ui-monospace,monospace; font-size: 1.5cqw; font-weight: 700;
+    border-radius: 50%;
+  }
+  .vx .prop { font-size: 1.92cqw; font-weight: 800; letter-spacing: 0.01em; }
+  .vx .en { display: block; margin-top: 0.3cqw; font-size: 1.06cqw; font-weight: 700; letter-spacing: 0.22em; color: var(--ink-faint); }
+
+  .v-apex  { left: 50%; top: 17%; border-color: rgba(255,157,84,0.6); background: linear-gradient(180deg, rgba(244,119,42,0.15), rgba(244,119,42,0.05)), var(--ground-3); }
+  .v-left  { left: 17%; top: 80%; border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.15), rgba(122,92,240,0.05)), var(--ground-3); }
+  .v-right { left: 83%; top: 80%; border-color: rgba(166,137,255,0.6); background: linear-gradient(180deg, rgba(122,92,240,0.15), rgba(122,92,240,0.05)), var(--ground-3); }
+
+  .v-apex  .no-num { color: var(--claude); border: 1.5px solid var(--claude); }
+  .v-left  .no-num,
+  .v-right .no-num { color: var(--local);  border: 1.5px solid var(--local); }
+
+  /* 満たす主体タグ(頂点の外側) */
+  .who {
+    position: absolute; transform: translate(-50%, -50%);
+    font-size: 1.16cqw; font-weight: 800; letter-spacing: 0.06em;
+    padding: 0.4em 0.9em; border-radius: 2px; white-space: nowrap;
+  }
+  .who-claude { left: 50%; top: -1.5%; color: var(--claude); border: 1px solid rgba(255,157,84,0.5); background: rgba(244,119,42,0.1); }
+  .who-local  { left: 50%; top: 99%;  color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.1); }
+
+  /* 中央パンチライン */
+  .core {
+    position: absolute; left: 50%; top: 51%; transform: translate(-50%, -50%);
+    text-align: center; width: 30cqw;
+  }
+  .core .x {
+    font-family: "SF Mono",ui-monospace,monospace; font-size: 3.6cqw; font-weight: 700;
+    color: var(--no); line-height: 1;
+    filter: drop-shadow(0 0 12px rgba(229,72,77,0.5));
+  }
+  .core .msg { margin-top: 0.6cqw; font-size: 1.66cqw; font-weight: 800; letter-spacing: 0.01em; color: var(--ink); }
+
+  /* ── 解決ストリップ ───────────────────────────────────────────────── */
+  .resolution {
+    flex: 0 0 auto; margin-top: 1.6cqw;
+    display: flex; align-items: center; justify-content: center; gap: 1.4cqw;
+    padding: 1.35cqw 1.8cqw; border-radius: 5px;
+    background: linear-gradient(90deg, rgba(166,137,255,0.12), rgba(255,157,84,0.10));
+    border: 1px solid var(--line); font-size: 1.66cqw; font-weight: 700; letter-spacing: 0.01em;
+  }
+  .resolution .kill { color: var(--ink-dim); }
+  .resolution .arrow { color: var(--ink-faint); font-family: ui-monospace,monospace; font-size: 1.5cqw; }
+  .resolution .opt { padding: 0.35em 0.9em; border-radius: 3px; font-weight: 800; }
+  .resolution .opt.local  { color: var(--local);  border: 1px solid rgba(166,137,255,0.5); background: rgba(122,92,240,0.10); }
+  .resolution .opt.claude { color: var(--claude); border: 1px solid rgba(255,157,84,0.5);  background: rgba(244,119,42,0.10); }
+  .resolution .sep { color: var(--ink-faint); }
+
+  /* 持ち帰りフッター */
+  .takeaway {
+    flex: 0 0 auto; margin-top: 1.5cqw;
+    display: flex; align-items: center; gap: 1.5cqw;
+    padding: 1.35cqw 1.8cqw; border-radius: 5px;
+    background: var(--ground-3); border: 1px solid var(--line);
+    font-size: 1.66cqw; font-weight: 700; color: var(--ink);
+  }
+  .takeaway .lb {
+    flex: 0 0 auto; font-size: 1.18cqw; font-weight: 800; letter-spacing: 0.14em;
+    color: var(--ground); background: linear-gradient(120deg, var(--local), var(--claude));
+    padding: 0.5em 1em; border-radius: 2px;
+  }
+  .takeaway .em-l { color: var(--local); }
+  .takeaway .em-c { color: var(--claude); }
+  /* ── 点灯段階(②ビートB〜E) ───────────────────────── */
+  .vx.off{opacity:.32;}
+  .vx.off .prop{color:var(--ink-faint);}
+  .vx.off .en{color:var(--ink-faint);}
+  .vx.off .no-num{color:var(--ink-faint)!important;border-color:var(--ink-faint)!important;}
+  .v-apex.off,.v-left.off,.v-right.off{border-color:var(--line-2)!important;background:var(--ground-3)!important;box-shadow:none!important;}
+  .frame.step .core,.frame.step .resolution,.frame.step .takeaway,.frame.step .who-local,.frame.step .who-claude{visibility:hidden;}
+</style>
+
+<main class="stage">
+  <div class="net" aria-hidden="true"></div>
+
+  <div class="frame step">
+    <div class="figno">STEP <b>1</b> / 3</div>
+
+    <header>
+      <div class="eyebrow">
+        <span class="tag">EP01 · ② 制約①：オフライン</span>
+        <span class="en">OFFLINE FIRST</span>
+      </div>
+      <h1>常駐する相棒の、<span class="hl">三すくみ</span></h1>
+      <p class="dek">まず、<b>オフラインでも動く</b>こと。ネットが切れて黙る相棒は、相棒じゃない。</p>
+    </header>
+
+    <section class="tri" aria-label="三すくみの三角形">
+      <svg class="edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line class="edge-side" x1="50" y1="17" x2="17" y2="80" />
+        <line class="edge-side" x1="50" y1="17" x2="83" y2="80" />
+        <line class="edge-base" x1="17" y1="80" x2="83" y2="80" />
+      </svg>
+
+      <!-- 満たす主体タグ(底辺=ローカル) -->
+      <div class="who who-local">普段づかい = ローカルが満たす</div>
+
+      <!-- 頂点 -->
+      <div class="vx v-apex off">
+        <span class="no-num">3</span>
+        <div class="prop">賢さ・品質</div>
+        <span class="en">SMART</span>
+      </div>
+      <div class="vx v-left">
+        <span class="no-num">1</span>
+        <div class="prop">オフラインでも動く</div>
+        <span class="en">OFFLINE</span>
+      </div>
+      <div class="vx v-right off">
+        <span class="no-num">2</span>
+        <div class="prop">低コスト・低遅延</div>
+        <span class="en">CHEAP / FAST</span>
+      </div>
+
+      <!-- 中央パンチライン -->
+      <div class="core">
+        <div class="x">3 ✕ 1</div>
+        <div class="msg">3つ同時に満たす脳は、無い</div>
+      </div>
+    </section>
+
+    <div class="resolution">
+      <span class="kill">「常時どっちか」をやめた</span>
+      <span class="arrow">→</span>
+      <span>普段は <span class="opt local">ローカル ①②</span></span>
+      <span class="sep">／</span>
+      <span>賢さが要るときだけ <span class="opt claude">クラウド ③</span></span>
+    </div>
+
+    <footer class="takeaway">
+      <span class="lb">持ち帰り ★★</span>
+      <span>賢さは<span class="em-c">“常時”</span>じゃなく<span class="em-l">“必要なとき”</span>。——これが、設計判断の型。</span>
+    </footer>
+  </div>
+</main>
