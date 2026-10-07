@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4 portrait; margin: 12mm 12mm 10mm 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: "IPAPGothic", "IPAGothic", sans-serif;
+    color: #111; background: #fff;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  body { width: 186mm; }
+
+  .head { border-bottom: 2.5pt solid #111; padding-bottom: 3.5mm; margin-bottom: 4mm; }
+  .title { font-size: 25pt; font-weight: 700; letter-spacing: .02em; }
+  .sub { font-size: 12pt; color: #333; margin-top: 1.5mm; }
+  .sub b { font-weight: 700; }
+
+  .meta {
+    display: flex; gap: 10mm; margin: 4mm 0 4mm;
+    font-size: 12.5pt;
+  }
+  .meta .field { display: flex; align-items: baseline; gap: 2mm; }
+  .meta .line { display: inline-block; width: 42mm; border-bottom: 1.2pt solid #333; height: 6mm; }
+
+  ul { list-style: none; }
+  li {
+    display: flex; align-items: center; gap: 4mm;
+    height: 12.5mm; padding: 0 2mm;
+    border-bottom: 0.6pt solid #d8d8d8;
+  }
+  li:nth-child(odd) { background: #f7f7f7; }
+  .box {
+    flex: none; width: 8.5mm; height: 8.5mm;
+    border: 1.6pt solid #111; border-radius: 1mm; background: #fff;
+  }
+  .n {
+    flex: none; width: 8mm; text-align: right;
+    font-size: 13pt; font-weight: 700; color: #888;
+  }
+  .task { font-size: 15pt; font-weight: 700; }
+  .cond { font-size: 11pt; font-weight: 700; color: #b06a00; margin-left: 2.5mm; }
+  li.tall { height: 15.5mm; }
+  .taskwrap { display: flex; flex-direction: column; justify-content: center; }
+  .taskwrap .sub2 { font-size: 10.5pt; font-weight: 700; color: #b06a00; margin-top: 1mm; }
+
+  .foot { margin-top: 5mm; }
+  .signrow {
+    display: flex; align-items: baseline; gap: 3mm;
+    font-size: 13pt; font-weight: 700;
+  }
+  .signrow .line { display: inline-block; flex: 1; border-bottom: 1.2pt solid #333; height: 7mm; }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <div class="title">ランチ オープン チェックリスト</div>
+    <div class="sub"><b>Baker's Dozen</b> ／ 開店作業</div>
+  </div>
+
+  <div class="meta">
+    <div class="field">日付 <span class="line"></span></div>
+    <div class="field">担当 <span class="line"></span></div>
+  </div>
+
+  <ul>
+    <li><span class="box"></span><span class="n">1</span><span class="task">換気扇・照明確認</span><span class="cond">看板・厨房・フロア・個室</span></li>
+    <li><span class="box"></span><span class="n">2</span><span class="task">フロア・掃除機がけ</span></li>
+    <li><span class="box"></span><span class="n">3</span><span class="task">テーブル配置</span></li>
+    <li><span class="box"></span><span class="n">4</span><span class="task">テーブル拭き上げ</span></li>
+    <li><span class="box"></span><span class="n">5</span><span class="task">カトラリーセッティング</span></li>
+    <li><span class="box"></span><span class="n">6</span><span class="task">窓ふき</span><span class="cond">※雨天はなし</span></li>
+    <li><span class="box"></span><span class="n">7</span><span class="task">傘立て設置</span><span class="cond">※雨天のみ</span></li>
+    <li><span class="box"></span><span class="n">8</span><span class="task">洗濯物干し</span></li>
+    <li><span class="box"></span><span class="n">9</span><span class="task">ドリンク場セッティング</span></li>
+    <li><span class="box"></span><span class="n">10</span><span class="task">音楽再生</span></li>
+    <li class="tall"><span class="box"></span><span class="n">11</span><div class="taskwrap"><span class="task">ワイン・スパークリングワイン補充</span><span class="sub2">日替わりワイン・マグナムワイン・ランチと飲み放題(のみほ)のスパークリングワイン</span></div></li>
+    <li><span class="box"></span><span class="n">12</span><span class="task">CLOSE → OPEN</span></li>
+  </ul>
+
+  <div class="foot">
+    <div class="signrow">オープン準備完了サイン <span class="line"></span></div>
+  </div>
+
+</body>
+</html>

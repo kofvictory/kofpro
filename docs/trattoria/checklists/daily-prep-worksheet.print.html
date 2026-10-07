@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4 portrait; margin: 8mm 8mm 7mm 8mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: "IPAPGothic", "IPAGothic", sans-serif;
+    color: #111; background: #fff;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  body { width: 194mm; }
+
+  /* header */
+  .head { display: flex; align-items: flex-end; justify-content: space-between;
+    border-bottom: 2.4pt solid #111; padding-bottom: 2.2mm; margin-bottom: 3.5mm; }
+  .head .ttl { font-size: 20pt; font-weight: 700; letter-spacing: .01em; }
+  .head .sub { font-size: 10pt; color: #333; margin-top: 0.5mm; }
+  .head .sub b { font-weight: 700; }
+  .meta { font-size: 10pt; text-align: right; line-height: 1.9; }
+  .meta .fl { display: inline-block; border-bottom: 1pt solid #555; min-width: 18mm; height: 4.5mm; }
+  .meta .seg { display: inline-block; width: 3.4mm; height: 3.4mm; border: 1.4pt solid #111;
+    border-radius: 0.8mm; vertical-align: -0.3mm; margin: 0 1mm 0 2mm; }
+
+  /* zones */
+  .zone { border: 1pt solid #cfcfcf; border-radius: 1mm; margin-bottom: 3.5mm; overflow: hidden;
+    display: flex; flex-direction: column; }
+  .zh { background: #2a2a2a; color: #fff; font-size: 10.5pt; font-weight: 700;
+    padding: 1.3mm 2.5mm; letter-spacing: .03em; display: flex; justify-content: space-between; }
+  .zh .hint { font-weight: 400; font-size: 8.5pt; color: #cfcfcf; }
+  .zbody { padding: 2mm 2.5mm 2.5mm; flex: 1; }
+
+  /* prep 3 columns */
+  .prep { display: flex; gap: 0; }
+  .pcol { flex: 1; padding: 0 2.5mm; }
+  .pcol + .pcol { border-left: 1pt dashed #cfcfcf; }
+  .pcol .ph { font-size: 10pt; font-weight: 700; display: flex; align-items: baseline;
+    gap: 1.5mm; margin-bottom: 2mm; }
+  .pcol .ph .nl { flex: 1; border-bottom: 1pt solid #555; height: 4.5mm; }
+  .wl { border-bottom: 0.5pt solid #c4c4c4; height: 6.8mm; }
+  .prep .wl { height: 13.3mm; }
+
+  /* bottom rows: 3-split grids (2fr + 1fr) */
+  .row3 { display: grid; grid-template-columns: 2fr 1fr; gap: 3.5mm; }
+  .row3 .zone { margin-bottom: 3.5mm; }
+
+  /* two-column writing lines (for 発注) */
+  .lines2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 5mm; }
+
+  /* cleaning checklist 2-col */
+  .checkgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 5mm; }
+  .crow { display: flex; align-items: center; gap: 2.5mm; height: 7mm;
+    border-bottom: 0.5pt solid #c4c4c4; }
+  .cbox { flex: none; width: 4.2mm; height: 4.2mm; border: 1.3pt solid #111; border-radius: 0.6mm; }
+  .cline { flex: 1; }
+
+  /* memo */
+  .memo { height: 100%; min-height: 35mm;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 7.9mm, #d7d7d7 7.9mm, #d7d7d7 8mm); }
+</style>
+</head>
+<body>
+
+  <div class="head">
+    <div>
+      <div class="ttl">ランチ／ディナー 工程表</div>
+      <div class="sub"><b>Baker's Dozen</b> ／ 本日の段取り</div>
+    </div>
+    <div class="meta">
+      日付 <span class="fl"></span>　曜日 <span class="fl" style="min-width:10mm"></span><br>
+      区分 <span class="seg"></span>ランチ <span class="seg"></span>ディナー　天気 <span class="fl" style="min-width:16mm"></span>
+    </div>
+  </div>
+
+  <!-- 仕込み割り振り -->
+  <div class="zone">
+    <div class="zh"><span>仕込み 割り振り</span><span class="hint">担当ごとに本日の仕込みを記入</span></div>
+    <div class="zbody prep">
+      <div class="pcol">
+        <div class="ph">担当① <span class="nl"></span></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div><div class="wl"></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div><div class="wl"></div>
+      </div>
+      <div class="pcol">
+        <div class="ph">担当② <span class="nl"></span></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div><div class="wl"></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div><div class="wl"></div>
+      </div>
+      <div class="pcol">
+        <div class="ph">担当③ <span class="nl"></span></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div><div class="wl"></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div><div class="wl"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 発注(2列) / 当日買い物(1列) -->
+  <div class="row3">
+    <div class="zone">
+      <div class="zh"><span>発注</span><span class="hint">業者・数量</span></div>
+      <div class="zbody">
+        <div class="lines2">
+          <div class="wl"></div><div class="wl"></div>
+          <div class="wl"></div><div class="wl"></div>
+          <div class="wl"></div><div class="wl"></div>
+          <div class="wl"></div><div class="wl"></div>
+          <div class="wl"></div><div class="wl"></div>
+          <div class="wl"></div><div class="wl"></div>
+        </div>
+      </div>
+    </div>
+    <div class="zone">
+      <div class="zh"><span>当日買い物</span><span class="hint">店・品目</span></div>
+      <div class="zbody">
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div>
+        <div class="wl"></div><div class="wl"></div><div class="wl"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 掃除・その他(2列) / アイデア・メモ(1列) -->
+  <div class="row3">
+    <div class="zone">
+      <div class="zh"><span>掃除・その他タスク</span><span class="hint">済んだらチェック</span></div>
+      <div class="zbody">
+        <div class="checkgrid">
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+          <div class="crow"><span class="cbox"></span><span class="cline"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="zone">
+      <div class="zh"><span>アイデア・メモ</span></div>
+      <div class="zbody"><div class="memo"></div></div>
+    </div>
+  </div>
+
+</body>
+</html>

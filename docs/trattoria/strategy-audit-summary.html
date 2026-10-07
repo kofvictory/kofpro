@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>戦略監査サマリー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:ital,wght@0,500;1,500&display=swap">
+<style>
+  :root{
+    --paper:#F1F4F5; --surface:#FBFCFC; --surface-2:#E7ECED; --surface-3:#F5F8F8;
+    --ink:#19222B; --muted:#586771; --faint:#8494A0; --muted-2:#71828B;
+    --line:#DBE2E3; --line-strong:#C4CFD0;
+    --accent:#12606B; --accent-soft:#2B7E88; --accent-ink:#0C464F;
+    --live:#2E7D5B; --plan:#2C5AA0; --idea:#9A6A16; --concept:#6B5A86; --gate:#A94E2A;
+    --risk-hi:#AB392E; --risk-md:#9A6A16; --risk-lo:#66757D;
+    --f-disp:"Spectral",Georgia,"Times New Roman",serif;
+    --f-body:"IBM Plex Sans","Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",Meiryo,system-ui,sans-serif;
+    --f-head:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"IBM Plex Sans","Noto Sans JP",Meiryo,system-ui,sans-serif;
+    --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0D1317; --surface:#141D22; --surface-2:#1B262C; --surface-3:#111A1F;
+      --ink:#E7ECEE; --muted:#93A2A9; --faint:#6E7E86; --muted-2:#A7B4BA;
+      --line:#243139; --line-strong:#33434B;
+      --accent:#5EB6C0; --accent-soft:#7CC8D0; --accent-ink:#9BD6DC;
+      --live:#63B18B; --plan:#83A9E4; --idea:#D2A45C; --concept:#AC9AC9; --gate:#DA8A61;
+      --risk-hi:#DE7E6F; --risk-md:#D2A45C; --risk-lo:#8F9DA4;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0D1317; --surface:#141D22; --surface-2:#1B262C; --surface-3:#111A1F;
+    --ink:#E7ECEE; --muted:#93A2A9; --faint:#6E7E86; --muted-2:#A7B4BA;
+    --line:#243139; --line-strong:#33434B;
+    --accent:#5EB6C0; --accent-soft:#7CC8D0; --accent-ink:#9BD6DC;
+    --live:#63B18B; --plan:#83A9E4; --idea:#D2A45C; --concept:#AC9AC9; --gate:#DA8A61;
+    --risk-hi:#DE7E6F; --risk-md:#D2A45C; --risk-lo:#8F9DA4;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--f-body); line-height:1.7; font-feature-settings:"palt";
+    -webkit-font-smoothing:antialiased;
+    padding:clamp(18px,4vw,52px) clamp(14px,4vw,40px);
+  }
+  .wrap{ max-width:1000px; margin:0 auto; }
+  h1,h2,h3,h4{ font-family:var(--f-head); font-weight:700; line-height:1.32; margin:0; text-wrap:balance; }
+  p{ margin:0; }
+  .mono{ font-family:var(--f-mono); font-variant-numeric:tabular-nums; }
+  a{ color:var(--accent); }
+
+  /* ---- header ---- */
+  header.doc{ border-top:3px solid var(--accent); padding-top:20px; margin-bottom:30px; }
+  .brow{ font-family:var(--f-disp); font-style:italic; font-size:.98rem; color:var(--accent-soft); letter-spacing:.02em; margin-bottom:10px; }
+  header.doc h1{ font-size:clamp(1.7rem,4.4vw,2.5rem); letter-spacing:.01em; margin-bottom:12px; }
+  header.doc .sub{ color:var(--muted); max-width:70ch; font-size:1.01rem; }
+  .metabar{ display:flex; flex-wrap:wrap; gap:6px 26px; margin-top:20px; padding-top:15px; border-top:1px solid var(--line); font-size:.8rem; color:var(--muted); }
+  .metabar b{ color:var(--ink); font-weight:600; }
+  .metabar .mono{ color:var(--accent); }
+
+  /* ---- legend ---- */
+  .legend{ display:flex; flex-wrap:wrap; gap:8px 10px; margin:18px 0 4px; }
+  .chip{ display:inline-flex; align-items:center; gap:6px; font-family:var(--f-mono); font-size:.7rem; font-weight:500; letter-spacing:.02em; padding:3px 9px; border-radius:999px; white-space:nowrap; border:1px solid transparent; }
+  .chip::before{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor; flex:none; }
+  .c-live{ color:var(--live); background:color-mix(in srgb,var(--live) 13%,transparent); }
+  .c-plan{ color:var(--plan); background:color-mix(in srgb,var(--plan) 13%,transparent); }
+  .c-idea{ color:var(--idea); background:color-mix(in srgb,var(--idea) 15%,transparent); }
+  .c-concept{ color:var(--concept); background:color-mix(in srgb,var(--concept) 15%,transparent); }
+  .c-gate{ color:var(--gate); background:color-mix(in srgb,var(--gate) 14%,transparent); }
+
+  /* ---- snapshot ---- */
+  .snap{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:22px 0 8px; }
+  .snap .cell{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:13px 14px; }
+  .snap .n{ font-family:var(--f-mono); font-size:1.5rem; font-weight:600; line-height:1; }
+  .snap .k{ font-size:.72rem; color:var(--muted); margin-top:7px; }
+  .snap .cell.live .n{ color:var(--live); } .snap .cell.plan .n{ color:var(--plan); }
+  .snap .cell.idea .n{ color:var(--idea); } .snap .cell.concept .n{ color:var(--concept); }
+  .snap .cell.gate .n{ color:var(--gate); }
+  @media (max-width:640px){ .snap{ grid-template-columns:repeat(2,1fr); } }
+
+  .thesis{ background:var(--surface-3); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:8px; padding:18px 22px; margin:16px 0 8px; }
+  .thesis .lab{ font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-soft); font-weight:700; margin-bottom:8px; }
+  .thesis p{ font-size:.98rem; }
+  .thesis .three{ display:flex; flex-wrap:wrap; gap:8px 12px; margin-top:12px; }
+  .thesis .three span{ font-size:.85rem; background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:5px 11px; }
+  .thesis .three b{ color:var(--accent); font-family:var(--f-mono); font-size:.78rem; margin-right:5px; }
+
+  /* ---- sections ---- */
+  section{ margin:38px 0; }
+  .shead{ display:flex; align-items:baseline; gap:12px; margin-bottom:6px; border-bottom:2px solid var(--line-strong); padding-bottom:9px; }
+  .shead .tag{ font-family:var(--f-mono); font-size:.82rem; font-weight:600; color:var(--accent); }
+  .shead h2{ font-size:clamp(1.15rem,2.8vw,1.4rem); }
+  .shead .role{ margin-left:auto; font-size:.74rem; color:var(--muted); font-family:var(--f-mono); }
+  .snote{ color:var(--muted); font-size:.88rem; margin:12px 0 0; }
+
+  /* ---- audit table ---- */
+  .tw{ overflow-x:auto; margin-top:14px; border:1px solid var(--line); border-radius:8px; }
+  table{ border-collapse:collapse; width:100%; font-size:.86rem; min-width:560px; }
+  th,td{ text-align:left; padding:10px 13px; border-bottom:1px solid var(--line); vertical-align:top; }
+  thead th{ background:var(--surface-2); font-family:var(--f-mono); font-weight:600; font-size:.72rem; letter-spacing:.03em; color:var(--muted); text-transform:uppercase; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--surface-3); }
+  td .init{ font-weight:600; color:var(--ink); }
+  td .why{ color:var(--muted); font-size:.82rem; display:block; margin-top:3px; }
+  td.id{ font-family:var(--f-mono); color:var(--faint); font-size:.76rem; white-space:nowrap; }
+  td.st{ white-space:nowrap; }
+  .col-gate{ font-family:var(--f-mono); font-size:.78rem; color:var(--gate); }
+
+  /* ---- KPI ---- */
+  .kpi td.now,.kpi td.goal{ font-family:var(--f-mono); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .kpi td.goal{ color:var(--accent); font-weight:500; }
+  .warnflag{ color:var(--risk-md); font-family:var(--f-mono); font-size:.72rem; }
+
+  /* ---- audit findings ---- */
+  .findings{ display:flex; flex-direction:column; gap:11px; margin-top:14px; }
+  .finding{ display:grid; grid-template-columns:auto 1fr; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:15px 18px; }
+  .finding .sev{ font-family:var(--f-mono); font-size:.66rem; font-weight:600; letter-spacing:.04em; padding:3px 8px; border-radius:5px; height:fit-content; white-space:nowrap; }
+  .sev.hi{ color:var(--risk-hi); background:color-mix(in srgb,var(--risk-hi) 14%,transparent); border:1px solid color-mix(in srgb,var(--risk-hi) 40%,transparent); }
+  .sev.md{ color:var(--risk-md); background:color-mix(in srgb,var(--risk-md) 14%,transparent); border:1px solid color-mix(in srgb,var(--risk-md) 38%,transparent); }
+  .sev.lo{ color:var(--risk-lo); background:color-mix(in srgb,var(--risk-lo) 14%,transparent); border:1px solid color-mix(in srgb,var(--risk-lo) 34%,transparent); }
+  .finding h4{ font-size:.96rem; margin-bottom:4px; }
+  .finding p{ font-size:.86rem; color:var(--muted); }
+  .finding .ref{ font-family:var(--f-mono); font-size:.72rem; color:var(--faint); margin-top:6px; display:block; }
+
+  /* ---- decisions ---- */
+  .dcols{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+  @media (max-width:680px){ .dcols{ grid-template-columns:1fr; } }
+  .dcard{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px 19px; }
+  .dcard.decided{ border-top:3px solid var(--live); }
+  .dcard.pending{ border-top:3px solid var(--idea); }
+  .dcard h3{ font-size:.98rem; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .dcard h3 .mono{ font-size:.72rem; color:var(--muted); font-weight:500; }
+  .dcard ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .dcard li{ position:relative; padding-left:17px; font-size:.86rem; }
+  .dcard li::before{ content:""; position:absolute; left:2px; top:.62em; width:6px; height:6px; border-radius:50%; }
+  .dcard.decided li::before{ background:var(--live); }
+  .dcard.pending li::before{ background:var(--idea); }
+  .dcard li .d{ color:var(--faint); font-family:var(--f-mono); font-size:.72rem; margin-left:5px; }
+
+  /* ---- exclude ---- */
+  .exclude{ background:var(--surface-3); border:1px solid var(--line); border-radius:8px; padding:16px 20px; }
+  .exclude ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .exclude li{ position:relative; padding-left:22px; font-size:.9rem; }
+  .exclude li::before{ content:"✕"; position:absolute; left:0; top:0; color:var(--risk-hi); font-family:var(--f-mono); font-size:.82rem; font-weight:600; }
+
+  .foot{ margin-top:44px; border-top:1px solid var(--line); padding-top:16px; font-size:.76rem; color:var(--muted); line-height:1.7; }
+  .foot .mono{ color:var(--accent-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="brow">Strategy Audit — internal review draft</div>
+    <h1>梅雨時売上回復戦略 ／ 監査サマリー</h1>
+    <p class="sub">Baker's Dozen(沼津)の現行戦略を、第三者レビュー用に1枚へ統合。各施策の<b>状態</b>・<b>依存関係</b>・<b>未検証の前提</b>を明示し、監査で突ける形にした要約です。原典は <span class="mono">docs/trattoria/</span> の戦略・計画ドキュメント群。</p>
+    <div class="metabar">
+      <span><b>対象店舗</b>　Baker's Dozen(静岡県沼津市)</span>
+      <span><b>対象期間</b>　<span class="mono">2026-07 〜 08</span>(盛夏対策含む)</span>
+      <span><b>監査基準日</b>　<span class="mono">2026-08-25</span></span>
+      <span><b>原典</b>　rainy-season-2026-strategy / project-plan ほか</span>
+    </div>
+  </header>
+
+  <div class="legend" aria-label="状態の凡例">
+    <span class="chip c-live">稼働中 LIVE</span>
+    <span class="chip c-plan">計画(実行予定)</span>
+    <span class="chip c-idea">検討(要トリアージ)</span>
+    <span class="chip c-concept">構想</span>
+    <span class="chip c-gate">条件付き / ゲート</span>
+  </div>
+
+  <div class="snap">
+    <div class="cell live"><div class="n">1</div><div class="k">稼働中<br>(UEディナー非混雑帯)</div></div>
+    <div class="cell plan"><div class="n">14</div><div class="k">計画タスク<br>(Phase 1–4)</div></div>
+    <div class="cell idea"><div class="n">13</div><div class="k">検討・idea<br>(要トリアージ)</div></div>
+    <div class="cell concept"><div class="n">3</div><div class="k">来年向け構想<br>(祭り/ビュッフェ/効率化)</div></div>
+    <div class="cell gate"><div class="n">1</div><div class="k">ゲート付き<br>(ランチ解放=#15試算)</div></div>
+  </div>
+
+  <div class="thesis">
+    <div class="lab">中心仮説(この戦略の土台)</div>
+    <p>梅雨以降の売上減の主因は <b>来店動機の低下</b> であり、料理・サービスの質ではない。ゆえに打ち手は3方向に整理される。<b>※この主因の断定は、過去2年の売上棚卸し(タスク#5)による裏付け前 —— 下記の監査論点 A-1 を参照。</b></p>
+    <div class="three">
+      <span><b>①</b>雨でも来る理由を作る(来店動機の上乗せ)</span>
+      <span><b>②</b>来店に依存しない売上(テイクアウト・物販・デリバリー)</span>
+      <span><b>③</b>来た客の単価を上げる(コース・ペアリング・季節限定)</span>
+    </div>
+  </div>
+
+  <!-- 柱A -->
+  <section>
+    <div class="shead"><span class="tag">柱A</span><h2>雨の日を「お得な日」に変える</h2><span class="role">即効・低コスト / 方向①</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>施策</th><th>状態</th><th>期限</th></tr></thead>
+      <tbody>
+        <tr><td class="id">#1</td><td><span class="init">雨の日セット</span>(本日のパスタ+グラスワイン)<span class="why">当日朝9時の降水確率○%以上で機械的に発動 → 判断コストゼロ</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/4</td></tr>
+        <tr><td class="id">#2</td><td><span class="init">入口の雨の日おもてなし</span>(傘立て・傘袋・タオル)<span class="why">「雨の日こそ行きたい店」の体験</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/4</td></tr>
+        <tr><td class="id">#3</td><td><span class="init">Googleビジネスプロフィール更新</span><span class="why">駅からの濡れにくい道順・入口位置まで記載(来店前情報の未整理=静かな失注)</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/5</td></tr>
+        <tr><td class="id">#4</td><td><span class="init">雨の日クーポン配信</span>(LINE公式/Instagram)<span class="why">柱Eの広告ブーストと連動</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/7</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 柱B -->
+  <section>
+    <div class="shead"><span class="tag">柱B</span><h2>来店に依存しない売上をつくる</h2><span class="role">構造対策 / 方向②</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>施策</th><th>状態</th><th>期限/ゲート</th></tr></thead>
+      <tbody>
+        <tr><td class="id">#6</td><td><span class="init">テイクアウト3品</span>の選定と原価計算<span class="why">看板パスタ・前菜に絞る。原価率・容器コストを先に計算</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/10</td></tr>
+        <tr><td class="id">#7</td><td><span class="init">容器・包材の調達</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/14</td></tr>
+        <tr><td class="id">#8</td><td><span class="init">自家製ソース・焼き菓子の物販</span>(Baton菓子工房連携)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">—</td></tr>
+      </tbody>
+    </table></div>
+    <p class="snote"><b>B-2 Uber Eats 展開</b> — 出店申請・審査は<b>完了済み</b>。現在は<b>ディナー非混雑帯のみ解放して稼働中</b>。6月実績(4週): <span class="mono">5件 / ¥25,950 / 客単価¥5,190 / 0.2件・日</span>。採算は良い(相場の2〜3倍)が<b>課題は露出量</b>。営業窓の拡大が最短の打ち手。</p>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>施策</th><th>状態</th><th>期限/ゲート</th></tr></thead>
+      <tbody>
+        <tr><td class="id">B-2 稼働</td><td><span class="init">ディナー非混雑帯 Uber Eats</span><span class="why">2人前セットで単価勝負。申請完了・稼働中</span></td><td class="st"><span class="chip c-live">稼働中</span></td><td class="mono">—</td></tr>
+        <tr><td class="id">#26</td><td><span class="init">ディナー帯実績の棚卸し</span>(注文数・客単価・人気品・評価)<span class="why">#15の入力データ。クリティカルパス</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/6</td></tr>
+        <tr><td class="id">#15</td><td><span class="init">ランチデリバリーの損益分析</span>(手数料込みユニットエコノミクス)<span class="why">この試算が撤退基準割れなら解放を見送る</span></td><td class="st"><span class="chip c-gate">ゲート</span></td><td class="mono">7/8</td></tr>
+        <tr><td class="id">#16 #27</td><td><span class="init">ランチ専用メニュー設計 → ランチ帯解放</span><span class="why">30分放置テスト+専用価格。1人前で件数勝負</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="col-gate">#15次第</td></tr>
+        <tr><td class="id">#28</td><td><span class="init">Baton菓子店のUEストア稼働</span><span class="why">劣化なし・雨天無関係の純増「隠れた本命」。縮小解の起点</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/12</td></tr>
+        <tr><td class="id">#18</td><td><span class="init">ランチピークのデリバリーオペ設計</span>(同時受注上限・動線)</td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/9</td></tr>
+        <tr><td class="id">#19 #29</td><td><span class="init">UE内プロモ集中投下 / 雨の日おやつセット</span>(×Baton)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">—</td></tr>
+        <tr><td class="id">#20</td><td><span class="init">4週間レビュー</span>(注文数×貢献利益で継続/撤退)<span class="why">だらだら続けない撤退基準</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">8/14</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 柱C -->
+  <section>
+    <div class="shead"><span class="tag">柱C</span><h2>客単価アップと平日夜の埋め合わせ</h2><span class="role">方向③</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>施策</th><th>状態</th><th>期限</th></tr></thead>
+      <tbody>
+        <tr><td class="id">#10</td><td><span class="init">季節限定コース開発</span>(初夏食材+白ワインペアリング)<span class="why">「梅雨〜盛夏だから食べたいもの」を軸に</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/20</td></tr>
+        <tr><td class="id">#11</td><td><span class="init">エンタメコース(¥12,000)のB2B営業リスト10社</span><span class="why">企業の暑気払い・歓送迎需要=7月が商機</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/17</td></tr>
+        <tr><td class="id">#12</td><td><span class="init">雨の夜ワイン会/料理教室 月1</span><span class="why">「予約済みの予定」は雨でもキャンセルされにくい</span></td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">—</td></tr>
+        <tr><td class="id">#13</td><td><span class="init">常連向けサブスク/回数券</span>(柱Dリピート構造と重複)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">—</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 柱E -->
+  <section>
+    <div class="shead"><span class="tag">柱E</span><h2>Instagram広告(少額テスト→計測→スケール)</h2><span class="role">計測ドリブン</span></div>
+    <p class="snote">「いくら使うか」ではなく<b>「予約1件をいくらで買えるか(CPA)」で管理</b>。ターゲットは店舗半径3〜5km・25〜54歳(商圏外に配信しない=飲食店広告の最重要設定)。</p>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>施策</th><th>状態</th><th>期限</th></tr></thead>
+      <tbody>
+        <tr><td class="id">#21</td><td><span class="init">Meta広告アカウント設定</span>(IGプロアカウント確認含む)</td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/9</td></tr>
+        <tr><td class="id">#22</td><td><span class="init">クリエイティブ2種制作</span>(料理リール動画+静止画のA/B)</td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/12</td></tr>
+        <tr><td class="id">#23</td><td><span class="init">少額テスト配信</span>(日予算¥1,000〜2,000 × 2週=総額¥1.5〜3万)</td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/13</td></tr>
+        <tr><td class="id">#24</td><td><span class="init">効果測定とスケール判断</span>(CPM/CTR/予約CPA)<span class="why">スケール条件: 予約CPA ≦ 客単価×粗利率×リピート回数。効かなければ先にクリエイティブを疑う</span></td><td class="st"><span class="chip c-plan">計画</span></td><td class="mono">7/27</td></tr>
+        <tr><td class="id">#25</td><td><span class="init">雨予報日の広告ブースト</span>ルール化(柱Aと連動)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">—</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 柱F -->
+  <section>
+    <div class="shead"><span class="tag">柱F</span><h2>脱・薄利多売の収益構造改革</h2><span class="role">構想 / 中期</span></div>
+    <p class="snote">席数×回転×単価の天井の<b>外側</b>に収益軸をつくる中期構想。利益と社会的恩恵の両立を選定基準に。全案 <span class="mono">kind=idea</span> でトリアージ待ち。原典: <span class="mono">beyond-restaurant-ideas.md</span>。</p>
+    <div class="tw"><table>
+      <thead><tr><th>ID</th><th>アイデア</th><th>状態</th><th>優先(私案)</th></tr></thead>
+      <tbody>
+        <tr><td class="id">#30</td><td><span class="init">ダズンクラブ</span>(回数券12+1/月額会員)<span class="why">店名の由来 baker's dozen を直訳。キャッシュフロー先取り</span></td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">high(今月・投資ほぼ0)</td></tr>
+        <tr><td class="id">#31</td><td><span class="init">パティシエ直伝教室</span>(8月の親子菓子教室)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">high(今月告知)</td></tr>
+        <tr><td class="id">#32</td><td><span class="init">ふるさと納税返礼品</span>(焼き菓子・ソース/沼津市)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">medium(今夏)</td></tr>
+        <tr><td class="id">#33</td><td><span class="init">駿河湾コラボディナー</span>(生産者連携・前売り制)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">medium(今夏)</td></tr>
+        <tr><td class="id">#34</td><td><span class="init">「13個目のおすそわけ」</span>(サスペンデッドミール)</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">medium(秋)</td></tr>
+        <tr><td class="id">#35</td><td><span class="init">YouTube×焼き菓子通販</span>のオンライン展開</td><td class="st"><span class="chip c-idea">検討</span></td><td class="mono">low(中期)</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 来年構想 -->
+  <section>
+    <div class="shead"><span class="tag">来年</span><h2>来年に向けた構想(基準日時点で保留)</h2><span class="role">2027 / concept</span></div>
+    <div class="tw"><table>
+      <thead><tr><th>区分</th><th>構想</th><th>状態</th><th>要検証の点</th></tr></thead>
+      <tbody>
+        <tr><td class="id">夏祭り</td><td><span class="init">昼ランチのみ営業+夜は外売り</span><span class="why">祭りの人流を屋台形式で売上化。昼を絞り夜の仕込みに人員集中</span></td><td class="st"><span class="chip c-concept">構想</span></td><td class="mono">保健所許可 / 品目 / 告知</td></tr>
+        <tr><td class="id">ランチ</td><td><span class="init">ビュッフェスタイルの試運転</span>(単価¥2,000〜3,000)<span class="why">焼きたてパン・カットピザ・一品を店員が回って提供</span></td><td class="st"><span class="chip c-concept">構想</span></td><td class="mono">沼津のランチ単価需要 / 食材ロス / 人件費削減は限定的</td></tr>
+        <tr><td class="id">効率化</td><td><span class="init">業務効率化ツール導入</span>(Airレジ/メイト/シフト+自作レイヤー)<span class="why">売上・レジ締め自動化 / 売上連動シフト。提案書を別途作成済み</span></td><td class="st"><span class="chip c-concept">構想</span></td><td class="mono">STEP1承認 / 自作工数・費用未見積り</td></tr>
+        <tr><td class="id">効率化</td><td><span class="init">LINE交渉エージェント</span>(不足日のシフト打診)<span class="why">オーナー指示で構想段階に留置(2026-08-25)</span></td><td class="st"><span class="chip c-concept">構想</span></td><td class="mono">公式アカウント方式 / 承認フロー / 労務同意</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- KPI -->
+  <section>
+    <div class="shead"><span class="tag">KPI</span><h2>目標指標</h2><span class="role">※現状値は棚卸し後に確定</span></div>
+    <div class="tw"><table class="kpi">
+      <thead><tr><th>KPI</th><th>現状</th><th>目標(7月末)</th><th>計測</th></tr></thead>
+      <tbody>
+        <tr><td>月商</td><td class="now">棚卸しで確定 <span class="warnflag">未取得</span></td><td class="goal">前年同月比 +10%</td><td class="mono">レジ締め</td></tr>
+        <tr><td>雨天日の1日平均売上</td><td class="now">棚卸しで確定 <span class="warnflag">未取得</span></td><td class="goal">晴天日の80%以上</td><td class="mono">天候×日次売上</td></tr>
+        <tr><td>テイクアウト売上比率</td><td class="now">0%</td><td class="goal">5%</td><td class="mono">会計区分</td></tr>
+        <tr><td>Uber Eats注文数(全帯)</td><td class="now">0.2件/日(6月実測)</td><td class="goal">3件/日 → 8月末5件</td><td class="mono">UE管理画面</td></tr>
+        <tr><td>デリバリー貢献利益/月</td><td class="now">約0.8万円(試算)</td><td class="goal">5万円 → 8月末9万円</td><td class="mono">手取り−原価−包材</td></tr>
+        <tr><td>B2B見込み商談数</td><td class="now">0</td><td class="goal">3件</td><td class="mono">営業リスト</td></tr>
+        <tr><td>LINE/SNS登録者</td><td class="now">要確認</td><td class="goal">+100人</td><td class="mono">各管理画面</td></tr>
+        <tr><td>IG広告の予約CPA</td><td class="now">—</td><td class="goal">目安 ¥2,000以下</td><td class="mono">広告マネージャ+予約台帳</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 監査論点 -->
+  <section>
+    <div class="shead"><span class="tag">監査</span><h2>監査上の論点(未検証の前提とリスク)</h2><span class="role">レビューで突くべき点</span></div>
+    <p class="snote">戦略が「筋が通っているか」ではなく「<b>何に依存していて、どこが未確認か</b>」を並べた。着手前にここを潰すのが監査の主眼。</p>
+    <div class="findings">
+      <div class="finding"><span class="sev hi">HIGH · A-1</span><div><h4>中心仮説がデータ未検証</h4><p>「売上減の主因=来店動機低下(質ではない)」と断定し、柱A全体がこの仮説に依存。だが過去2年6〜7月の売上棚卸し(#5)は未完で、天候と客数・客単価の相関は未確認。土台が仮説のまま各施策が走っている。</p><span class="ref">→ #5 を全施策の事前条件に格上げすべき</span></div></div>
+      <div class="finding"><span class="sev hi">HIGH · KPI</span><div><h4>KPIベースライン未取得のまま目標を設定</h4><p>月商・雨天日売上など主要KPIの現状値が「棚卸しで確定」のまま。効果測定の基準線が無く、+10%等の目標も仮。デリバリー貢献利益 0.8万→9万(11倍)は露出改善を前提にした楽観値の可能性。</p><span class="ref">→ 目標は #5 完了後に必ず再設定(戦略ドキュメントにも明記あり)</span></div></div>
+      <div class="finding"><span class="sev hi">HIGH · 実行</span><div><h4>7月に施策が同時多発、実行キャパの担保が不明</h4><p>Phase 1〜4(雨の日導線・テイクアウト・UE・IG広告)を同月に並行。小規模店の実行主体(オーナー・厨房)の工数上限に対する割り当てが定義されていない。優先順位付けと「誰がやるか」が抜けると全部が中途になるリスク。</p><span class="ref">→ 週次レビュー(#14)で inbox を捌く運用はあるが、キャパ制約の可視化が必要</span></div></div>
+      <div class="finding"><span class="sev md">MED · B-2</span><div><h4>デリバリー手数料35%は「想定値」</h4><p>ユニットエコノミクス(#15)とゲート判断が手数料35%前提。実契約料率が異なればゲートの結論が変わる。クリティカルパスが棚卸し2件(#5, #26)に集中している依存構造も注意。</p><span class="ref">→ 実料率で #15 を再検算してから解放可否を確定</span></div></div>
+      <div class="finding"><span class="sev md">MED · B-2</span><div><h4>露出量の改善は仮説</h4><p>0.2件/日という低露出の主因を「営業時間窓の狭さ」と置き、窓拡大で改善を見込む。だがアルゴリズム依存で不確実。改善しない場合の代替(プロモ投下#19の効果次第)も検証が必要。</p><span class="ref">→ #20 の4週間レビューを厳格に適用</span></div></div>
+      <div class="finding"><span class="sev md">MED · 構想</span><div><h4>ランチビュッフェ: 人件費削減効果は限定的・単価需要は未検証</h4><p>「回って提供」方式はホール人件費を大きくは下げない(削減の本丸は厨房)。かつ単価¥2,000〜3,000が沼津の平日ランチで通るかは未検証。構想メモには明記済みだが、試運転で数字を取るまで前提。</p><span class="ref">→ 試運転(週1・予約制)で原価率・人件費・客単価を実測</span></div></div>
+      <div class="finding"><span class="sev md">MED · 撤退基準</span><div><h4>撤退/見送り基準がある施策と無い施策が混在</h4><p>デリバリー(#20)と広告(#24)には明確な撤退基準があるが、テイクアウト・イベント・柱Fの各案には成功/撤退の閾値が未設定。「だらだら続けない」原則を全施策に適用すべき。</p><span class="ref">→ トリアージ時に各案へ撤退条件を付与</span></div></div>
+      <div class="finding"><span class="sev lo">LOW · 費用</span><div><h4>効率化ツールの費用・工数が未見積り</h4><p>Airシフト有料プラン料金が未確認、自作レイヤー(補正・売掛台帳/シフト提案)の開発工数も未算定。STEP1(無料設定)は低リスクだが、STEP2以降は投資判断の材料が揃っていない。</p><span class="ref">→ STEP1効果を見てから STEP2/3 を見積り</span></div></div>
+    </div>
+  </section>
+
+  <!-- 意思決定ログ -->
+  <section>
+    <div class="shead"><span class="tag">意思決定</span><h2>意思決定ログ</h2><span class="role">確定 / 保留中</span></div>
+    <div class="dcols">
+      <div class="dcard decided">
+        <h3>確定済み <span class="mono">decided</span></h3>
+        <ul>
+          <li>Uber Eatsは<b>ディナー非混雑帯のみ稼働</b>とする<span class="d">2026-07-03</span></li>
+          <li>ランチ帯解放は<b>#15試算をゲート</b>とし、導入時も<b>Baton焼き菓子のみの縮小解を優先</b><span class="d">2026-07-04</span></li>
+          <li>LINE交渉エージェントは<b>構想段階に留置</b>(着手しない)<span class="d">2026-08-25</span></li>
+        </ul>
+      </div>
+      <div class="dcard pending">
+        <h3>要判断 <span class="mono">pending</span></h3>
+        <ul>
+          <li>全 inbox タスク/idea の<b>トリアージ</b>(着手/見送り/保留)</li>
+          <li>ランチ<b>ビュッフェ試運転</b>の可否と条件(曜日・価格・席数)</li>
+          <li>効率化ツール<b>STEP1(無料設定)の承認</b></li>
+          <li>柱F各案(ダズンクラブ・教室など)の<b>今月着手分の選定</b></li>
+          <li>夏祭り運用は<b>来年の梅雨明け前</b>に判断</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- やらないこと -->
+  <section>
+    <div class="shead"><span class="tag">除外</span><h2>やらないことの明確化</h2><span class="role">スコープ外</span></div>
+    <div class="exclude"><ul>
+      <li>値引き一辺倒の集客(ブランド毀損・利益率悪化)</li>
+      <li>ユニットエコノミクス検算なしのデリバリー本格展開(手数料前提の専用価格・4週テスト・撤退基準をセットで運用)</li>
+      <li>計測なしの広告増額(CPAが取れる前に日予算を上げない。先にクリエイティブを差し替える)</li>
+      <li>梅雨だけの一時しのぎへの過剰投資(8月の猛暑も来店抑制要因 —— <b>天候に強い売上構造</b>を作るのが本丸)</li>
+    </ul></div>
+  </section>
+
+  <div class="foot">
+    本サマリーは監査(第三者レビュー)用の統合要約。原典は <span class="mono">docs/trattoria/</span> の各ドキュメントと <span class="mono">supabase/migrations/</span> のシード(KofPro LifeLog 投入済み・全 status=inbox)。
+    施策IDは KofPro のタスク番号に対応。状態区分は本基準日(<span class="mono">2026-08-25</span>)時点の解釈であり、トリアージ・棚卸しの進行で変わる。数値・料率・需要の各前提は上記「監査上の論点」の通り未確定を含む。
+  </div>
+
+</div>
+
+</body>
+</html>
