@@ -7,6 +7,7 @@ export type EffortSize = 'quick' | 'short' | 'deep'
 // Table row types
 export interface Area {
   id: string
+  user_id: string
   slug: string
   name: string
   color: string | null
@@ -16,6 +17,7 @@ export interface Area {
 
 export interface Project {
   id: string
+  user_id: string
   area_id: string | null
   title: string
   description: string | null
@@ -26,6 +28,7 @@ export interface Project {
 
 export interface Entry {
   id: string
+  user_id: string
   kind: EntryKind
   title: string
   body: string | null
@@ -88,6 +91,7 @@ export type Database = {
         Row: Entry
         Insert: {
           id?: string
+          user_id?: string
           kind?: EntryKind
           title: string
           body?: string | null
@@ -108,12 +112,12 @@ export type Database = {
       }
       areas: {
         Row: Area
-        Insert: Omit<Area, 'id' | 'created_at'> & { id?: string }
+        Insert: Omit<Area, 'id' | 'user_id' | 'created_at'> & { id?: string; user_id?: string }
         Update: Partial<Area>
       }
       projects: {
         Row: Project
-        Insert: Omit<Project, 'id' | 'created_at' | 'updated_at'> & { id?: string }
+        Insert: Omit<Project, 'id' | 'user_id' | 'created_at' | 'updated_at'> & { id?: string; user_id?: string }
         Update: Partial<Project>
       }
     }

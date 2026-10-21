@@ -41,6 +41,17 @@ supabase db push
 > 拡張が必要な場合は `entries.metadata` (jsonb) を使うか、  
 > `supabase/migrations/` に新しいファイルを追加してください。
 
+#### RLS 強化マイグレーション（`20261021000000_rls_owner_scope.sql`）
+
+各データをログイン本人だけが読み書きできるようにするマイグレーション。既存データはこの時点で最初に登録されたユーザーに割り当てられるため、**先にアプリで一度ログインしてから**適用すること。
+
+1. アプリを起動し、メールのログインリンクでログインする（初回はユーザーが自動作成される）
+2. SQL Editor で `20261021000000_rls_owner_scope.sql` を実行
+3. 自分以外が登録できないよう、Dashboard → **Authentication → Sign In / Providers** で「Allow new users to sign up」をオフにする
+4. Dashboard → **Authentication → URL Configuration** の Site URL / Redirect URLs にアプリの URL を登録する
+
+> service_role（Supabase MCP 等）で `entries` などに INSERT する場合は `user_id` を明示的に指定すること。
+
 ### 3. 環境変数
 
 ```bash
