@@ -50,20 +50,20 @@ export default function TriageCard({ entry, onTriaged }: Props) {
 
   return (
     <>
-      <article className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <article className="bg-white rounded-lg border border-gray-200 p-4 shadow-xs">
         {/* header row */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+            <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-sm">
               {KIND_LABELS[entry.kind] ?? entry.kind}
             </span>
             {entry.priority && (
-              <span className={`text-xs px-2 py-0.5 rounded ${PRIORITY_CLS[entry.priority]}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-sm ${PRIORITY_CLS[entry.priority]}`}>
                 {entry.priority}
               </span>
             )}
             {entry.effort && (
-              <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded">
+              <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded-sm">
                 {EFFORT_LABELS[entry.effort] ?? entry.effort}
               </span>
             )}
@@ -98,21 +98,21 @@ export default function TriageCard({ entry, onTriaged }: Props) {
           <button
             onClick={() => setShowModal(true)}
             disabled={loading}
-            className="flex-1 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-40"
+            className="flex-1 py-1.5 text-xs bg-green-600 text-white rounded-sm hover:bg-green-700 disabled:opacity-40"
           >
             着手
           </button>
           <button
             onClick={() => applyStatus('declined')}
             disabled={loading}
-            className="flex-1 py-1.5 text-xs bg-red-50 text-red-700 rounded hover:bg-red-100 disabled:opacity-40"
+            className="flex-1 py-1.5 text-xs bg-red-50 text-red-700 rounded-sm hover:bg-red-100 disabled:opacity-40"
           >
             見送り
           </button>
           <button
             onClick={() => applyStatus('someday')}
             disabled={loading}
-            className="flex-1 py-1.5 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 disabled:opacity-40"
+            className="flex-1 py-1.5 text-xs bg-gray-100 text-gray-600 rounded-sm hover:bg-gray-200 disabled:opacity-40"
           >
             保留
           </button>

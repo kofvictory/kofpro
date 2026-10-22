@@ -5,7 +5,7 @@ export type PriorityLevel = 'low' | 'medium' | 'high' | 'urgent'
 export type EffortSize = 'quick' | 'short' | 'deep'
 
 // Table row types
-export interface Area {
+export type Area = {
   id: string
   user_id: string
   slug: string
@@ -15,7 +15,7 @@ export interface Area {
   created_at: string
 }
 
-export interface Project {
+export type Project = {
   id: string
   user_id: string
   area_id: string | null
@@ -26,7 +26,7 @@ export interface Project {
   updated_at: string
 }
 
-export interface Entry {
+export type Entry = {
   id: string
   user_id: string
   kind: EntryKind
@@ -50,7 +50,7 @@ export interface Entry {
 }
 
 // View row types — match exactly the SELECT columns in the SQL views
-export interface InboxView {
+export type InboxView = {
   id: string
   kind: EntryKind
   title: string
@@ -63,7 +63,7 @@ export interface InboxView {
   created_at: string
 }
 
-export interface ActiveView {
+export type ActiveView = {
   id: string
   kind: EntryKind
   title: string
@@ -74,7 +74,7 @@ export interface ActiveView {
   due_at: string | null
 }
 
-export interface TodayView {
+export type TodayView = {
   id: string
   title: string
   next_action: string | null
@@ -109,22 +109,25 @@ export type Database = {
           created_by?: string
         }
         Update: Partial<Entry>
+        Relationships: []
       }
       areas: {
         Row: Area
         Insert: Omit<Area, 'id' | 'user_id' | 'created_at'> & { id?: string; user_id?: string }
         Update: Partial<Area>
+        Relationships: []
       }
       projects: {
         Row: Project
         Insert: Omit<Project, 'id' | 'user_id' | 'created_at' | 'updated_at'> & { id?: string; user_id?: string }
         Update: Partial<Project>
+        Relationships: []
       }
     }
     Views: {
-      inbox_view: { Row: InboxView }
-      active_view: { Row: ActiveView }
-      today_view: { Row: TodayView }
+      inbox_view: { Row: InboxView; Relationships: [] }
+      active_view: { Row: ActiveView; Relationships: [] }
+      today_view: { Row: TodayView; Relationships: [] }
     }
     Functions: Record<string, never>
     Enums: {
@@ -133,5 +136,6 @@ export type Database = {
       priority_level: PriorityLevel
       effort_size: EffortSize
     }
+    CompositeTypes: Record<string, never>
   }
 }

@@ -42,7 +42,7 @@ export default function TodayPage() {
       {entries.map(entry => (
         <article
           key={entry.id}
-          className="bg-white rounded-lg border border-gray-200 border-l-4 border-l-orange-400 p-4 shadow-sm"
+          className="bg-white rounded-lg border border-gray-200 border-l-4 border-l-orange-400 p-4 shadow-xs"
         >
           <div className="flex items-center justify-between mb-1">
             {entry.due_at && (

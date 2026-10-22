@@ -45,10 +45,10 @@ export default function ActivePage() {
     <div className="space-y-3 pb-10">
       <p className="text-xs text-gray-400">{entries.length} 件 — 着手中</p>
       {entries.map(entry => (
-        <article key={entry.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <article key={entry.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-xs">
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+              <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-sm">
                 {KIND_LABELS[entry.kind] ?? entry.kind}
               </span>
               {entry.priority && (

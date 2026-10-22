@@ -32,7 +32,7 @@ export default function QuickCapture() {
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="クイックキャプチャ — タイトルだけで inbox に追加"
-        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         disabled={loading}
       />
       <button

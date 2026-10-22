@@ -28,7 +28,7 @@ export default function NextActionModal({ entryTitle, onConfirm, onCancel }: Pro
           value={nextAction}
           onChange={e => setNextAction(e.target.value)}
           placeholder="次に具体的にやること（例: 仕入れ先にメールする）"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-hidden focus:ring-2 focus:ring-green-500 resize-none"
           rows={3}
           autoFocus
         />
